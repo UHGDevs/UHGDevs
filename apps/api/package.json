@@ -1,0 +1,11 @@
+{
+  "name": "uhg-api",
+  "version": "0.0.0",
+  "description": "Hypixel API handler for UHG",
+  "main": "./src/index.js",
+  "dependencies": {
+    "@discordjs/collection": "^0.5.0",
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.7"
+  }
+}
