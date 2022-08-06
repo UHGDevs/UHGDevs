@@ -6,17 +6,18 @@ const EventEmitter = require('events').EventEmitter
 module.exports = class Functions extends EventEmitter {
   constructor() {
     super()
-    //this.getApi = require("../utils/api")
+    this.getApi = require("../utils/api")
   }
 
-  //getDiscordIds() {return JSON.parse(fs.readFileSync('settings/discord.json', 'utf8'));}
+  getDiscordIds() {return JSON.parse(fs.readFileSync('settings/discord.json', 'utf8'));}
 
   delay(ms) {return new Promise(res => setTimeout(res, ms))}
 
   clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
 
   capitalize(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    if (!string) return string
+    return String(string)[0].toUpperCase() + String(string).slice(1);
   }
 
   startsWithArray(str, array) {
@@ -387,92 +388,104 @@ module.exports = class Functions extends EventEmitter {
   }
 
   getCrimson(quests = []) {
-    let fancyquests = []
-    for (let i in quests) {
-      let quest = quests[i].split("_")
-      let quantity = 1
-      let rarity = (quest[quest.length-1]).toUpperCase()
-      if (quest[2] == "kill") {
-        let boss;
-        if (rarity == "A") quantity = 2
-        else if (rarity == "S") quantity = 3
-        switch (quest[3]) {
-          case "ashfang":
-            boss = "Ashfang"
-            break
-          case "bladesoul":
-            boss = "Bladesoul"
-            break
-          case "magma":
-            boss = "Magma Boss"
-            break
-          case "barbarian":
-            boss = "Barbarian Duke X"
-            break
-          case "mage":
-            boss = "Mage Outlaw"
-            break
+    if (quests.length) {
+      let fancyquests = []
+      for (let i in quests) {
+        let quest = quests[i].split("_")
+        let quantity = 1
+        let rarity = (quest[quest.length-1]).toUpperCase()
+        if (quest[2] == "kill") {
+          let boss;
+          if (rarity == "A") quantity = 2
+          else if (rarity == "S") quantity = 3
+          switch (quest[3]) {
+            case "ashfang":
+              boss = "Ashfang"
+              break
+            case "bladesoul":
+              boss = "Bladesoul"
+              break
+            case "magma":
+              boss = "Magma Boss"
+              break
+            case "barbarian":
+              boss = "Barbarian Duke X"
+              break
+            case "mage":
+              boss = "Mage Outlaw"
+              break
+          }
+          fancyquests.push(`(${rarity}) ${quantity}x ${boss}`)
         }
-        fancyquests.push(`(${rarity}) ${quantity}x ${boss}`)
-      }
-      else if (quest[2] == "fight") {
-        let type;
-        switch (quest[4]) {
-          default:
-            type = "Basic"
-            break
-          case "hot":
-            type = "Hot"
-            break
-          case "burning":
-            type = "Burning"
-            break
-          case "fiery":
-            type = "Fiery"
-          case "infernal":
-            type = "Infernal"
+        else if (quest[2] == "fight") {
+          let type;
+          switch (quest[4]) {
+            default:
+              type = "Basic"
+              break
+            case "hot":
+              type = "Hot"
+              break
+            case "burning":
+              type = "Burning"
+              break
+            case "fiery":
+              type = "Fiery"
+            case "infernal":
+              type = "Infernal"
+          }
+          fancyquests.push(`(${rarity}) ${type} Kuudra`)
         }
-        fancyquests.push(`(${rarity}) ${type} Kuudra`)
-      }
-      else if (quest[2] == "dojo") {
-        let type;
-        let difficulty = (quest[quest.length-2])[0].toUpperCase()
-        switch (quest[5]) {
-          case "snake":
-            type = "Swiftness"
-            break
-          case "archer":
-            type = "Mastery"
-            break
-          case "sword":
-            type = "Discipline"
-            break
-          case "wall":
-            type = "Stamina"
-            break
-          case "mob":
-            type = "Force"
-            break
-          case "fireball":
-            type = "Tenacity"
-            break
-          default:
-            type = "Control"
-            break
+        else if (quest[2] == "dojo") {
+          let type;
+          let difficulty = (quest[quest.length-2])[0].toUpperCase()
+          switch (quest[5]) {
+            case "snake":
+              type = "Swiftness"
+              break
+            case "archer":
+              type = "Mastery"
+              break
+            case "sword":
+              type = "Discipline"
+              break
+            case "wall":
+              type = "Stamina"
+              break
+            case "mob":
+              type = "Force"
+              break
+            case "fireball":
+              type = "Tenacity"
+              break
+            default:
+              type = "Control"
+              break
+          }
+          fancyquests.push(`(${rarity}) ${type} Rank ${difficulty}`)
         }
-        fancyquests.push(`(${rarity}) ${type} Rank ${difficulty}`)
+        else if (quest[2] == "rescue") fancyquests.push(`(${rarity}) Rescue Mission`)
+        else if (quest[2] == "fetch") {
+          let material = quest[3].charAt(0).toUpperCase() + quest[3].slice(1)
+          //WIP
+          fancyquests.push(`(${rarity}) undefinedx ${material}`)
+        }
+        else if (quest[2]) {
+          fancyquests.push(`(${rarity}) undefinedx ${quest[2].charAt(0).toUpperCase() + quest[2].slice(1)}`)
+        } //WIP
       }
-      else if (quest[2] == "rescue") fancyquests.push(`(${rarity}) Rescue Mission`)
-      else if (quest[2] == "fetch") {
-        let material = quest[3].charAt(0).toUpperCase() + quest[3].slice(1)
-        //WIP
-        fancyquests.push(`(${rarity}) undefinedx ${material}`)
-      }
-      else if (quest[2]) {
-        fancyquests.push(`(${rarity}) undefinedx ${quest[2].charAt(0).toUpperCase() + quest[2].slice(1)}`)
-      } //WIP
+      return fancyquests
+    } return "None"
+  }
+
+  getSpeedUHCPerk(perk) {
+    if (!perk || perk == "None") return "None"
+    perk = perk.split("_")
+    perk.shift()
+    for (let i in perk) {
+      perk[i] = this.capitalize(perk[i]);
     }
-    return fancyquests
+    return perk.join(' ')
   }
 
   getRank(json) {
@@ -735,6 +748,59 @@ module.exports = class Functions extends EventEmitter {
         .replace(/murder_assassins/g, "Murder Mystery Assassins")
 
         .replaceAll(/_/g, " ")
+  }
+
+  getGameplayers(game) {
+    if (!game) return
+    return game.toLowerCase()
+      .replace("_", "")
+
+      .replace("megasw", "SKYWARS_MEGA")
+      .replace("skywarsmega", "SKYWARS_MEGA")
+      .replace("megaskywars", "SKYWARS_MEGA")
+      .replace("swmega", "SKYWARS_MEGA")
+      .replace("mega", "SKYWARS_MEGA")
+      .replace("SKYWARS_MEGA", "skywars_mega")
+
+      .replace("pb", "LEGACY_PAINTBALL")
+      .replace("paintball", "LEGACY_PAINTBALL")
+      .replace("LEGACY_PAINTBALL", "legacy_paintball")
+
+      .replace("tkr", "LEGACY_TKR")
+      .replace("turbokartracers", "LEGACY_TKR")
+      .replace("LEGACY_TKR", "legacy_tkr")
+
+      .replace("arena", "LEGACY_ARENA")
+      .replace("ab", "LEGACY_ARENA")
+      .replace("arenabrawl", "LEGACY_ARENA")
+      .replace("brawl", "LEGACY_ARENA")
+      .replace("LEGACY_ARENA", "legacy_arena")
+
+      .replace("quake", "LEGACY_QUAKE")
+      .replace("qc", "LEGACY_QUAKE")
+      .replace("quakecraft", "LEGACY_QUAKE")
+      .replace("LEGACY_QUAKE", "legacy_quake")
+
+      .replace("thewalls", "LEGACY_WALLS")
+      .replace("walls", "LEGACY_WALLS")
+      .replace("LEGACY_WALLS", "legacy_walls")
+
+      .replace("vz", "LEGACY_VAMPIREZ")
+      .replace("vampirez", "LEGACY_VAMPIREZ")
+      .replace("vampires", "LEGACY_VAMPIREZ")
+      .replace("vampire", "LEGACY_VAMPIREZ")
+      .replace("LEGACY_VAMPIREZ", "legacy_vampirez")
+
+      .replace("ssh", "SUPERSMASH")
+      .replace("supersmashheroes", "SUPERSMASH")
+      .replace("SUPERSMASH", "supersmash")
+
+      .replace("megawalls", "MW")
+      .replace("MW", "mw")
+
+      .replace("pixelparty", "PROTOTYPE_PIXELPARTY")
+      .replace("pp", "PROTOTYPE_PIXELPARTY")
+      .replace("PROTOTYPE_PIXELPARTY", "prototype_pixelparty")
   }
 
   /* ANTI DISCORD CHAT FORMATTING */

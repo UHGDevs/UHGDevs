@@ -1,0 +1,23 @@
+.container {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+div {
+    position: absolute
+}
+
+.name {
+    bottom: 80px;
+    left: 800px;
+    font-size: 300%;
+    color: #CDBFA4;
+}
+
+.rank {
+    bottom: 60px;
+    left: 800px;
+    font-size: 150%;
+    color:rgb(255, 8, 0)
+}

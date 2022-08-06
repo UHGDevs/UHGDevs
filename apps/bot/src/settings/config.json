@@ -1,1 +1,19 @@
-{}
+{
+    "prefix": ",",
+    "minecraft": false,
+    "test": false,
+    "deleteverify": true,
+    "time": {
+        "loot": false,
+        "database": false,
+        "finder": false,
+        "elites": false,
+        "guildinfo": false,
+        "uhgrole": false,
+        "sniper": false,
+        "bwroles": false,
+        "legacyaps": false,
+        "gameplayers": false
+    },
+    "dev_mode": true
+}
