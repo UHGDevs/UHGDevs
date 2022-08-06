@@ -2,32 +2,47 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
 async function run(mode = 'profile', api = {}) {
-  let canvas = new Canvas(805, 540);
-  let ctx = canvas.getContext("2d");
-  FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
-  //FontLibrary.use(["../canvas/src/fonts/"])
+   let canvas = new Canvas(805, 540);
+   let ctx = canvas.getContext("2d");
 
-  let username = api.username
-  let rank = '[' + api.rank + ']'
+   /* FONTS */
+   FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
+   //FontLibrary.use(["../canvas/src/fonts/"])
 
-  let profile = api.prefix
-  
-  let usernamecolor = "#fcba03"
+   /* HANDLE API ERROR */
+   if (!api.success) {
+      'return neplatne jmeno nebo jiny duvod'
+      console.log(api.reason)
+      return null
+   }
 
-  let img = await loadImage('../canvas/src/templates/profile.png')
-  ctx.drawImage(img, 0, 0, 805, 540)
+   /* DEFINE BASIC HYPIXEL STATS */
+   /* needs error handlering */
+   let username = api.username
+   let prefix = api.hypixel.prefix
+   let rank = api.hypixel.rank
+   let rankcolor = api.hypixel.color
 
-  ctx.font = '30px Minecraft'
-  ctx.fillStyle = usernamecolor
-  ctx.textAlign = 'center'
-  ctx.fillText(profile, 150 + 320, 43)
-  
-  await canvas.saveAs(`../canvas/src//results/${username}.png`)
-  let toDiscord = await canvas.toBuffer()
-  return {
-   attachment: toDiscord,
-   name: `${username}_profile.png`
-}
+   let usernamecolor = "#fcba03"
+
+   /* STAT TO SHOW */
+   let img = await loadImage(`../canvas/src/templates/${mode}.png`)
+   ctx.drawImage(img, 0, 0, 805, 540) // mozna pak udělat jine velikosti?
+
+   
+   // TADY potom ten text, který jeste nevíme jak (musí se rozdělit podle gamemodu)
+   ctx.textAlign = 'center'
+   ctx.font = '30px Minecraft'
+   ctx.fillStyle = usernamecolor
+   ctx.fillText(prefix, 150 + 320, 43)
+
+   //await canvas.saveAs(`../canvas/src//results/${username}_${mode}.png`)
+   let toDiscord = await canvas.toBuffer()
+   return {
+      attachment: toDiscord,
+      name: `${username}_${mode}.png`
+   }
+   // Also to username_mode pak budem jeste menit
 }
 
 exports.run = run
