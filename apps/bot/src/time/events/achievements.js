@@ -17,8 +17,8 @@ module.exports = {
     let event = time.start(uhg, eventName)
     try {
         let api = await axios.get('https://api.hypixel.net/resources/achievements')
-        let json = JSON.parse(fs.readFileSync('settings/values/achievements.json', 'utf8'))
-        fs.writeFileSync('settings/values/achievements.json', JSON.stringify({all: api.data.achievements, legacy: await aps.getLegacy(uhg, api.data.achievements)}, null, 4))
+        let json = JSON.parse(fs.readFileSync('src/settings/values/achievements.json', 'utf8'))
+        fs.writeFileSync('src/settings/values/achievements.json', JSON.stringify({all: api.data.achievements, legacy: await aps.getLegacy(uhg, api.data.achievements)}, null, 4))
     } catch(e) {
       if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
       else console.log(String(e.stack).bgRed + 'Time error v2');

@@ -3,7 +3,7 @@ const cron = require('cron');
 module.exports = async (uhg) => {
   let running = 0;
   let events = []
-  const files = fs.readdirSync(`time/events`).filter((file) => file.endsWith(".js"));
+  const files = fs.readdirSync(`src/time/events`).filter((file) => file.endsWith(".js"));
   for (const file of files) {
     let pull = require(`./events/${file}`)
     uhg.time.ready[pull.name]=true

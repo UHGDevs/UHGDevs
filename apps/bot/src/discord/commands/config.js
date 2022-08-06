@@ -57,7 +57,7 @@ module.exports = {
         settings.time[item] = task
       }
 
-      await fs.writeFile('settings/config.json', JSON.stringify(settings, null, 4), 'utf8', data =>{})
+      await fs.writeFile('src/settings/config.json', JSON.stringify(settings, null, 4), 'utf8', data =>{})
 
       return 'DONE'
     } catch (e) {

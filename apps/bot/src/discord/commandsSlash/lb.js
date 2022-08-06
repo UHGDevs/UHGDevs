@@ -132,9 +132,9 @@ module.exports = {
         embeds.push(embed)
       }
 
-      let cache = JSON.parse(fs.readFileSync('settings/cache/lb.json', 'utf8'));
+      let cache = JSON.parse(fs.readFileSync('src/settings/cache/lb.json', 'utf8'));
       cache[title] = embeds
-      await fs.writeFile('settings/cache/lb.json', JSON.stringify(cache, null, 4), 'utf8', data =>{})
+      await fs.writeFile('src/settings/cache/lb.json', JSON.stringify(cache, null, 4), 'utf8', data =>{})
 
       await interaction.editReply({ embeds: [embeds[0]], components: [buttons] })
     } catch (e) {

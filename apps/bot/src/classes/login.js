@@ -12,7 +12,7 @@ class Login extends Functions {
     this.ignore = []
     this.data = {guild:[], verify:[], stats:[], uhg:[]}
     this.cache = {guildjoin: new Collection()}
-    this.time = {events: new Collection(), ready:JSON.parse(fs.readFileSync('settings/config.json', 'utf8')).time}
+    this.time = {events: new Collection(), ready:JSON.parse(fs.readFileSync('src/settings/config.json', 'utf8')).time}
     this.snipe = new Collection()
     this.info = {path: require.main.path + '/'}
     this.loot = {}
@@ -26,8 +26,9 @@ class Login extends Functions {
     require("../utils/client.js")(this)
     require("../time/handler.js")(this)
 
-    fs.watchFile('settings/config.json', (curr, prev) => this.reload(["settings"]));
-    fs.watchFile('settings/values/lootBoxes.js', (curr, prev) => this.reload(["loot"]));
+
+    fs.watchFile('src/settings/config.json', (curr, prev) => this.reload(["settings"]));
+    fs.watchFile('src/settings/values/lootBoxes.js', (curr, prev) => this.reload(["loot"]));
 
     setInterval(() => {
       this.reload(["mongo"])
@@ -51,7 +52,7 @@ class Login extends Functions {
     if (reload.includes("settings") || !reload.length) {
       let oldtime;
       if (this.settings) oldtime = this.settings.time
-      this.settings = JSON.parse(fs.readFileSync('settings/config.json', 'utf8'));
+      this.settings = JSON.parse(fs.readFileSync('src/settings/config.json', 'utf8'));
       if (oldtime) {
         try {
           Object.keys(this.settings.time).forEach(key => {
@@ -65,7 +66,7 @@ class Login extends Functions {
     }
 
     if (reload.includes("aps") || !reload.length) {
-      this.aps = JSON.parse(fs.readFileSync('settings/values/achievements.json', 'utf8'));
+      this.aps = JSON.parse(fs.readFileSync('src/settings/values/achievements.json', 'utf8'));
     }
 
     if (reload.includes("guild") || reload.includes("mongo") || !reload.length) {
@@ -102,7 +103,7 @@ class Login extends Functions {
 
     if (reload.includes("loot") || !reload.length ) {
       let req = Object.keys(require.cache).filter(n => n == require.main.path+'/settings/values/lootBoxes.js')
-      if (req.length) delete require.cache[req[0]]
+      if (req.length) delete require.cache[req[0]];
       let lootData = require('../settings/values/lootBoxes')
       this.loot.data = lootData 
     }

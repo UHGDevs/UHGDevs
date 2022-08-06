@@ -7,7 +7,7 @@ const znovu = new MessageEmbed().setTitle("ERROR").setDescription("Nepodařilo s
 module.exports = async (uhg, interaction) => {
   await interaction.update({ type:6 })
 
-  let embeds = JSON.parse(fs.readFileSync('settings/cache/gexp.json', 'utf8'));
+  let embeds = JSON.parse(fs.readFileSync('src/settings/cache/gexp.json', 'utf8'));
   let pages = embeds[interaction.message.embeds[0].title]
 
   if (!pages) return interaction.editReply({ embeds: [znovu], components: [] })

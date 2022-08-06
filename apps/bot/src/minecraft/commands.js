@@ -1,7 +1,7 @@
 const fs = require("fs");
 module.exports = (uhg) => {
     try {
-        const commands = fs.readdirSync(`minecraft/commands/`).filter((file) => file.endsWith(".js"));
+        const commands = fs.readdirSync(`src/minecraft/commands/`).filter((file) => file.endsWith(".js"));
         for (let file of commands) {
             let pull = require(`./commands/${file}`);
             if (pull.name) uhg.mc.commands.set(pull.name, pull);

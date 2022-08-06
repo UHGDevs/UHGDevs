@@ -36,7 +36,7 @@ module.exports = async (uhg, interaction) => {
     if (config.time[type]) embed.addField('**__Result__**', `**REJECTED**`).setColor('RED').addField('**__Reason__**', `${type} is already ENABLED`, false);
     else {
       config.time[type] = true
-      await fs.writeFile('settings/config.json', JSON.stringify(config, null, 4), 'utf8', data =>{})
+      await fs.writeFile('src/settings/config.json', JSON.stringify(config, null, 4), 'utf8', data =>{})
       embed.addField('**__Result__**', `**SUCCESS**\n${type} is now ENABLED`).setColor('GREEN')
     }
   } else if (action === 'false') {
@@ -46,7 +46,7 @@ module.exports = async (uhg, interaction) => {
     if (!config.time[type]) embed.addField('**__Result__**', `**REJECTED**`).setColor('RED').addField('**__Reason__**', `${type} is already DISABLED`, false);
     else {
       config.time[type] = false
-      await fs.writeFile('settings/config.json', JSON.stringify(config, null, 4), 'utf8', data =>{})
+      await fs.writeFile('src/settings/config.json', JSON.stringify(config, null, 4), 'utf8', data =>{})
       embed.addField('**__Result__**', `**SUCCESS**\n*${type} is now DISABLED*`).setColor('GREEN')
     }
   }

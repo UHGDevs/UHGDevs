@@ -91,7 +91,7 @@ module.exports = {
       if (period == 'm') title = `MĚSÍČNÍ GEXP - ${guild} - ${ft.m}. ${ft.y}`
       else if (period == 'w') title = `TÝDENNÍ GEXP - ${guild}`
 
-      let cache = JSON.parse(fs.readFileSync('settings/cache/gexp.json', 'utf8'));
+      let cache = JSON.parse(fs.readFileSync('src/settings/cache/gexp.json', 'utf8'));
       if (cache[title] && cache[title].length) interaction.editReply({ embeds:[cache[title][0]] })
 
       let data = await guildrefresh(uhg, guild)
@@ -180,9 +180,9 @@ module.exports = {
 
       await interaction.editReply({ embeds: [embeds[0]], components: [buttons] })
 
-      cache = JSON.parse(fs.readFileSync('settings/cache/gexp.json', 'utf8'));
+      cache = JSON.parse(fs.readFileSync('src/settings/cache/gexp.json', 'utf8'));
       cache[title] = embeds
-      await fs.writeFile('settings/cache/gexp.json', JSON.stringify(cache, null, 4), 'utf8', data =>{})
+      await fs.writeFile('src/settings/cache/gexp.json', JSON.stringify(cache, null, 4), 'utf8', data =>{})
 
     } catch (e) {
         console.log(String(e.stack).bgRed)

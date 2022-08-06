@@ -146,7 +146,7 @@ module.exports = async (uhg, packet) => {
   }
 
   if (pmsg.channel == "To") return
-  let chats = fs.readdirSync(`minecraft/chats/`).filter((file) => file.endsWith(".js"))
+  let chats = fs.readdirSync(`src/minecraft/chats/`).filter((file) => file.endsWith(".js"))
   chats = chats.filter(chat => chat.split(".")[0] == pmsg.channel.toLowerCase())
   if (chats.length) return require(`./chats/${chats[0]}`)(uhg, pmsg)
   return require("./chats/all")(uhg, pmsg)

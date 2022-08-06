@@ -2,7 +2,7 @@ const fs = require("fs");
 module.exports = async (uhg) => {
   let amount = 0;
   const events = () => {
-    const files = fs.readdirSync(`discord/events`).filter((file) => file.endsWith(".js"));
+    const files = fs.readdirSync(`src/discord/events`).filter((file) => file.endsWith(".js"));
     amount = files.length
     for (const file of files) {
       try {

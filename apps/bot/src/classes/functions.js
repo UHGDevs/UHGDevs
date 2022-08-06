@@ -9,7 +9,7 @@ module.exports = class Functions extends EventEmitter {
     this.getApi = require("../utils/api")
   }
 
-  getDiscordIds() {return JSON.parse(fs.readFileSync('settings/discord.json', 'utf8'));}
+  getDiscordIds() {return JSON.parse(fs.readFileSync('src/settings/discord.json', 'utf8'));}
 
   delay(ms) {return new Promise(res => setTimeout(res, ms))}
 
