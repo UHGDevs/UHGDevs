@@ -5,3 +5,4 @@ package-lock.json
 .vscode/
 apps/bot/src/settings/minecraft
 farmanstest.js
+yarn.lock

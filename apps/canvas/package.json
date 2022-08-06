@@ -1,6 +1,6 @@
 {
   "name": "uhg-canvas",
-  "version": "test:0.0.0",
+  "version": "0.0.0",
   "description": "UHG Canvas",
   "main": "./src/index.js",
   "dependencies": {
