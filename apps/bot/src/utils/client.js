@@ -10,14 +10,16 @@ module.exports = (uhg) => {
         username: process.env.email,
         password: process.env.password,
         auth: 'microsoft',
-        onMsaCode: msaCode
+        onMsaCode: msaCode,
+        profilesFolder: 'src/settings/minecraft/'
       })
     } else {
       uhg.mc.client = minecraft.createClient({
         host: "mc.hypixel.net",
         username: process.env.email,
         auth: 'microsoft',
-        onMsaCode: msaCode
+        onMsaCode: msaCode,
+        profilesFolder: 'src/settings/minecraft/'
       })
     }
 

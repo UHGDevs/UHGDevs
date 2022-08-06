@@ -3,3 +3,5 @@ package-lock.json
 .env
 .DS_Store
 .vscode/
+apps/bot/src/settings/minecraft
+farmanstest.js
