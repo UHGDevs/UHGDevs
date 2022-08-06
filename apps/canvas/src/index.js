@@ -18,7 +18,7 @@ async function run(mode = 'profile', api = {}) {
 
    /* DEFINE BASIC HYPIXEL STATS */
    /* needs error handlering */
-   let username = api.username
+   let username = "TestTestTest"
    let prefix = api.hypixel.prefix
    let rank = api.hypixel.rank
    let rankcolor = api.hypixel.color
@@ -34,7 +34,12 @@ async function run(mode = 'profile', api = {}) {
    ctx.textAlign = 'center'
    ctx.font = '30px Minecraft'
    ctx.fillStyle = usernamecolor
-   ctx.fillText(prefix, 150 + 320, 43)
+   if (rank == "MVP+") {
+      ctx.fillText(`[MVP⠀] ${username}`, 150+320, 43) /* ! THE WHITESPACE IS A SPECIAL CHARACTER, NOT A CLASSIC SPACE, DO NOT REMOVE IT ! */
+      ctx.fillStyle = "#ffffff"
+      ctx.fillText(`+`, 150+320-ctx.measureText(`${username}`).width+ctx.measureText(`[MVP⠀`).width, 43)
+   }
+   else ctx.fillText(prefix, 150 + 320, 43)
 
    //await canvas.saveAs(`../canvas/src//results/${username}_${mode}.png`)
    let toDiscord = await canvas.toBuffer()
