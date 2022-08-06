@@ -43,7 +43,7 @@ class Hypixel {
     const ctourney = hypixel.tourney ? hypixel.tourney[client.options.currentTourney] || {} : {};
 
     api.stats = {};
-    for (let file of fs.readdirSync(`src/api/games/`).filter((file) => file.endsWith('.js') && file !== 'general.js')) {
+    for (let file of fs.readdirSync(`../api/src/api/games/`).filter((file) => file.endsWith('.js') && file !== 'general.js')) {
         api.stats[file.split('.')[0]] = require(`./games/${file}`) (hypixel);
     }
 

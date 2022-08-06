@@ -12,6 +12,8 @@
         "fs": "^0.0.1-security",
         "mineflayer": "^4.3.0",
         "mongodb": "^4.8.0",
-        "request": "^2.88.2"
+        "request": "^2.88.2",
+        "uhg-api": "file:../api",
+        "uhg-canvas": "file:../canvas"
     }
 }
