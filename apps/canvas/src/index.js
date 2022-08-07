@@ -18,7 +18,7 @@ async function run(mode = 'profile', api = {}) {
 
    /* DEFINE BASIC HYPIXEL STATS */
    /* needs error handlering */
-   let username = "TestTestTest"
+   let username = api.hypixel.username
    let prefix = api.hypixel.prefix
    let rank = api.hypixel.rank
    let rankcolor = api.hypixel.color
@@ -31,13 +31,20 @@ async function run(mode = 'profile', api = {}) {
 
    
    // TADY potom ten text, který jeste nevíme jak (musí se rozdělit podle gamemodu)
-   ctx.textAlign = 'center'
+   //ctx.textAlign = 'center'
    ctx.font = '30px Minecraft'
    ctx.fillStyle = usernamecolor
    if (rank == "MVP+") {
-      ctx.fillText(`[MVP⠀] ${username}`, 150+320, 43) /* ! THE WHITESPACE IS A SPECIAL CHARACTER, NOT A CLASSIC SPACE, DO NOT REMOVE IT ! */
+      let x = 150+320, y = 43
+      ctx.fillText(`[MVP`, x, y) /* ! THE WHITESPACE IS A SPECIAL CHARACTER, NOT A CLASSIC SPACE, DO NOT REMOVE IT ! */
+      x += ctx.measureText(`[MVP`).width
+      
       ctx.fillStyle = "#ffffff"
-      ctx.fillText(`+`, 150+320-ctx.measureText(`${username}`).width+ctx.measureText(`[MVP⠀`).width, 43)
+      ctx.fillText(`+`, x, y)
+      x += ctx.measureText(`+`).width
+
+      ctx.fillStyle = usernamecolor
+      ctx.fillText(`] ${username}`, x, y)
    }
    else ctx.fillText(prefix, 150 + 320, 43)
 
