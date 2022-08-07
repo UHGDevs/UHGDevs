@@ -99,9 +99,13 @@ module.exports = {
         await uhg.delay(600)
       }
 
-      let embed2 = new MessageEmbed().setTitle('NEJSEM ONLINE').setDescription(`BOT není online na serveru, nastavte Elite Members za mě\n\n*${msgs.join("\n")}*`)
-      let channel2 = await uhg.dc.client.channels.cache.get('530496801782890527')
-      channel2.send({ embeds: [embed2] })
+
+      let online = await uhg.getApi("fb811b92561e434eb5b6ef04695cc49a", ["online"]).then(n => n.online)
+      if (!online.online) {
+        let embed2 = new MessageEmbed().setTitle('NEJSEM ONLINE').setDescription(`BOT není online na serveru, nastavte Elite Members za mě\n\n*${msgs.join("\n")}*`)
+        let channel2 = await uhg.dc.client.channels.cache.get('530496801782890527')
+        channel2.send({ embeds: [embed2] })
+      }
 
   } catch(e) {
     if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
