@@ -2,15 +2,12 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
 async function run(mode = 'profile', api = {}) {
-   let canvas = new Canvas(805, 540);
-   let ctx = canvas.getContext("2d");
 
    /* FONTS */
    FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
-   //FontLibrary.use(["../canvas/src/fonts/"])
-
+   
    /* HANDLE API ERROR */
-   if (!api.success) {
+   if (!api.hypixel) {
       'return neplatne jmeno nebo jiny duvod'
       console.log(api.reason)
       return null
@@ -21,32 +18,40 @@ async function run(mode = 'profile', api = {}) {
    let username = api.hypixel.username
    let prefix = api.hypixel.prefix
    let rank = api.hypixel.rank
-   let rankcolor = api.hypixel.color
+   let color = api.hypixel.color
 
-   let usernamecolor = "#fcba03"
+   /* define CANVAS */
+   let canvas = new Canvas(805, 540);
+   let ctx = canvas.getContext("2d");
+   ctx = fCtx(ctx, {})
 
    /* STAT TO SHOW */
    let img = await loadImage(`../canvas/src/templates/${mode}.png`)
    ctx.drawImage(img, 0, 0, 805, 540) // mozna pak udělat jine velikosti?
 
-   
-   // TADY potom ten text, který jeste nevíme jak (musí se rozdělit podle gamemodu)
-   //ctx.textAlign = 'center'
-   ctx.font = '30px Minecraft'
-   ctx.fillStyle = usernamecolor
-   if (rank == "MVP+") {
-      let x = 150+320, y = 43
-      ctx.fillText(`[MVP`, x, y) /* ! THE WHITESPACE IS A SPECIAL CHARACTER, NOT A CLASSIC SPACE, DO NOT REMOVE IT ! */
-      x += ctx.measureText(`[MVP`).width
-      
-      ctx.fillStyle = "#ffffff"
-      ctx.fillText(`+`, x, y)
-      x += ctx.measureText(`+`).width
+   let dim = ctx.measureText(prefix)
+   let displayName = new Canvas(dim.width, 40);
+   let ctx2 = fCtx(displayName.getContext('2d'), {color: color})
 
-      ctx.fillStyle = usernamecolor
-      ctx.fillText(`] ${username}`, x, y)
-   }
-   else ctx.fillText(prefix, 150 + 320, 43)
+   if (rank.includes('MVP+')) {
+      let plusColor = color
+      color = "#55ffff"
+      if (rank.includes('++')) color = "#fcba03"
+      let x = 0, y = 30
+
+      ctx2.fillStyle = color
+      ctx2.fillText(`[MVP`, x, y) /* ! THE WHITESPACE IS A SPECIAL CHARACTER, NOT A CLASSIC SPACE, DO NOT REMOVE IT ! */ //kam zmizela?
+      x += ctx2.measureText(`[MVP`).width
+      
+      ctx2.fillStyle = plusColor
+      ctx2.fillText(rank.replace('MVP', ''), x, y)
+      x += ctx2.measureText(rank.replace('MVP', '')).width
+
+      ctx2.fillStyle = color
+      ctx2.fillText(`] ${username}`, x, y)
+   } else ctx2.fillText(prefix, 0, 30)
+   ctx.drawImage(displayName, 150 + 320 - dim.width/2, 43 - 30)
+  
 
    //await canvas.saveAs(`../canvas/src//results/${username}_${mode}.png`)
    let toDiscord = await canvas.toBuffer()
@@ -55,6 +60,14 @@ async function run(mode = 'profile', api = {}) {
       name: `${username}_${mode}.png`
    }
    // Also to username_mode pak budem jeste menit
+}
+
+function fCtx(ctx, options = {}) {
+   ctx.font = options.font || '30px Minecraft'
+   ctx.fillStyle = options.fillStyle || options.color || ''
+
+
+   return ctx
 }
 
 exports.run = run
