@@ -1256,6 +1256,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     var skyblock = await fetch(`https://api.hypixel.net/skyblock/profiles?key=${api_key}&uuid=${uuid}`).then(api => api.json())
     if (!skyblock.success) return "Chyba v skyblock api"
     let profiles = skyblock.profiles
+    if (!profiles) return "Hráč nehrál SkyBlock"
     if (skyblocki.includes("all")) {api.skyblock.all = skyblock}
     if (skyblocki.includes("dungeons")) {
       for (let i=0;i<profiles.length; i++) {
