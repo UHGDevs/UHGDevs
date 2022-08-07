@@ -26,7 +26,16 @@ module.exports = (hypixel = {} , uuid) => {
     giftsGiven: hypixel.giftingMeta ? hypixel.giftingMeta.giftsGiven || 0 : 0,
     quests: achievements.general_quest_master || 0,
     challenges: achievements.general_challenger || 0,
-    lastLogin: hypixel.lastLogin || 0,
+    firstLogin: hypixel.firstLogin || -1,
+    lastLogin: hypixel.lastLogin || -1,
+    seasonal: hypixel.seasonal ? {
+      summer: hypixel.seasonal.summer ? {
+        experience: hypixel.seasonal.summer["2022"].levelling.experience || 0,
+        level: (hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000,
+        xpleft: 25000-((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000-Math.floor((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000))*25000
+      } : {},
+      silver: hypixel.seasonal.silver || 0,
+    } : {summer: {}},
     updated: Number(new Date())
 
   })

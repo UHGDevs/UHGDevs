@@ -3,7 +3,8 @@ const { Error } = require('../errors')
 const EventEmitter = require('events');
 const Util = require('../util/Util');
 const Options = require('../util/Options');
-const fetch = require('node-fetch');
+
+const { create } = require('axios');
 
 class ApiKey extends EventEmitter {
   constructor(options) {
@@ -24,6 +25,8 @@ class ApiKey extends EventEmitter {
       if (this.options.key.length !== this.options.key_count) throw new Error('API_KEY_COUNT', this.options.key_count, this.options.key.length);
     }
 
+    this.callHypixel = create({ baseURL: 'https://api.hypixel.net/' })
+
     this.testKeys()
     this.resetKeyTimer()
   }
@@ -33,11 +36,10 @@ class ApiKey extends EventEmitter {
     this.options.key = []
     for (let key of keys) {
       try {
-        const response = await fetch(`http://api.hypixel.net/key?key=${key}`);
-        const data = await response.json();
-        if (!data.success) throw new Error('API_KEY_INVALIDE', `(${key})`);
+        const response = await this.callHypixel.get('key', {params: { key: key }}).then( n => n.data )
+        if (!response.success) throw new Error('API_KEY_INVALIDE', `(${key})`);
         else this.options.key.push(key);
-      } catch (e) {console.info("Invalid authorization of API key (Hypixel API is having hard time)")}
+      } catch (e) { console.info("Invalid authorization of API key (Hypixel API is having hard time)")}
     }
     if (!this.options.key.length) throw new Error('API_KEY_NOT_WORKING');
     this.options.key_count = this.options.key.length
@@ -63,6 +65,7 @@ class ApiKey extends EventEmitter {
   }
 
   delay(ms) {return new Promise(res => setTimeout(res, ms))}
+
 }
 
 module.exports = ApiKey;

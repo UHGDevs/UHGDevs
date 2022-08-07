@@ -11,25 +11,33 @@ class Api extends CreateUser {
   async getApi(options) {
     return new Promise(async resolve => {
 
-    let launch = await this.ready
-    if (!launch.success) return resolve(launch)
+    /* First time call */
+    if (!this.username) {
+      let launch = this.basic ? await this.basic : {success: false}
+      if (!launch.success) launch = await require(`./mojang`).call(options)
+      if (!launch.success) return resolve(launch)
 
+      this.username = launch.username
+      this.uuid = launch.uuid
 
-    const api = {success: true, username: this.username||launch.username, uuid: this.uuid||launch.uuid}
+      delete this.basic
+    }
 
-    if (launch.type !== 'mojang') api[launch.type] = launch
-
+    const api = {success: true, username: this.username, uuid: this.uuid}
+    
     options.client = this.client
-    options.uuid = api.uuid
+    options.uuid = this.uuid
     
 
-    const calls = options.call.filter(n => n.toLowerCase() !== 'mojang');
+    const calls = options.call.filter(n => n.toLowerCase() !== 'mojang' && n.toLowerCase() !== 'mjg' );
+
     let promises = []
     for (let call of calls) {
+      /* require api from database (aliases) */
       let fetcher = this.client.calls.get(call.toLowerCase())
       if (!fetcher) return resolve ({ success: false, reason: `${call} is invalide name of api`})
 
-      promises.push( require(`./${call}`).call(options) );
+      promises.push( require(`./${fetcher}`).call(options) );
     }
 
     promises = await Promise.all(promises);
@@ -42,7 +50,6 @@ class Api extends CreateUser {
       delete result.type
       api[type] = result
     }
-
     resolve(api)
     });
   }

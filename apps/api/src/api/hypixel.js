@@ -1,7 +1,6 @@
 
 const fs = require('fs');
 
-const fetch = require('node-fetch');
 const func = require('../util/ApiFunctions');
 
 class Hypixel {
@@ -19,8 +18,7 @@ class Hypixel {
     if (limit <= 0) return {success: false, type: "hypixel", reason: 'Hypixel API key limit reached!'};
 
     let hypixel;
-
-    try { hypixel = await fetch(`https://api.hypixel.net/player?key=${apikey}&uuid=${uuid}`).then(api => api.json()) } catch (e) {return {success: false, type: "hypixel", reason: 'Hypixel API is getting touble!'}};
+    try { hypixel = await client.callHypixel.get('player', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "hypixel", reason: 'Hypixel API is getting touble!'}};
     if (!hypixel.success) return  {success: false, type: "hypixel", reason: `Hypixel API: ${hypixel.cause || 'error'}`};
     if (!hypixel.player.stats) return  {success: false, type: "hypixel", reason: `Hypixel API: Hráč nehrál žádnou minihru`};
 

@@ -32,12 +32,12 @@ class Client extends ApiKey {
     options = Util.mergeSettings(Options.createCall(this), options);
 
     input = input.toLowerCase();
-    let user = this.users.get(input) || this.users.get(this.aliases.get("input"));
+    let user = this.users.get(input) || this.users.get(this.aliases.get(input));
     if (!user) {
       options.user = input
       options.client = this
 
-      user = new Api( options )
+      user = new Api(options)
 
       delete options.user
       delete options.client
