@@ -10,8 +10,8 @@ class Hypixel {
 
     if (!options.uuid) return {success: false, type: "hypixel", reason: 'Hypixel API needs UUID to be called!'};
     const uuid = options.uuid;
-    
-    const apikey = client.getKey();
+
+    const apikey = client.getKey() // needs fix - slow loading
     if (!apikey) return  {success: false, type: "hypixel", reason: `Hypixel API key not found`};
 
     const limit = client.ratelimit();
