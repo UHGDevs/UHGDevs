@@ -1,4 +1,4 @@
-const banned = ["vape", "liquidbounce", "wurst", "sigma", "huzuni", ".org", ".net", ".com", ".gg", "https://", "http://", "kys", ".xxx", " ip", "fuck", "fag", "fa g", "f ag", "fu ck", "f uck", "fuc k", "fack", "shit", "0.0.0.0", "255.255.255.255", "i-p", "i.p", "retard", "retarded", "penis", "dick", "porn"];
+const banned = ["vape", "liquidbounce", "wurst", "sigma", "huzuni", ".org", ".net", ".com", ".gg", "https://", "http://", "kys", ".xxx", " ip ", "fuck", "fag", "fa g", "f ag", "fu ck", "f uck", "fuc k", "fack", "shit", "0.0.0.0", "255.255.255.255", "i-p", "i.p", "retard", "retarded", "penis", "dick", "porn", "gay", "gej", "lgbt", "die", "kill yourself", "kill urself"];
 module.exports = async (uhg, message) => {
   let user = uhg.data.verify.filter(n=>n._id==message.author.id)[0]
   if (!user) return message.reply(`Nejsi verifikovaný, zpráva nebyla odeslána.\nVerifikuj se pomocí ${uhg.settings.prefix}verify *\`nick\`*`)
