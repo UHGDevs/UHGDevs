@@ -1044,7 +1044,10 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       kills: pb.kills || 0,
       deaths: pb.deaths || 0,
       kdr: ratio(pb.kills || 0, pb.deaths || 0),
-      shots: pb.shots_fired || 0
+      shots: pb.shots_fired || 0,
+      killstreaks: pb.killstreaks || 0,
+      hat: pb.hat || "None",
+      prefix: pb.selectedKillPrefix || ""
     }
 
     api.hypixel.stats.cac = {

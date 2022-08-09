@@ -145,9 +145,19 @@ module.exports = async (uhg, interaction) => {
       ])
     } else if (game == 'bb') {
       return interaction.respond([
-        { name: 'Score', value: 'score' },
+        { name: 'Skóre', value: 'score' },
         { name: 'Výhry', value: 'wins' },
         { name: 'Mince', value: 'coins' }
+      ])
+    } else if (game == "paintball") {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Killstreaks', value: 'killstreaks' },
+        { name: 'Střel vystřeleno', value: 'shots' }
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -203,6 +213,8 @@ module.exports = async (uhg, interaction) => {
     } else if (game == "ww") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "bb") {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == "paintball") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }

@@ -58,6 +58,10 @@ module.exports = {
         {
           name: 'Build Battle',
           value: 'bb'
+        },
+        {
+          name: 'Paintball',
+          value: 'paintball'
         }
       ]
     },
