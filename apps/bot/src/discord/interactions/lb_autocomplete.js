@@ -159,6 +159,17 @@ module.exports = async (uhg, interaction) => {
         { name: 'Killstreaks', value: 'killstreaks' },
         { name: 'Střel vystřeleno', value: 'shots' }
       ])
+    } else if (game == "walls") {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' }
+      ])
     }
   } else if (focused.name == 'gamemode') {
     if (!stat) return
@@ -215,6 +226,8 @@ module.exports = async (uhg, interaction) => {
     } else if (game == "bb") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "paintball") {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == "walls") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }

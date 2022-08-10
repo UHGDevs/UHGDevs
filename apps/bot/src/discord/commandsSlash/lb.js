@@ -62,6 +62,10 @@ module.exports = {
         {
           name: 'Paintball',
           value: 'paintball'
+        },
+        {
+          name: 'The Walls',
+          value: 'walls'
         }
       ]
     },
@@ -91,8 +95,9 @@ module.exports = {
 
       let data = uhg.data.stats.length ? uhg.data.stats : await uhg.mongo.run.get("stats", "stats")
 
-      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb') && stat == 'level') stat = 'wins'
+      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'walls') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
+      else if (game == "paintball") stat = "kills"
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
