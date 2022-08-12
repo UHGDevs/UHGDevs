@@ -30,7 +30,7 @@ exports.send = async (uhg, interaction) => {
             components: [
                 {
                     custom_id: 'modal_verfiy_language',
-                    label: 'Your language: (cz/sk/en) - not working yet',
+                    label: 'Your language: (cz/sk/en)',
                     max_length: 2,
                     min_length: 2,
                     placeholder: null,
