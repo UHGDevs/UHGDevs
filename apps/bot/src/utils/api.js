@@ -906,16 +906,16 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       },
       mini_walls_0: {
         kit: arcade.miniwalls_activeKit || "None",
-        wins: arcade.wins_mini_walls || 0,
-        kills: arcade.kills_mini_walls || 0,
-        deaths: arcade.deaths_mini_walls || 0,
-        kdr: ratio(arcade.kills_mini_walls, arcade.deaths_mini_walls) || 0,
-        witherdmg: arcade.wither_damage_mini_walls || 0,
-        witherkills: arcade.wither_kills_mini_walls || 0,
-        arrowsshot: arcade.arrows_shot_mini_walls || 0,
-        arrowshit: arcade.arrows_hit_mini_walls || 0,
-        arrowhitratio: f(arcade.arrows_hit_mini_walls/arcade.arrows_shot_mini_walls),
-        finals: arcade.final_kills_mini_walls || 0,
+        wins: arcade.wins_tourney_mini_walls_0 || 0,
+        kills: arcade.kills_tourney_mini_walls_0 || 0,
+        deaths: arcade.deaths_tourney_mini_walls_0 || 0,
+        kdr: ratio(arcade.kills_tourney_mini_walls_0, arcade.deaths_tourney_mini_walls_0) || 0,
+        witherdmg: arcade.wither_damage_tourney_mini_walls_0 || 0,
+        witherkills: arcade.wither_kills_tourney_mini_walls_0 || 0,
+        arrowsshot: arcade.arrows_shot_tourney_mini_walls_0 || 0,
+        arrowshit: arcade.arrows_hit_tourney_mini_walls_0 || 0,
+        arrowhitratio: f(arcade.arrows_hit_tourney_mini_walls_0/arcade.arrows_shot_tourney_mini_walls_0),
+        finals: arcade.final_kills_tourney_mini_walls_0 || 0,
       }
     }
 
