@@ -64,7 +64,6 @@ exports.get = async (uhg, interaction) => {
     let gBw = uhg.dc.client.guilds.cache.get('874337528621191251')
 
     let user = interaction.user;
-    let coment = ''
 
     if (custom) {
         if (!Number(custom) && custom.length < 17) {return interaction.reply({ content: 'Invalid style of requesting custom verify! (discord id)', ephemeral: true })}
@@ -95,8 +94,17 @@ exports.get = async (uhg, interaction) => {
     verified = verified.filter(n => n._id == user.id)
     if (verified.length && verified[0].nickname == username) {return interaction.editReply({ content: `Už ${custom ? 'je':'jsi'} verifikovaný` })}
 
+    // Overwrite Verify
     let filtered = uhg.data.verify.filter(n => n.uuid == api.uuid)
-    if (filtered.length) uhg.mongo.run.delete("general", "verify", {_id:filtered[0]._id})
+    let guild = await uhg.mongo.run.get("general", "uhg")
+    let guildfiltered = guild.filter(n => n.uuid == api.uuid)
+    if (filtered.length) await uhg.mongo.run.delete("general", "verify", {_id:filtered[0]._id})
+    if (guildfiltered.length) {
+        await uhg.mongo.run.delete("general", "uhg", {_id:guildfiltered[0]._id})
+        let rank;
+        rank = api.guild.all.members.filter(n => n.uuid == api.uuid)[0].rank
+        await uhg.mongo.run.post("general", "uhg", {_id: user.id, username: username, uuid: api.uuid, guildrank: rank})
+    }
 
     let post = await uhg.mongo.run.post("general", "verify", { _id: user.id, uuid: api.uuid, nickname: username, names: api.hypixel.nicks })
     if (!post.acknowledged) {return interaction.editReply({ content: 'Nastala chyba v nahrávání informací do databáze!' })}
