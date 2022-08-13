@@ -15,7 +15,7 @@ module.exports = async (uhg, interaction) => {
   else if (type == 'elites') embed = new MessageEmbed().setTitle("**Elite membeři**").setDescription("➙ 10 nejlepších hráčů v GEXP za týden\n➙ konec týdne bývá v neděli kolem 17:00\n\n_Použijte /gexp v <#555832215922278401> pro zobrazení leaderboardu GEXP_")
   else if (type == 'events') embed = new MessageEmbed().setTitle("**UHG Eventy**").setDescription("Většinou jde o turnaje v různých minihrách, vše se oznamuje v <#715989905532256346>, zároveň pořádáme celoměsíční soutěž o největší počet GEXP o rank upgrade (jen VIP, VIP+, nebo MVP++) nebo o 20mil Skyblock coinů.")
   else if (type == 'bot') embed = new MessageEmbed().setTitle("**Guild Bot (UHGuild)**").setDescription("Všechny funkce:\n➙\n➙\n➙\n➙\n➙\n➙\n➙\ntu si toho dej kolik chceš")
-  else if (type == 'merch') embed = new MessageEmbed().setTitle("**UHG Tričko**").setDescription("**Cena:** 549 Kč/22.49 €\n**Barva:** Modrá námořnická\n**Střih a velikost:** Dogo Premium XS, S, M, L, XL, XXL\n\n_Pro koupi trička napište <@!379640544143343618> do soukromé zprávy._")
+  else if (type == 'merch') embed = new MessageEmbed().setTitle("**UHG Tričko**").setDescription("**Cena:** 549 Kč/22.49 €\n**Barva:** Modrá námořnická\n**Střih a velikost:** Dogo Premium XS, S, M, L, XL, XXL\n\n_Pro koupi trička napište <@!379640544143343618> do soukromé zprávy._").setImage('https://cdn.discordapp.com/attachments/630779313813454890/1007945792843169872/unknown.png?size=4096')
 
   /* Roles */
   if (type == 'guild');
