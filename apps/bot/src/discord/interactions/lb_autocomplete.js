@@ -46,7 +46,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'KDR', value: 'kdr' },
         { name: 'Hlavy', value: 'heads' },
         { name: 'Opály', value: 'opals' },
-        { name: 'Shardy', value: 'shards' },
+        { name: 'Duše', value: 'souls' },
         { name: 'Tokeny', value: 'tokens' },
         { name: 'Asistence', value: 'assists' }
       ])
