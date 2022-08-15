@@ -122,6 +122,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     var ww = hypixel.stats.WoolGames || {}
     var cw = hypixel.stats.TrueCombat || {}
     var skyclash = hypixel.stats.SkyClash || {}
+    var legacy = hypixel.stats.Legacy || {}
     //var ww = hypixel.stats.WoolGames || {wool_wars: {layouts: {}, stats: {classes: {engineer: {}, golem: {}, tank: {}, swordsman: {}, assualt: {}, archer: {}}}}, progression: {}}
     var tourney = hypixel.tourney || {}
     var ctourney = tourney[currenttourney] || {}
@@ -222,6 +223,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       giftsGiven: hypixel.giftingMeta ? hypixel.giftingMeta.giftsGiven || 0 : 0,
       quests: achievements.general_quest_master || 0,
       challenges: achievements.general_challenger || 0,
+      legacyTokens: legacy.total_tokens || 0,
       stats: {},
       firstLogin: hypixel.firstLogin || -1,
       lastLogin: hypixel.lastLogin || -1,

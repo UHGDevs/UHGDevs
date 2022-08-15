@@ -20,6 +20,10 @@ module.exports = {
       required: true,
       choices: [
         {
+          name: 'General',
+          value: 'general'
+        },
+        {
           name: 'BedWars',
           value: 'bedwars'
         },
@@ -28,36 +32,24 @@ module.exports = {
           value: 'skywars'
         },
         {
-          name: 'General',
-          value: 'general'
-        },
-        {
-          name: 'Arena Brawl',
-          value: 'arena'
+          name: 'Duels',
+          value: 'duels'
         },
         {
           name: 'Murder Mystery',
           value: 'murder'
         },
         {
+          name: 'Arena Brawl',
+          value: 'arena'
+        },
+        {
           name: 'TKR',
           value: 'tkr'
         },
         {
-          name: 'Duels',
-          value: 'duels'
-        },
-        {
           name: 'Quakecraft',
           value: 'quake'
-        },
-        {
-          name: 'Wool Wars',
-          value: 'ww'
-        },
-        {
-          name: 'Build Battle',
-          value: 'bb'
         },
         {
           name: 'Paintball',
@@ -66,6 +58,14 @@ module.exports = {
         {
           name: 'The Walls',
           value: 'walls'
+        },
+        {
+          name: 'Wool Wars',
+          value: 'ww'
+        },
+        {
+          name: 'Build Battle',
+          value: 'bb'
         }
       ]
     },

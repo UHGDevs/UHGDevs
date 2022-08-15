@@ -60,6 +60,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Gifts Gifted', value: 'giftsGiven' },
         { name: 'Quests', value: 'quests' },
         { name: 'Challenges', value: 'challenges' },
+        { name: 'Classic Tokeny', value: 'legacyTokens' }
       ])
     } else if (game == 'arena') {
       return interaction.respond([
