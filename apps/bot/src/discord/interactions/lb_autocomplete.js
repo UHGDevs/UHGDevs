@@ -112,7 +112,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Zabití', value: 'kills' },
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
-        { name: 'WinStreak', value: 'winstrek' },
+        { name: 'WinStreak', value: 'winstreak' },
         { name: 'Best WinStreak', value: 'bestwinstreak' },
         { name: 'Loot Bedny', value: 'lootchests' }
       ])

@@ -97,7 +97,7 @@ module.exports = {
 
       if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'walls') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
-      else if (game == "paintball") stat = "kills"
+      else if (game == "paintball" && stat == 'level') stat = "kills"
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
