@@ -94,7 +94,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     if (!hypixel.player) return "Hráč nikdy nebyl na hypixelu"
     if (!hypixel.player.stats || false) return "Hráč nehrál žádnou minihru"
 
-    var currenttourney = "mini_walls_0" //  ! CURRENT TOURNAMENT !
+    var currenttourney = null //  ! CURRENT TOURNAMENT !
 
     hypixel = hypixel.player
     var achievements = hypixel.achievements || {}
