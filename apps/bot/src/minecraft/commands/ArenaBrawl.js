@@ -10,14 +10,17 @@ module.exports = {
       if (getmode) args1 = getmode.split(" ")[0]
       if (getmode) args2 = getmode.split(" ")[1]
       let mode;
+      let all = ["deck", "setup", "skills", "skilly", "basic", "normal", "overall", "základní", "rt", "rating", "pos", "ranked", "position", "pozice"]
       let deck = ["deck", "setup", "skills", "skilly"];
       let basic = ["basic", "normal", "overall", "základní"]
       let ranked = ["rt", "rating", "pos", "ranked", "position", "pozice"]
-      if (args1 === "basic" || args1 === "normal" || args1 === "overall" || args1 === "základní" || args1 === "deck" || args1 === "setup" || args1 === "skills" || args1 === "skilly" || args1 === "rt" || args1 === "rating" || args1 === "pos" || args1 === "position" || args1 === "ranked" || args1 === "pozice") nickname = args2 || pmsg.username
-      if (args2 === "basic" || args2 === "normal" || args2 === "overall" || args2 === "základní" || args2 === "deck" || args2 === "setup" || args2 === "skills" || args2 === "skilly" || args2 === "rt" || args2 === "rating" || args2 === "pos" || args2 === "ranked" || args2 === "position" || args2 === "pozice") nickname = args1 || pmsg.username
-      if (args1 === "basic" || args1 === "normal" || args1 === "overall" || args1 === "základní" || args2 === "basic" || args2 === "normal" || args2 === "overall" || args2 === "základní") mode = "basic"
-      if (args1 === "deck" || args1 === "setup" || args1 === "skills" || args1 === "skilly" || args2 === "deck" || args2 === "setup" || args2 === "skills" || args2 === "skilly") mode = "deck"
-      if (args1 === "rt" || args1 === "rating" || args1 === "pos" || args1 === "position" || args1 === "pozice" || args1 === "ranked" || args2 === "rt" || args2 === "rating" || args2 === "pos" || args2 === "position" || args2 === "pozice" || args2 === "ranked") mode = "ranked"
+      for (let i in all) {
+        if (args1 == all[i]) {nickname = args2 || pmsg.username; mode = args1}
+        else if (args2 == all[i]) {nickname = args1 || pmsg.username; mode = args2}
+        if (basic.includes(mode)) mode = "basic"
+        else if (deck.includes(mode)) mode = "deck"
+        else if (ranked.includes(mode)) mode = "ranked"
+      }
       let api = await uhg.getApi(nickname)
       if (api instanceof Object == false) return api
       let arena = api.hypixel.stats.arena
