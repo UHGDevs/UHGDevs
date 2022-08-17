@@ -1,9 +1,8 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
-let api = {}
+const { f, fCtx } = require('./util/Functions')
 
-async function run(mode = 'general', fApi = {}) {
-   api = fApi
+async function run(mode = 'general', api = {}) {
 
    /* FONTS */
    FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
@@ -34,7 +33,7 @@ async function run(mode = 'general', fApi = {}) {
 
    /* STAT TO SHOW */
    let background = await loadImage(`../canvas/src/templates/${background_name}.png`)
-   let img = await loadImage(`../canvas/src/templates/${mode}command.png`)
+   let img = await loadImage(`../canvas/src/templates/${mode}_command.png`)
    ctx.drawImage(background, 0, 0, 800, 480) // Background Image
 
    
@@ -44,52 +43,31 @@ async function run(mode = 'general', fApi = {}) {
    ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
    // displayname
-   let displayName = displayText(ctx.measureText(prefix), ctx, "name")
+   let displayName = displayText(ctx.measureText(prefix), ctx, "name", api)
    ctx.drawImage(displayName, 234 + 275 - displayName.width/2, 10)
 
    // general example
    let skin = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`)
    ctx.drawImage(skin, 20, 70, 198, 320)
-   let general = drawGame(ctx, 'general', 'overall', ['level', 'quests', 'challenges'])
+   let general = drawGame(ctx, api, 'general', 'overall', ['level', 'quests', 'challenges'])
+
    ctx.drawImage(general.level, 315 - general.level.width/2, 68)
    ctx.drawImage(general.quests, 500 - general.quests.width/2, 68)
-   let aps = displayText(ctx.measureText(""), ctx, "aps")
+   let aps = displayText(ctx.measureText(""), ctx, "aps", api)
    ctx.drawImage(aps, 694 - aps.width/2, 68)
    //ctx.drawImage(general.aps, 685 - general.aps.width/2, 68)
 
-   //await canvas.saveAs(`../canvas/src//results/${username}_${mode}.png`)
    let toDiscord = await canvas.toBuffer()
    return {
       attachment: toDiscord,
       name: `${username}_${mode}.png`
    }
-   // Also to username_mode pak budem jeste menit  
-}
-
-// define ctx with formating
-function fCtx(ctx, options = {}) {
-   ctx.font = options.font || '24px Minecraft'
-   ctx.fillStyle = options.fillStyle || options.color || ''
-
-   return ctx
 }
 
 exports.run = run
 
-// basic text - without color changes - example viz drawBedwars
-function createCanvas(options) {
-   options.ctx.font = options.font || '24px Minecraft'
-   let dim = options.text ? options.ctx.measureText(options.text) : {} 
-   if (!dim) return {}
-   let canvas = new Canvas(dim.width || 300, dim.height || 40);
-
-   let ctx = fCtx(canvas.getContext('2d'), {color: options.color || '#aaaaaa', font: options.font || '24px Minecraft'})
-   ctx.fillText(options.text, 0, 30)
-   return canvas
-}
-
 // custom function for colored text - displayName with rank
-function displayText(dim, oldctx, text) {
+function displayText(dim, oldctx, text, api) {
    let width = dim.width
    if (text == 'aps') {
       var a = '18px Minecraft', b = '15px Minecraft'
@@ -174,34 +152,14 @@ function displayText(dim, oldctx, text) {
 }
 
 // example of possible method of displaying minigames
-function drawGame(ctx, game, gamemode, req = []) {
+function drawGame(ctx, api, game, gamemode, req = []) {
    let result = {}
    for (let stat of req) {
       let fApi = api.hypixel.stats[game] || api.hypixel
 
-      let text = fApi[stat] >= 0 ? fApi[stat] : fApi[gamemode][stat]
-
-      let color = null;
-      let font = null;
-      if (game == "general") {
-         color = "#FFAA00"
-         font = '20px Minecraft'
-         switch(stat) {
-            case "level":
-               break
-            case "quests":
-               text = `${f(fApi[stat])}/${f(fApi.challenges)}`
-               break
-         }
-      }
-
-      result[stat] = createCanvas({ text: f(text), ctx: ctx, color: color, font: font })
+      let res = require(`./games/${game}`).draw(ctx, stat, fApi, gamemode)
+      result[stat] = res //createCanvas({ text: f(text), ctx: ctx, color: color, font: font })
    }
 
    return result
 }
-
-function f(number, max=2) {
-   if (!Number(number)) return number
-   return Number(number).toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: max})
- }
