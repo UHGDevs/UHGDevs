@@ -490,19 +490,20 @@ module.exports = class Functions extends EventEmitter {
 
   getRank(json) {
     function replaceRank (rank) { return rank.replace(/§.|\[|]/g, '').replace('SUPERSTAR', "MVP++").replace('VIP_PLUS', 'VIP+').replace('MVP_PLUS', 'MVP+').replace('NONE', 'MVP+').replace("GAME_MASTER", "GM").replace("YOUTUBER", "YOUTUBE").replace("OWNER", "OWNER").replace("EVENTS", "EVENTS").replace("MOJANG", "MOJANG").replace("ADMIN", "ADMIN")}
-    let rank = json.prefix || json.rank || json.monthlyPackageRank || json.packageRank || json.newPackageRank || false
-    if (!rank) return {rank: "NON", prefix: json.displayname}
+    let rank = json.prefix || json.rank || json.newPackageRank || json.monthlyPackageRank || json.packageRank || false
+    if (!rank || rank == "NORMAL") return {rank: "NON", prefix: json.displayname}
     return { rank: replaceRank(rank), prefix: `[${replaceRank(rank)}] ${json.displayname}` }
   }
 
   getPlusColor(rank, plus) {
-    if (plus == undefined || rank == 'PIG+++' || rank == "OWNER" || rank == "ADMIN" || rank == "GM") {
+    if (plus == undefined || rank == 'PIG+++' || rank == "OWNER" || rank == "ADMIN" || rank == "GM" || rank == "YOUTUBE") {
       var rankColor = {
         'MVP': { mc: '§b', hex: '#55FFFF' },
         'MVP+': { mc: '§c', hex: '#FF5555' },
         'MVP++': { mc: '§c', hex: '#FFAA00' },
         'VIP+': { mc: '§a', hex: '#55FF55' },
         'VIP': { mc: '§a', hex: '#55FF55' },
+        'YOUTUBE': { mc: '§c', mc2: '§f', hex: '#FF5555', hex2: '#F2F2F2'},
         'PIG+++': { mc: '§d', hex: '#FF55FF' },
         'OWNER': { mc: '§c', hex: '#FF5555' },
         'ADMIN': { mc: '§c', hex: '#FF5555' },

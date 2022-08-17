@@ -1,7 +1,11 @@
-
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
-async function run(mode = 'profile', api = {}) {
+let uhg = {}
+let api = {}
+
+async function run(mode = 'general', fApi = {}, fUhg = {}) {
+   uhg = fUhg
+   api = fApi
 
    /* FONTS */
    FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
@@ -13,37 +17,40 @@ async function run(mode = 'profile', api = {}) {
       return null
    }
 
-   const stats = {
-      profile: {
-         displayName: displayNameF
-      },
-      bedwars: drawBedwars
-   }
-
    /* DEFINE BASIC HYPIXEL STATS */
    /* needs error handlering */
    let username = api.hypixel.username
-   let prefix = api.hypixel.prefix
+   let prefix = api.guild.tag ? `${api.hypixel.prefix} [${api.guild.tag}]` : api.hypixel.prefix
    let rank = api.hypixel.rank
-   let color = api.hypixel.color
 
    /* define CANVAS */
-   let canvas = new Canvas(805, 540);
+   let canvas = new Canvas(800, 480);
    let ctx = fCtx(canvas.getContext("2d"), {});
 
+   if (mode == "general") {
+      let files = ["general_1", "general_2", "general_3", "general_4"]
+      mode = files[Math.floor(Math.random()*files.length)]
+   }
+
    /* STAT TO SHOW */
-   let img = await loadImage(`../canvas/src/templates/${mode}.png`)
-   ctx.drawImage(img, 0, 0, 805, 540) // mozna pak udělat jine velikosti?
+   let background = await loadImage(`../canvas/src/templates/${mode}.png`)
+   let img = await loadImage(`../canvas/src/templates/${mode.substring(0, mode.length-2)}command.png`)
+   ctx.drawImage(background, 0, 0, 800, 480) // Background Image
+   ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
    // displayname
-   let displayName = stats.profile.displayName(api, ctx.measureText(prefix))
-   ctx.drawImage(displayName, 150 + 320 - displayName.width/2, 43 - 30)
+   let displayName = displayText(ctx.measureText(prefix), ctx, "name")
+   ctx.drawImage(displayName, 234 + 275 - displayName.width/2, 10)
 
-   // bw example
-   let bw = stats.bedwars(api, ctx, ['level', 'finalKills'])
-   ctx.drawImage(bw.level, 200 - bw.level.width/2, 170 ) // zatím jen test čísla, nemám to naměřené (a navíc bw LOL)
-   ctx.drawImage(bw.finalKills, 600 - bw.finalKills.width/2, 170 )
-  
+   // general example
+   let skin = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`)
+   ctx.drawImage(skin, 20, 70, 198, 320)
+   let general = drawGame(ctx, 'general', 'overall', ['level', 'quests', 'challenges'])
+   ctx.drawImage(general.level, 315 - general.level.width/2, 68)
+   ctx.drawImage(general.quests, 500 - general.quests.width/2, 68)
+   let aps = displayText(ctx.measureText(""), ctx, "aps")
+   ctx.drawImage(aps, 694 - aps.width/2, 68)
+   //ctx.drawImage(general.aps, 685 - general.aps.width/2, 68)
 
    //await canvas.saveAs(`../canvas/src//results/${username}_${mode}.png`)
    let toDiscord = await canvas.toBuffer()
@@ -51,12 +58,12 @@ async function run(mode = 'profile', api = {}) {
       attachment: toDiscord,
       name: `${username}_${mode}.png`
    }
-   // Also to username_mode pak budem jeste menit
+   // Also to username_mode pak budem jeste menit  
 }
 
 // define ctx with formating
 function fCtx(ctx, options = {}) {
-   ctx.font = options.font || '30px Minecraft'
+   ctx.font = options.font || '24px Minecraft'
    ctx.fillStyle = options.fillStyle || options.color || ''
 
    return ctx
@@ -66,52 +73,124 @@ exports.run = run
 
 // basic text - without color changes - example viz drawBedwars
 function createCanvas(options) {
-   let dim = options.text ? options.preview.measureText(options.text) : {} 
+   options.ctx.font = options.font || '24px Minecraft'
+   let dim = options.text ? options.ctx.measureText(options.text) : {} 
    if (!dim) return {}
    let canvas = new Canvas(dim.width || 300, dim.height || 40);
 
-   let ctx = fCtx(canvas.getContext('2d'), {color: options.color || '#aaaaaa'})
+   let ctx = fCtx(canvas.getContext('2d'), {color: options.color || '#aaaaaa', font: options.font || '24px Minecraft'})
    ctx.fillText(options.text, 0, 30)
    return canvas
 }
 
 // custom function for colored text - displayName with rank
-function displayNameF(api, dim) {
-   let canvas = new Canvas(dim.width, 40);
+function displayText(dim, oldctx, text) {
+   let width = dim.width
+   if (text == 'aps') {
+      var a = '18px Minecraft', b = '15px Minecraft'
+      oldctx.font = a
+      width += oldctx.measureText(`${uhg.f(api.hypixel.aps)}`).width
+      oldctx.font = b
+      width += oldctx.measureText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`).width
+   }
+   let canvas = new Canvas(width, 40);
    let ctx = fCtx(canvas.getContext('2d'), {color: api.hypixel.color})
 
-   if (api.hypixel.rank.includes('MVP+')) {
-      let plusColor = api.hypixel.color
-      color = "#55ffff"
-      if (api.hypixel.rank.includes('++')) color = "#fcba03"
+   if (text == 'aps') {
       let x = 0, y = 30
+      ctx.fillStyle = '#FFAA00'
 
-      ctx.fillStyle = color
-      ctx.fillText(`[MVP`, x, y)
-      x += ctx.measureText(`[MVP`).width
-      
-      ctx.fillStyle = plusColor
-      ctx.fillText(api.hypixel.rank.replace('MVP', ''), x, y)
-      x += ctx.measureText(api.hypixel.rank.replace('MVP', '')).width
+      ctx.font = a
+      ctx.fillText(`${uhg.f(api.hypixel.aps)}`, x, y)
+      x += ctx.measureText(`${uhg.f(api.hypixel.aps)}`).width
 
-      ctx.fillStyle = color
-      ctx.fillText(`] ${api.hypixel.username}`, x, y)
-   } else ctx.fillText(api.hypixel.prefix, 0, 30)
+      ctx.font = b
+      ctx.fillText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`, x, y)
+      x += ctx.measureText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`).width
+   }
+   else if (text == 'name') {
+      let x = 0, y = 30
+      let color = api.hypixel.color
+
+      if (api.hypixel.rank.includes('MVP+')) {
+         let plusColor = api.hypixel.color
+         color = "#55ffff"
+         if (api.hypixel.rank.includes('++')) color = "#fcba03"
+
+         ctx.fillStyle = color
+         ctx.fillText(`[MVP`, x, y)
+         x += ctx.measureText(`[MVP`).width
+         
+         ctx.fillStyle = plusColor
+         ctx.fillText(api.hypixel.rank.replace('MVP', ''), x, y)
+         x += ctx.measureText(api.hypixel.rank.replace('MVP', '')).width
+
+         ctx.fillStyle = color
+         ctx.fillText(`] ${api.hypixel.username}`, x, y)
+         x += ctx.measureText(`] ${api.hypixel.username}`).width
+      } else {
+         if (api.hypixel.rank == 'YOUTUBE') {
+            ctx.fillStyle = color[0]
+            ctx.fillText(`[`, x, y)
+            x += ctx.measureText(`[`).width
+
+            ctx.fillStyle = color[1]
+            ctx.fillText(`YOUTUBE`, x, y)
+            x += ctx.measureText(`YOUTUBE`).width
+
+            ctx.fillStyle = color[0]
+            ctx.fillText(`] ${api.hypixel.username}`, x, y)
+            x += ctx.measureText(`] ${api.hypixel.username}`).width
+         }
+         else if (api.hypixel.rank == 'VIP+') {
+            ctx.fillStyle = color
+            ctx.fillText(`[VIP`, x, y)
+            x += ctx.measureText(`[VIP`).width
+
+            ctx.fillStyle = '#FFAA00'
+            ctx.fillText(`+`, x, y)
+            x += ctx.measureText(`+`).width
+
+            ctx.fillStyle = color
+            ctx.fillText(`] ${api.hypixel.username}`, x, y)
+            x += ctx.measureText(`] ${api.hypixel.username}`).width
+         }
+         else {
+            ctx.fillText(api.hypixel.prefix, x, y)
+            x += ctx.measureText(api.hypixel.prefix).width
+         }
+      }
+      if (api.guild.tag) {
+         ctx.fillStyle = api.guild.color
+         ctx.fillText(` [${api.guild.tag}]`, x, y)
+      }
+   }
    return canvas
 }
 
 // example of possible method of displaying minigames
-function drawBedwars(api, preview, req = ['level', 'finalKills']) {
+function drawGame(ctx, game, gamemode, req = []) {
    let result = {}
    for (let stat of req) {
-      let fStat = stat == 'level' ? 'levelformatted' : stat
-      
-      let bwApi = api.hypixel.stats.bedwars
+      let fApi = api.hypixel.stats[game] || api.hypixel
 
-      let gamemode = 'overall' // need this to be fixed
-      let text = bwApi[fStat] ? bwApi[fStat] : bwApi[gamemode][fStat]
+      let text = fApi[stat] >= 0 ? fApi[stat] : fApi[gamemode][stat]
 
-      result[stat] = createCanvas({ text: text, preview: preview, color: null, font: null })
+      let color = null;
+      let font = null;
+      if (game == "general") {
+         color = "#FFAA00"
+         font = '20px Minecraft'
+         switch(stat) {
+            case "level":
+               break
+            case "quests":
+               text = `${uhg.f(fApi[stat])}/${uhg.f(fApi.challenges)}`
+               break
+         }
+      }
+
+      result[stat] = createCanvas({ text: uhg.f(text), ctx: ctx, color: color, font: font })
    }
 
    return result

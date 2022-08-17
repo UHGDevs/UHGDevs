@@ -200,13 +200,15 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       }
     }
 
+    let color = getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex
+    if (getRank(hypixel).rank == 'YOUTUBE') {color = [getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex, getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex2]}
     api.hypixel = {
       _id: uuid,
       username: hypixel.displayname,
       uuid: uuid,
       rank: getRank(hypixel).rank,
       prefix: getRank(hypixel).prefix,
-      color: getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex,
+      color: color,
       level: nwLevel(hypixel.networkExp || 0),
       karma: hypixel.karma || 0,
       aps: hypixel.achievementPoints || 0,
@@ -1160,6 +1162,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         guild: true,
         name: guild.name,
         tag: guild.tag,
+        color: getPlusColor(null, guild.tagColor).hex,
         url: `https://plancke.io/hypixel/guild/player/${nickname}`,
       }
       api.guild.all = guild
