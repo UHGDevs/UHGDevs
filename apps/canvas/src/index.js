@@ -1,10 +1,8 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
-let uhg = {}
 let api = {}
 
-async function run(mode = 'general', fApi = {}, fUhg = {}) {
-   uhg = fUhg
+async function run(mode = 'general', fApi = {}) {
    api = fApi
 
    /* FONTS */
@@ -27,15 +25,22 @@ async function run(mode = 'general', fApi = {}, fUhg = {}) {
    let canvas = new Canvas(800, 480);
    let ctx = fCtx(canvas.getContext("2d"), {});
 
+   let background_name = mode
+   
    if (mode == "general") {
       let files = ["general_1", "general_2", "general_3", "general_4"]
-      mode = files[Math.floor(Math.random()*files.length)]
+      background_name = files[Math.floor(Math.random()*files.length)]
    }
 
    /* STAT TO SHOW */
-   let background = await loadImage(`../canvas/src/templates/${mode}.png`)
-   let img = await loadImage(`../canvas/src/templates/${mode.substring(0, mode.length-2)}command.png`)
+   let background = await loadImage(`../canvas/src/templates/${background_name}.png`)
+   let img = await loadImage(`../canvas/src/templates/${mode}command.png`)
    ctx.drawImage(background, 0, 0, 800, 480) // Background Image
+
+   
+   // TADY PRIDAT RUZNE HRY? (require(`./games/${mode}`))
+
+
    ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
    // displayname
@@ -89,9 +94,9 @@ function displayText(dim, oldctx, text) {
    if (text == 'aps') {
       var a = '18px Minecraft', b = '15px Minecraft'
       oldctx.font = a
-      width += oldctx.measureText(`${uhg.f(api.hypixel.aps)}`).width
+      width += oldctx.measureText(`${f(api.hypixel.aps)}`).width
       oldctx.font = b
-      width += oldctx.measureText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`).width
+      width += oldctx.measureText(` [Legacy ${f(api.hypixel.legacyAps)}]`).width
    }
    let canvas = new Canvas(width, 40);
    let ctx = fCtx(canvas.getContext('2d'), {color: api.hypixel.color})
@@ -101,12 +106,12 @@ function displayText(dim, oldctx, text) {
       ctx.fillStyle = '#FFAA00'
 
       ctx.font = a
-      ctx.fillText(`${uhg.f(api.hypixel.aps)}`, x, y)
-      x += ctx.measureText(`${uhg.f(api.hypixel.aps)}`).width
+      ctx.fillText(`${f(api.hypixel.aps)}`, x, y)
+      x += ctx.measureText(`${f(api.hypixel.aps)}`).width
 
       ctx.font = b
-      ctx.fillText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`, x, y)
-      x += ctx.measureText(` [Legacy ${uhg.f(api.hypixel.legacyAps)}]`).width
+      ctx.fillText(` [Legacy ${f(api.hypixel.legacyAps)}]`, x, y)
+      x += ctx.measureText(` [Legacy ${f(api.hypixel.legacyAps)}]`).width
    }
    else if (text == 'name') {
       let x = 0, y = 30
@@ -185,13 +190,18 @@ function drawGame(ctx, game, gamemode, req = []) {
             case "level":
                break
             case "quests":
-               text = `${uhg.f(fApi[stat])}/${uhg.f(fApi.challenges)}`
+               text = `${f(fApi[stat])}/${f(fApi.challenges)}`
                break
          }
       }
 
-      result[stat] = createCanvas({ text: uhg.f(text), ctx: ctx, color: color, font: font })
+      result[stat] = createCanvas({ text: f(text), ctx: ctx, color: color, font: font })
    }
 
    return result
 }
+
+function f(number, max=2) {
+   if (!Number(number)) return number
+   return Number(number).toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: max})
+ }
