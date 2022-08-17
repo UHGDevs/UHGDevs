@@ -41,13 +41,12 @@ module.exports = {
       let username = `**${api.username}**`
       let shortbuild = (offensive[0]+utility[0]+support[0]+ultimate[0]).toUpperCase()
       let fullbuild = `${offensive}, ${utility}, ${support}, ${ultimate}, ${fancyrune} Rune`
-      let rating = `${arena.highestrt} Best Rt`
-      let position = `#${arena.highestpos} Best Pos`
+      let rankedmsg = arena.highestrt ? `${arena.highestrt} Best Rt, #${arena.highestpos} Best Pos` : "Hráč nehrál 2v2"
 
       let message = `${minigame} ${prefix} ${username} - ${shortbuild} ${maxed}`
       if (mode === "basic") message = `${minigame} ${prefix} ${username} - ${uhg.f(arena.overall.wins)}Wins ${uhg.f(arena.overall.kills)}Kills ${uhg.f(arena.overall.wlr)}WLR ${maxed}`
       else if (mode === "deck") message  = `${minigame} ${prefix} ${username} - ${fullbuild} ${maxed}`
-      else if (mode === "ranked") message = `${minigame} ${prefix} ${username} - ${rating}, ${position}`
+      else if (mode === "ranked") message = `${minigame} ${prefix} ${username} - ${rankedmsg}`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)
