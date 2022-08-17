@@ -1,8 +1,11 @@
 
 const func = require('../../util/ApiFunctions');
 
-module.exports = (hypixel = {} , uuid) => {
+module.exports = async (hypixel = {} , uuid, client) => {
   const achievements = hypixel.achievements || {};
+  const legacy = hypixel.stats.Legacy || {}
+
+  let legacyAps = await require('../../util/achievements').countPoints(client.aps ? client.aps.legacy: await client.cacheAps(), hypixel.achievementsOneTime, achievements)
   return ({
     success: true,
     type: 'hypixel',
@@ -15,6 +18,7 @@ module.exports = (hypixel = {} , uuid) => {
     level: func.getNwLevel(hypixel.networkExp || 0),
     karma: hypixel.karma || 0,
     aps: hypixel.achievementPoints || 0,
+    legacyAps: legacyAps,
     nicks: hypixel.knownAliases || {},
     links: hypixel.socialMedia ? hypixel.socialMedia.links || {} : {},
     fishing: {
@@ -26,6 +30,8 @@ module.exports = (hypixel = {} , uuid) => {
     giftsGiven: hypixel.giftingMeta ? hypixel.giftingMeta.giftsGiven || 0 : 0,
     quests: achievements.general_quest_master || 0,
     challenges: achievements.general_challenger || 0,
+    legacyTokens: legacy.total_tokens || 0,
+    userLanguage: hypixel.userLanguage || "ENGLISH",
     firstLogin: hypixel.firstLogin || -1,
     lastLogin: hypixel.lastLogin || -1,
     seasonal: hypixel.seasonal ? {

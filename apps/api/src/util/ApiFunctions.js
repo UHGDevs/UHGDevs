@@ -103,6 +103,34 @@ class ApiFunctions {
     return parseFloat((level + (remainingExp / 5000)).toFixed(2))
   }
 
+  static getWwLevel(exp = 0) {
+    let level = 0;
+    let xpleft = 0;
+    let hundred = Math.floor(exp / 485000)
+    if (exp - 485000 * hundred < 10000) {
+      let o = 0;
+      let finalexp = 0;
+      let levels = {0: 1000, 1: 2000, 2: 3000, 3: 4000}
+      for (let i = 0; i<4; i++) {
+        if (exp - 485000 * hundred > 0) {
+          exp = exp - 485000 * hundred - levels[i]
+          level++
+          o = levels[i]
+          finalexp = exp + levels[i]
+        }
+        else break
+      }
+      level += hundred * 100 + finalexp / o
+      xpleft = (1 - finalexp / o)*o
+    }
+    else {
+      let x = ((exp - 485000 * hundred) - 10000) / 5000 + 5
+      level = hundred * 100 + x
+      xpleft = 5000-((level - Math.floor(level))*5000)
+    }
+    return {level: level, levelformatted: Math.floor(level), xpleft: xpleft}
+  }
+  
   static getCaC(score) {
     let title = 'Gray'
     if (score >= 100000) title = 'Red';
@@ -130,6 +158,52 @@ class ApiFunctions {
     else if (score >= 100) title = 'Untrained';
 
     return title
+  }
+
+  static getSpeedUHCPerk(perk) {
+    if (!perk || perk == "None") return "None"
+    perk = perk.split("_")
+    perk.shift()
+    for (let i in perk) {
+      perk[i] = this.capitalize(perk[i]);
+    }
+    return perk.join(' ')
+  }
+
+  static getSpeedUHC(score) {
+    let stars = 1
+
+    if (score >= 85550) stars = 10;
+    else if (score >= 55550) stars = 9;
+    else if (score >= 30550) stars = 8;
+    else if (score >= 15550) stars = 7;
+    else if (score >= 5550) stars = 6;
+    else if (score >= 2560) stars = 5;
+    else if (score >= 1050) stars = 4;
+    else if (score >= 300) stars = 3;
+    else if (score >= 50) stars = 2;
+
+    return stars
+  }
+
+  static getUHC(score) {
+    let stars = 1
+    if (score >= 25210) stars = 15;
+    else if (score >= 22210) stars = 14;
+    else if (score >= 19210) stars = 13;
+    else if (score >= 16210) stars = 12;
+    else if (score >= 13210) stars = 11;
+    else if (score >= 10210) stars = 10;
+    else if (score >= 5210) stars = 9;
+    else if (score >= 2710) stars = 8;
+    else if (score >= 1710) stars = 7;
+    else if (score >= 960) stars = 6;
+    else if (score >= 460) stars = 5;
+    else if (score >= 210) stars = 4;
+    else if (score >= 60) stars = 3;
+    else if (score >= 10) stars = 2;
+
+    return stars
   }
 
   static getSwLevel(xp) {
