@@ -1,6 +1,6 @@
 module.exports = {
   name: "Class",
-  aliases: ["class", "classes"],
+  aliases: ["class", "classes", "ca", "classaverage"],
   run: async (uhg, pmsg) => {
     try {
       let nickname = pmsg.nickname

@@ -1,6 +1,6 @@
 module.exports = {
   name: "Skills",
-  aliases: ["skills", "skill", "skilly"],
+  aliases: ["skills", "skill", "skilly", "sa"],
   run: async (uhg, pmsg) => {
     try {
       let nickname = pmsg.nickname
