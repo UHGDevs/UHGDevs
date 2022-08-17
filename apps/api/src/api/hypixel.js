@@ -24,18 +24,12 @@ class Hypixel {
 
     hypixel = hypixel.player;
 
-    const api = require('./games/general')(hypixel, uuid)
+    const api = await require('./games/general')(hypixel, uuid, client)
 
     
     const mw = hypixel.stats.Walls3 || {};
-    const pb = hypixel.stats.Paintball || {};
     const smash = hypixel.stats.SuperSmash || {};
-    const speeduhc = hypixel.stats.SpeedUHC || {};
-    const tkr = hypixel.stats.GingerBread || {};
     const tnt = hypixel.stats.TNTGames || {};
-    const uhc = hypixel.stats.UHC || {};
-    const vampirez = hypixel.stats.VampireZ || {};
-    const walls = hypixel.stats.Walls || {};
     const warlords = hypixel.stats.Battleground || {};
 
     const ctourney = hypixel.tourney ? hypixel.tourney[client.options.currentTourney] || {} : {};

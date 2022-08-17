@@ -7,6 +7,7 @@ const Util = require('../util/Util');
 const Options = require('../util/Options');
 
 const Api = require('../api/Api');
+const { getLegacy } = require('../util/achievements');
 
 class Client extends ApiKey {
   constructor(options = {}) {
@@ -21,6 +22,7 @@ class Client extends ApiKey {
     this.calls = new Collection()
 
     this.createCalls()
+    this.cacheAps()
   }
   call(input, opt = {}) {
     let options = opt;
@@ -53,6 +55,17 @@ class Client extends ApiKey {
     this.calls.set('mjg', 'mojang')
     this.calls.set('hypixel', 'hypixel')
   }
+
+  async cacheAps() {
+    let data = await this.callHypixel.get('resources/achievements').then( n => n.data )
+    let aps = {
+      all: data.achievements,
+      legacy: await require('../util/achievements').getLegacy(data.achievements)
+    }
+    this.aps = aps
+    return aps
+  }
+
 }
 
 module.exports = Client;

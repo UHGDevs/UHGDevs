@@ -31,6 +31,8 @@ module.exports = (hypixel) => {
       xp: bedwars.Experience || 0,
       coins: bedwars.coins || 0,
       main_mode: func.getGamemode(bw_main_mode),
+      challenges: bedwars.total_challenges_completed || 0,
+      uniquechallenges: bedwars.bw_unique_challenges_completed || 0,
       overall: {
           games: bedwars.games_played_bedwars || 0,
           winstreak: bedwars.winstreak || 0,
