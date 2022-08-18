@@ -1502,9 +1502,9 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
 
   api.uuid = uuid
   api.username = nickname || hypixel.displayname || ""
-  api.skin = `https://mc-heads.net/body/${uuid}.png`
-  api.plancke = `https://plancke.io/hypixel/player/stats/${nickname || hypixel.displayname || "hypixel"}`
-  api.hypixellogo = `https://cdn.discordapp.com/attachments/875503784086892617/896765939285114960/hypixel.png`
+  // api.skin = `https://mc-heads.net/body/${uuid}.png`
+  // api.plancke = `https://plancke.io/hypixel/player/stats/${nickname || hypixel.displayname || "hypixel"}`
+  // api.hypixellogo = `https://cdn.discordapp.com/attachments/875503784086892617/896765939285114960/hypixel.png`
 
   let test = true
   if (test && api.hypixel) {

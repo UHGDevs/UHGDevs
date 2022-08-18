@@ -2,14 +2,14 @@
 const Collection = require('@discordjs/collection').Collection
 
 const { Error } = require('../errors')
-const ApiKey = require('./ApiKey');
+const MongoDB = require('./MongoDB');
 const Util = require('../util/Util');
 const Options = require('../util/Options');
 
 const Api = require('../api/Api');
 const { getLegacy } = require('../util/achievements');
 
-class Client extends ApiKey {
+class Client extends MongoDB {
   constructor(options = {}) {
     super(options);
 
@@ -53,7 +53,19 @@ class Client extends ApiKey {
   createCalls() {
     this.calls.set('mojang', 'mojang')
     this.calls.set('mjg', 'mojang')
+
     this.calls.set('hypixel', 'hypixel')
+
+    this.calls.set('guild', 'guild')
+
+    this.calls.set('recent', 'recent')
+
+    this.calls.set('online', 'online')
+    this.calls.set('status', 'online')
+    
+    this.calls.set('counts', 'counts')
+    this.calls.set('gamecounts', 'counts')
+    
   }
 
   async cacheAps() {

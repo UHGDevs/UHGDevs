@@ -271,6 +271,40 @@ class ApiFunctions {
         .replace(/_/g, " ")
   }
 
+  static renameHypixelGames(game){
+    if (game === null || game === undefined) return
+    else {
+      return game.toLowerCase()
+      .replace("skywars", "SkyWars")
+      .replace("bedwars", "BedWars")
+      .replace("gingerbread", "TKR")
+      .replace("mcgo", "Cops & Crims")
+      .replace("super_smash", "Smash Heroes")
+      .replace("skyblock", "SkyBlock")
+      .replace("murder_mystery", "Murder Mystery")
+      .replace("legacy", "Classic Games")
+      .replace("survival_games", "Blitz SG")
+      .replace("uhc", "UHC")
+      .replace("speed_uhc", "Speed UHC")
+      .replace("tntgames", "TNT Games")
+      .replace("pit", "The Hypixel Pit")
+      .replace("arcade", "Arcade Games")
+      .replace("walls3", "Mega Walls")
+      .replace("arena", "Arena Brawl")
+      .replace("vampirez", "VampireZ")
+      .replace("walls", "The Walls")
+      .replace("battleground", "Warlords")
+      .replace("build_battle", "Build Battle")
+      .replace("bb", "Build Battle")
+      .replace("ww", "Wool Wars")
+      .replace("wool_wars", "Wool Wars")
+      .replace("wool_games", "Wool Wars")
+      .replace("tkr", "TKR")
+      .replace("bw", "BedWars")
+      .replace("sw", "SkyWars")
+    }
+  }
+
   static clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
 }
 

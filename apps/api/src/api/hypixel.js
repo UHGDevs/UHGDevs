@@ -36,14 +36,16 @@ class Hypixel {
 
     api.stats = {};
     for (let file of fs.readdirSync(`../api/src/api/games/`).filter((file) => file.endsWith('.js') && file !== 'general.js')) {
-        api.stats[file.split('.')[0]] = require(`./games/${file}`) (hypixel);
+      api.stats[file.split('.')[0]] = require(`./games/${file}`) (hypixel);
     }
 
 
-    /* UPLOAD DB HERE */
-
-    delete api._id
-    delete api.updated
+    /* UPLOADING HYPIXEL STATS TO DB */
+    /* only if player is in db already*/
+    if (client.mongo) {
+      client.mUpdate("stats", "stats", {_id: uuid}, api, false)
+    }
+    
     return api
   }
 }

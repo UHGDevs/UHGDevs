@@ -9,7 +9,7 @@ class Login extends Functions {
     super()
     this.dc = {client: dc, commands: new Collection(), aliases: new Collection(), slash: new Collection(), cmd: new Collection(), loot: new Collection(), cache: {}}
     this.mc = {client: null, commands: new Collection(), aliases: new Collection(), send: [], ready: false}
-    this.api = new Client({key: [process.env.api_key, process.env.api_key_2], db: process.env.DB})
+    this.api = new Client({key: [process.env.api_key, process.env.api_key_2], db: process.env.db})
     this.test = {server:null}
     this.ignore = []
     this.data = {guild:[], verify:[], stats:[], uhg:[]}

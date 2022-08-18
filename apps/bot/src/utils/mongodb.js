@@ -35,6 +35,33 @@ async function post (db="stats", col="stats", query={}) {
   }
 }
 
+exports.bulkPost = bulkPost
+async function bulkPost (db="stats", col="stats", query=[]) {
+  if (!Array.isArray(query) || !query.length) return 'error'
+  let result;
+  try {
+    const database = mongo.db(db);
+    const collection = database.collection(col);
+    result = await collection.insertMany(query)
+    return result
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+exports.deleteAll = deleteAll
+async function deleteAll (db="null", col="coc") {
+  let result;
+  try {
+    const database = mongo.db(db);
+    const collection = database.collection(col);
+    result = await collection.deleteMany({})
+    return result
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 exports.update = update
 async function update (db="stats", col="stats", query={}, novy={}, con=true) {
   try {
