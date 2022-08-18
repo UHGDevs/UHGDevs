@@ -77,6 +77,9 @@ exports.get = async (uhg, interaction) => {
     if (api instanceof Object == false) return interaction.editReply({ content: api })
     username = api.username
     if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
+    
+    const bannedUUIDs = ["d92fde8bd3c243298bc0a7648c38bd48"]
+    if (bannedUUIDs.includes(api.hypixel.uuid)) return interaction.editReply({ content: `Nepodařilo se tě verifikovat!\nJméno \`${username}\` se nachází na seznamu zabanovaných UUIDs, pokud si myslíš, že se jedná o chybu, napiš členům Admin Teamu` })
 
     let refresh = require('../../../utils/serverroles.js')
     let uhgMember = gUhg.members.cache.get(user.id)
