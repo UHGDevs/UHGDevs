@@ -17,11 +17,13 @@ module.exports = {
 
         /* DOČASTNÝ BOT ONLINE CHECK */
         if (uhg.settings.minecraft) {
-          let botOnApi = await uhg.getApi('fb811b92561e434eb5b6ef04695cc49a', ['online']).then(n => n.online)
-          if (!botOnApi.online) {
-            uhg.restartbot()
-            uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `ONLINE CHECK RESTART` })
-          }
+          let botOnApi = await uhg.api.call('fb811b92561e434eb5b6ef04695cc49a', ['online'])
+          if (botOnApi.success) {
+            if (!botOnApi.online.online) {
+              uhg.restartbot()
+              uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `ONLINE CHECK RESTART` })
+            }
+          } else uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `ERROR V API - online check` })
         }
 
 
