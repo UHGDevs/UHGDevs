@@ -6,9 +6,8 @@ module.exports = {
     run: async (uhg, pmsg) => {
       const f = uhg.f
       try{
-        let nickname = pmsg.nickname
-        let api = await uhg.getApi(nickname)
-        if (api instanceof Object == false) return api
+        let api = await uhg.api.call(pmsg.nickname)
+        if (!api.success) return api.reason
         let suhc = api.hypixel.stats.speeduhc
         let message = `**SpeedUHC**: [${suhc.level}✫] ${api.username} - ${f(suhc.wins)}Wins ${f(suhc.kills)}Kills ${f(suhc.wlr)} ${f(suhc.kdr)}KDR (${f(suhc.score)} Score)`
 

@@ -20,6 +20,7 @@ class Hypixel {
     let hypixel;
     try { hypixel = await client.callHypixel.get('player', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "hypixel", reason: 'Hypixel API is getting touble!'}};
     if (!hypixel.success) return  {success: false, type: "hypixel", reason: `Hypixel API: ${hypixel.cause || 'error'}`};
+    if (!hypixel.player) return  {success: false, type: "hypixel", reason: `Hypixel API: Hráč nikdy nebyl na Hypixelu`};
     if (!hypixel.player.stats) return  {success: false, type: "hypixel", reason: `Hypixel API: Hráč nehrál žádnou minihru`};
 
     hypixel = hypixel.player;

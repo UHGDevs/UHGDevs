@@ -4,15 +4,16 @@ module.exports = {
   run: async (uhg, pmsg) => {
     try{
       let { onlinegame, onlinemode, onlinemap } = "david>all"
-      let api = await uhg.getApi(pmsg.nickname, ["hypixel", "online", "mojang"])
-      if (api instanceof Object == false) return api
-      let apioff = "";
-      //console.log(api.online.title)
+      let api = await uhg.api.call(pmsg.nickname, ['online'])
+      if (!api.success) return api.reason
+
+      if (!api.online.online) return `[${api.online.title}] **${api.username}**`
+
+      console.log(api.online)
       if (api.online.game) onlinegame = " - " + api.online.game + " "
-      if (api.online.mode) onlinemode = api.online.mode + " "
+      if (api.online.mode) onlinemode =  api.online.mode + " "
       if (api.online.map) onlinemap = `(${api.online.map})`
-      if (api.hypixel.lastLogin == -1) apioff = "- (API OFF)"
-      let message = `[${api.online.title||"error"}] **${api.username}**${onlinegame||""}${uhg.getStatus(onlinemode)||""}${onlinemap||""} ${apioff}`
+      let message = `[${api.online.title}] **${api.username}**${onlinegame||" "}${(onlinemode)||""}${onlinemap||""}`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)

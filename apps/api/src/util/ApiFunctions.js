@@ -305,6 +305,35 @@ class ApiFunctions {
     }
   }
 
+  static getStatus(status) {
+    if (!status) return
+    return status.toLowerCase()
+        .replace("dynamic", "Private Island")
+        .replace("hub", "Hub")
+        .replace("dungeon hub", "Dungeon Hub")
+        .replace("combat 1", "Spider's Den")
+        .replace("combat 2", "Blazing Fortress")
+        .replace("combat 3", "The End")
+        .replace("foraging 1", "The Park")
+        .replace("farming 1", "Farming Islands")
+        .replace("mining 1", "Gold Mine")
+        .replace("mining 2", "Deep Caverns")
+        .replace("mining 3", "Dwarven Mines")
+        .replace("crystal hollows", "Crystal Hollows")
+        .replace("dungeon", "Catacombs")
+        .replace("dark auction", "Dark Auction")
+        .replace("crimson isle", "Crimson Isle")
+
+        .replace("pit", "")
+        .replace("housing", "Housing")
+  }
+
+
+  static capitalize(string) {
+    if (!string) return string
+    return String(string)[0].toUpperCase() + String(string).slice(1);
+  }
+
   static clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
 }
 

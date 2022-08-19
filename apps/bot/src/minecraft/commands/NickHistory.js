@@ -3,8 +3,8 @@ module.exports = {
   aliases: ["nickhistory", "namehistory", "history", "names", "nicks"],
   run: async (uhg, pmsg) => {
     try{
-      let api = await uhg.getApi(pmsg.nickname)
-      if (api instanceof Object == false) return api
+      let api = await uhg.api.call(pmsg.nickname)
+      if (!api.success) return api.reason
       let nicks = api.hypixel
       let message = `**${api.username}** - ${nicks.nicks.join(", ")}`
       //if (message.length > 256) message = "Pro jistotu ty nicky nenapíšu, abych se nepřehřál, těch nicků jich je moc na mě"

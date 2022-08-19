@@ -5,6 +5,7 @@ module.exports = {
   name: "NetWorth",
   aliases: ["nw", "networth"],
   cache: new Collection(),
+  type: 'skyblock',
   run: async (uhg, pmsg) => {
     try {
       let nickname = pmsg.nickname

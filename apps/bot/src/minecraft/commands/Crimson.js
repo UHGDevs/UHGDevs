@@ -1,6 +1,7 @@
 module.exports = {
     name: "Crimson",
     aliases: ["crimson", "nether", "dojo", "kuudra", "kuudras", "faction", "trophies", "trophyfish", "trophyfishing", "rep", "reputation", "crimsonrep", "netherrep", "crimsonisle"],
+    type: 'skyblock',
     run: async (uhg, pmsg) => {
       try {
         let nickname = pmsg.nickname

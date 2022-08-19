@@ -49,6 +49,8 @@ class Api extends CreateUser {
       let type = result.type
       delete result.type
       api[type] = result
+
+      this.cache[type] = result
     }
     resolve(api)
     });

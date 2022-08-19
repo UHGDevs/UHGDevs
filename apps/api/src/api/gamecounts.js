@@ -19,7 +19,7 @@ class Counts {
     let gamecounts = counts.games
     const api = {
       success: true,
-      type: 'counts',
+      type: 'gamecounts',
       total: counts.playerCount,
       games: {
         mainlobby: gamecounts.MAIN_LOBBY.players || 0,

@@ -1,6 +1,7 @@
 module.exports = {
     name: "CrimsonQuests",
     aliases: ["crimsonquests", "quests", "quest", "crimsonquest", "dailyquest", "dailyquests", "crimonsislequest", "crimsonislequests", "islequest", "islequests", "netherquests", "netherquest", "netherdailyquests"],
+    type: 'skyblock',
     run: async (uhg, pmsg) => {
       try {
         return "Hypixel tuto funkci odstranil z Public API, příkaz a funkci zde nechávám pro případ, že Hypixel přidá údaje zpět do Public API a jedná se pouze o dočasný případ"

@@ -1,6 +1,7 @@
 module.exports = {
     name: "StatsMult",
     aliases: ["statsmult", "mp", "magicalpower"],
+    type: 'skyblock',
     run: async (uhg, pmsg) => {
       try{
         if (!pmsg.args) return "Prosím, zadej svou Magical Power"

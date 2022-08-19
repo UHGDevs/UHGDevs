@@ -1,6 +1,7 @@
 module.exports = {
   name: "Cakes",
   aliases: ["cakes", "cake"],
+  type: 'skyblock',
   run: async (uhg, pmsg) => {
     try{
       console.log(pmsg)

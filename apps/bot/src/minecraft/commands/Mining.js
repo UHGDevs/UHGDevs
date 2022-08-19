@@ -1,6 +1,7 @@
 module.exports = {
   name: "Mining",
   aliases: ["mining", "powder", "gemstone", "mithril", "gemstonepowder", "mithrilpowder", "hotm", "heartofthemountain", "nucleus", "crystalnucleus", "scatha", "scathakills", "comms", "commissions", "nucleusruns"],
+  type: 'skyblock',
   run: async (uhg, pmsg) => {
     try {
       const f = uhg.f

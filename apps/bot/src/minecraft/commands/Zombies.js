@@ -3,8 +3,8 @@ module.exports = {
   aliases: ["zombies"],
   run: async (uhg, pmsg) => {
     try{
-      let api = await uhg.getApi(pmsg.nickname)
-      if (api instanceof Object == false) return api
+      let api = await uhg.api.call(pmsg.nickname)
+      if (!api.success) return api.reason
       let zombies = api.hypixel.stats.arcade.zombies
       let bestround = zombies.bestround
       let numend = "th"

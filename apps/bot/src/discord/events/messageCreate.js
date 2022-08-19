@@ -35,7 +35,8 @@ module.exports = async (uhg, message) => {
 
   if (!command) command = uhg.mc.commands.get(uhg.mc.aliases.get(content.split(" ")[0].toLowerCase()));
   if (command) {
-    let msg = await command.run(uhg, {username: uhg.data.verify.filter(n=>n._id==message.author.id)[0].nickname||content.split(" ")[0], args:content.toLowerCase().replace(content.split(" ")[0].toLowerCase(), "").trim()||"", nickname:content.split(" ")[1]||uhg.data.verify.filter(n=>n._id==message.author.id)[0].nickname||"KOkasfneplatne"}) || "error v posilani mc commandu z discordu"
+    let user = uhg.data.verify.find(n=>n._id==message.author.id) || {}
+    let msg = await command.run(uhg, {username: user.nickname||content.split(" ")[0], args:content.toLowerCase().replace(content.split(" ")[0].toLowerCase(), "").trim()||"", nickname:content.split(" ")[1]||user.nickname||"KOkasfneplatne"}) || "error v posilani mc commandu z discordu"
     if (mcchat) {
       let mcchannel = "/go "
       if (message.channel.id == uhg.getDiscordIds().channels.guild) mcchannel = "/gc "

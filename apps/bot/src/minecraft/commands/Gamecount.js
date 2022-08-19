@@ -5,8 +5,9 @@ module.exports = {
       try{
         let args = pmsg.args.split(" ")
         args = args[0].toLowerCase()
-        let api = await uhg.getApi("fb811b92561e434eb5b6ef04695cc49a", ["gamecounts"])
-        if (api instanceof Object == false) return api
+        let api = await uhg.api.call('technoblade', ['gamecounts'])
+        if (!api.success) return api.reason
+
         let gc = api.gamecounts.games
         let minigame;
         let players;

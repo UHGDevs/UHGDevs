@@ -62,9 +62,9 @@ class Client extends MongoDB {
 
     this.calls.set('online', 'online')
     this.calls.set('status', 'online')
-    
-    this.calls.set('counts', 'counts')
-    this.calls.set('gamecounts', 'counts')
+
+    this.calls.set('counts', 'gamecounts')
+    this.calls.set('gamecounts', 'gamecounts')
     
   }
 

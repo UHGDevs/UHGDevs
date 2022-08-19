@@ -21,8 +21,8 @@ module.exports = {
         else if (deck.includes(mode)) mode = "deck"
         else if (ranked.includes(mode)) mode = "ranked"
       }
-      let api = await uhg.getApi(nickname)
-      if (api instanceof Object == false) return api
+      let api = await uhg.api.call(nickname)
+      if (!api.success) return api.reason
       let arena = api.hypixel.stats.arena
       let overall = arena.overall
       let maxed = "";

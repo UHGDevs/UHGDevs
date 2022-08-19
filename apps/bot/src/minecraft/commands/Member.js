@@ -3,10 +3,10 @@ module.exports = {
   aliases: ["member", "guild", "g"],
   run: async (uhg, pmsg) => {
     try{
-      let api = await uhg.getApi(pmsg.nickname, ["guild", "key", "mojang", "guild"])
-      if (api instanceof Object == false) return message
-      let guild = api.guild.all
-      if (!api.guild.guild) return `**${api.username}** - Guild: Žádná`
+      let api = await uhg.api.call(pmsg.nickname, ['guild'])
+      if (!api.success) return api.reason
+      let guild = api.guild.guild
+      if (!guild) return `**${api.username}** - Guild: Žádná`
       let joined;
       let grank;
 

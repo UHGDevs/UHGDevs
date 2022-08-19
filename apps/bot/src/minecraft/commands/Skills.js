@@ -1,6 +1,7 @@
 module.exports = {
   name: "Skills",
   aliases: ["skills", "skill", "skilly", "sa"],
+  type: 'skyblock',
   run: async (uhg, pmsg) => {
     try {
       let nickname = pmsg.nickname

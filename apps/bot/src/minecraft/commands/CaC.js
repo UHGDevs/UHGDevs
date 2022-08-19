@@ -6,8 +6,8 @@ module.exports = {
     const f = uhg.f
     try{
       let nickname = pmsg.nickname
-      let api = await uhg.getApi(nickname)
-      if (api instanceof Object == false) return api
+      let api = await uhg.api.call(nickname)
+      if (!api.success) return api.reason
       let cac = api.hypixel.stats.cac
       let overall = cac.overall
       let defusal = cac.defusal

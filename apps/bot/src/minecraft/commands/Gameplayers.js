@@ -24,8 +24,8 @@ module.exports = {
         game = game.split("_")
         if (game.length > 1) {gamemode = game[1]; game = game[0]} 
   
-        let api = await uhg.getApi(pmsg.username, ["hypixel", "mojang", "gamecounts"])
-        if (api instanceof Object == false) return api
+        let api = await uhg.api.call(pmsg.username, ['hypixel', 'gamecounts'])
+        if (!api.success) return api.reason
         if ((!api.gamecounts.games[game] ) || (gamemode && api.gamecounts.games[game][gamemode] < 0)) return "Tato minihra není podporována, podporované minihry nalezneš v Command dokumentu napravo https://shorturl.at/ipDR8"
 
         let message = `Zapínání gameplayers na ${gamemode ? `${game} ${gamemode}` : game}`

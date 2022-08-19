@@ -3,8 +3,8 @@ module.exports = {
   aliases: ["thewalls", "walls"],
   run: async (uhg, pmsg) => {
     try{
-      let api = await uhg.getApi(pmsg.nickname)
-      if (api instanceof Object == false) return api
+      let api = await uhg.api.call(pmsg.nickname)
+      if (!api.success) return api.reason
       let walls = api.hypixel.stats.walls
       let message = `**TheWalls**: [${walls.wins}] **${api.username}** - ${walls.kills}Kills ${walls.kdr}KDR ${walls.wlr}WLR`
       return message
