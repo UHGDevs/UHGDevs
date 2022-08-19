@@ -23,8 +23,8 @@ module.exports = {
       let dLoot = await uhg.mongo.run.get('general', 'loot')
       
       /* -- Fetch Guild api of Unisdynasty -- */
-      let api = await uhg.getApi("64680ee95aeb48ce80eb7aa8626016c7", ["guild"])
-      if (api instanceof Object == false) throw new Error(api)
+      let api = await uhg.api.call("64680ee95aeb48ce80eb7aa8626016c7", ["guild"])
+      if (!api.success) throw new Error(api.reason)
 
       let members = api.guild.all.members
 
@@ -48,8 +48,8 @@ module.exports = {
       /* -- Get UNVERIFIED Guild Members -- */
       unNames = []
       for (let uuid of unUuid) {
-        let uApi = await uhg.getApi(uuid, ["mojang", "hypixel", "guild"])
-        if (uApi instanceof Object == false) {unNames.push({name:uuid}); continue;}
+        let uApi = await uhg.api.call(uuid, ["hypixel", "guild"])
+        if (!uApi.success) {unNames.push({name:uuid}); continue;}
         let joined = Math.floor((new Date().getTime()-uApi.guild.member.joined)/ 86400000)
         unNames.push( {name:uApi.username, joined: joined, date: `<t:${Math.round(uApi.guild.member.joined/1000)}:R>`, lastLogin: uApi.hypixel.lastLogin, lastOnline: `<t:${Math.round(uApi.hypixel.lastLogin/1000)}:R>`, links: uApi.hypixel.links} )
       }

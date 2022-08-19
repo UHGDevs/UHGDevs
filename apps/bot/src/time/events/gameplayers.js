@@ -47,8 +47,8 @@ module.exports = {
 
           if (!game || !req || !player) continue
         
-        let api = await uhg.getApi("1afa0f55eb264065846b912c3397ab78", ["gamecounts"]);
-        if (api instanceof Object == false) return;
+        let api = await uhg.api.call("1afa0f55eb264065846b912c3397ab78", ["gamecounts"]);
+        if (!api.success) return;
 
         let fullgame;
 

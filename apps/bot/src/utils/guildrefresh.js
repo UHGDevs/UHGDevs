@@ -6,8 +6,8 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
   else if (guildname.toLowerCase() == "czsk" || guildname.toLowerCase() == "czech team") gmaster = "5d6bfd8fb417488d9cee97a9a4d5f8e7"
   if (!gmaster) return
 
-  let api = await uhg.getApi(gmaster, ["guild"])
-  if (api instanceof Object == false) return console.log(api)
+  let api = await uhg.api.call(gmaster, ["guild"])
+  if (!api.success) return console.log(api.reason)
   api = api.guild.all
 
   let today = Object.keys(api.members[0].expHistory)[0]
@@ -41,7 +41,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
       update.members.push(cache)
       update.left.splice(ileft,1)
     } else if (imem<0) {
-      let mjg = await uhg.getApi(uuid, ["mojang"])
+      let mjg = await uhg.api.call(uuid, ["mojang"])
       let nickname = mjg.username
       update.members.push({uuid: uuid, name: nickname, joined: member.joined, exp: {daily: wexp}, games:{daily: {}, total: {}}})
     } else {
@@ -49,7 +49,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
       if (!update.members[imem].games) update.members[imem].games = {daily: {}, total: {}}
 
       if (games) {
-        let gapi = await uhg.getApi(uuid, ["key", "hypixel"])
+        let gapi = await uhg.api.call(uuid, ["key", "hypixel"])
         if (gapi.key.uses > 50) await uhg.delay(1000)
         let wins = gapi.hypixel.stats.wins.total
         if (!update.members[imem].games.total[yesterday]) update.members[imem].games.total[yesterday] = wins
@@ -60,7 +60,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
     }
 
     if (names) {
-      let mjg = await uhg.getApi(uuid, ["mojang"])
+      let mjg = await uhg.api.call(uuid, ["mojang"])
       let nickname;
       if (typeof mjg === 'object') nickname = mjg.username || null
       if (nickname) update.members[imem].name = nickname
@@ -78,7 +78,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
   if (names) {
     for (let i=0; i<update.left.length;i++) {
       let uuid = update.left[i].uuid
-      let mjg = await uhg.getApi(uuid, ["mojang"])
+      let mjg = await uhg.api.call(uuid, ["mojang"])
       let nickname;
       if (typeof mjg === 'object') nickname = mjg.username || null
       if (nickname) update.left[i].name = nickname

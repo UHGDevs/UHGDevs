@@ -20,8 +20,8 @@ module.exports = {
 
       let updated = await guildrefresh(uhg, 'UltimateHypixelGuild')
       if (typeof updated !== 'object') {
-        api = await uhg.getApi("fb811b92561e434eb5b6ef04695cc49a", ["guild"])
-        if (api instanceof Object == false) return
+        api = await uhg.api.call("fb811b92561e434eb5b6ef04695cc49a", ["guild"])
+        if (!api.success) return uhg.dc.client.channels.cache.get('530496801782890527').send('ELITE MEMBERS ERROR:\n'+api.reason)
         api = api.guild.all
         data = await uhg.mongo.run.get('stats', 'guild', {name:"UltimateHypixelGuild"})
         if (!data.length) return
@@ -84,7 +84,7 @@ module.exports = {
       let error = []
       let msgs = []
       for (let i=0; i<add.length; i++) {
-        let mjg = await uhg.getApi(add[i], ["mojang"])
+        let mjg = await uhg.api.call(add[i], ["mojang"])
         let msg = `/g promote ${mjg.username}`
         msgs.push(msg)
         send(uhg, {send:msg})
@@ -92,7 +92,7 @@ module.exports = {
       }
 
       for (let i=0; i<remove.length; i++) {
-        let mjg = await uhg.getApi(remove[i], ["mojang"])
+        let mjg = await uhg.api.call(remove[i], ["mojang"])
         let msg = `/g demote ${mjg.username}`
         msgs.push(msg)
         send(uhg, {send:msg})
@@ -100,7 +100,7 @@ module.exports = {
       }
 
 
-      let online = await uhg.getApi("fb811b92561e434eb5b6ef04695cc49a", ["online"]).then(n => n.online)
+      let online = await uhg.api.call("fb811b92561e434eb5b6ef04695cc49a", ["online"]).then(n => n.online)
       if (!online.online) {
         let embed2 = new MessageEmbed().setTitle('NEJSEM ONLINE').setDescription(`BOT není online na serveru, nastavte Elite Members za mě\n\n*${msgs.join("\n")}*`)
         let channel2 = await uhg.dc.client.channels.cache.get('530496801782890527')
