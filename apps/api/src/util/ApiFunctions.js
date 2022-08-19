@@ -328,6 +328,14 @@ class ApiFunctions {
         .replace("housing", "Housing")
   }
 
+  static sbMode(mode) {
+    if (!mode) return 'Normal'
+    return mode.toLowerCase()
+          .replace('island', 'Stranded')
+          .replace('bingo', 'Bingo')
+          .replace('ironman', 'Ironman')
+  }
+
 
   static capitalize(string) {
     if (!string) return string

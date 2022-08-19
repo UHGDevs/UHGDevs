@@ -65,6 +65,9 @@ class Client extends MongoDB {
 
     this.calls.set('counts', 'gamecounts')
     this.calls.set('gamecounts', 'gamecounts')
+
+    this.calls.set('skyblock', 'skyblock')
+    this.calls.set('sb', 'skyblock')
     
   }
 
