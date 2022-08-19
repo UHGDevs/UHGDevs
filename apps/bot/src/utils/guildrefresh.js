@@ -8,7 +8,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
 
   let api = await uhg.api.call(gmaster, ["guild"])
   if (!api.success) return console.log(api.reason)
-  api = api.guild.all
+  api = api.guild.guild
 
   let today = Object.keys(api.members[0].expHistory)[0]
   let yesterday = Object.keys(api.members[0].expHistory)[1]

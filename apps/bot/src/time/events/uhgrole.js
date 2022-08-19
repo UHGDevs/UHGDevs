@@ -26,7 +26,7 @@ module.exports = {
       let api = await uhg.api.call("64680ee95aeb48ce80eb7aa8626016c7", ["guild"])
       if (!api.success) throw new Error(api.reason)
 
-      let members = api.guild.all.members
+      let members = api.guild.members
 
 
       /* -- Make sure UHG database is up to date -- */

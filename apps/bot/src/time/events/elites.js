@@ -22,7 +22,7 @@ module.exports = {
       if (typeof updated !== 'object') {
         api = await uhg.api.call("fb811b92561e434eb5b6ef04695cc49a", ["guild"])
         if (!api.success) return uhg.dc.client.channels.cache.get('530496801782890527').send('ELITE MEMBERS ERROR:\n'+api.reason)
-        api = api.guild.all
+        api = api.guild.guild
         data = await uhg.mongo.run.get('stats', 'guild', {name:"UltimateHypixelGuild"})
         if (!data.length) return
         data = data[0]
