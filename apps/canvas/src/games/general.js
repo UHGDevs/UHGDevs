@@ -4,10 +4,17 @@ const { f, fCtx, createCanvas, toDate } = require('../util/Functions')
 exports.draw = (ctx, obj, api, gamemode) => {
     let stat = obj.stat 
     let color = obj.color || "#FFAA00", font = `${obj.size || 20}px ${obj.font || 'Minecraft'}`, text = api[stat] >= 0 ? api[stat] : api[gamemode][stat]
+    let customText = obj.customText
 
-    if (obj.customText) {
-        console.log(obj.customText.match(/%%(.*?)%%/gi))
+    if (customText) {
+        customText.match(/%%(.*?)%%/gi).forEach(n => {
+          let apiStat = api[n.replace(/%%/g, '')] ? api[n.replace(/%%/g, '')] : api[gamemode][n.replace(/%%/g, '')]
+          customText = customText.replace(n, apiStat || n)
+        })
+    text = customText
     }
+
+    console.log(text)
 
     // switch(stat) {
     //     case "level":
