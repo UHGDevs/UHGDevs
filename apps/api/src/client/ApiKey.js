@@ -60,7 +60,8 @@ class ApiKey extends EventEmitter {
   async resetKeyTimer() {
     while (true) {
       await this.delay(60000 - (new Date().getTime() % 60000))
-      this.options.limit = this.options.key_count * 120
+      //this.options.limit = this.options.key_count * 120
+      this.options.key_uses = 0;
     }
   }
 
