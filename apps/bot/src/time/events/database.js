@@ -20,7 +20,7 @@ module.exports = {
       let update = data.slice(0,50)
       update.forEach(async (member) => {
         uhg.api.call(member.uuid, ["hypixel"]).then(n => {
-          if (!n.success) return uhg.dc.client.channels.cache.get('530496801782890527').send(`${member.username} database refresh error:\n${api.reason}`)
+          if (!n.success) return uhg.dc.client.channels.cache.get('530496801782890527').send(`${member.username} database refresh error:\n${n.reason}`)
         })
         //await uhg.mongo.run.update("stats", "stats", {_id: api.uuid}, api.hypixel)
       });
