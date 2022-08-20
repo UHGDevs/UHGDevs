@@ -873,12 +873,15 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       humanwins: vampirez.human_wins || 0,
       vampirewins: vampirez.vampire_wins || 0,
       kills: (vampirez.zombie_kills || 0) + (vampirez.vampire_kills || 0) + (vampirez.human_kills || 0),
+      humankills: vampirez.human_kills || 0,
       vampirekills: vampirez.vampire_kills || 0,
       zombiekills: vampirez.zombie_kills || 0,
+      mostvampirekills: vampirez.most_vampire_kills_new || 0,
+      deaths: (vampirez.human_deaths || 0)+(vampirez.vampire_deaths || 0),
+      kdr: ratio((vampirez.zombie_kills || 0) + (vampirez.vampire_kills || 0) + (vampirez.human_kills || 0), (vampirez.human_deaths || 0)+(vampirez.vampire_deaths || 0)),
       humandeaths: vampirez.human_deaths || 0,
       vampiredeaths: vampirez.vampire_deaths || 0,
-      goldbought: vampirez.gold_bought || 0,
-      humankills: vampirez.human_kills || 0,
+      goldbought: vampirez.gold_bought || 0
     }
 
     api.hypixel.stats.tourney = {

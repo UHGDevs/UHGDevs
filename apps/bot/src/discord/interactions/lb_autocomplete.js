@@ -140,8 +140,8 @@ module.exports = async (uhg, interaction) => {
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
         { name: 'Assisty', value: 'assists' },
-        { name: 'Vlny zničeno', value: 'blocks_broken' },
-        { name: 'Vlny položeno', value: 'blocks_placed' },
+        { name: 'Vln zničeno', value: 'blocks_broken' },
+        { name: 'Vln položeno', value: 'blocks_placed' },
         { name: 'Powerupů sebráno', value: 'powerups'},
       ])
     } else if (game == 'bb') {
@@ -170,6 +170,22 @@ module.exports = async (uhg, interaction) => {
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
         { name: 'Asistence', value: 'assists' }
+      ])
+    } else if (game == "vampirez") {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Výhry za člověka', value: 'humnanwins' },
+        { name: 'Výhry za upíra', value: 'vampirewins' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Lidí zabito', value: 'humankills' },
+        { name: 'Upírů zabito', value: 'vampirekills' },
+        { name: 'Zombie zabito', value: 'zombiekills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'Smrti za člověka', value: 'humnandeaths' },
+        { name: 'Smrti za upíra', value: 'vampiredeaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Zlata nakoupeno', value: 'goldbought' }
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -229,6 +245,8 @@ module.exports = async (uhg, interaction) => {
     } else if (game == "paintball") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "walls") {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == "vampirez") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }
