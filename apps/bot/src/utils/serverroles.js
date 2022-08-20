@@ -17,7 +17,7 @@ exports.uhg = async (uhg) => {
     uhg.dc.cache.split.guild = ["530504032708460584", "537255964898754571", "530504766225383425", "537252847025127424", "475585340762226698", "530504567528620063", "656827910807879696", "807226875411431424", "977141028115058718", "916790046823161956"]
     uhg.dc.cache.split.discord = ["684069130478813226", "456149770847649802", "575052804960288770", "478598933908553730", "478816107222925322", "478811145034137611", "478809710997536768", "475588114732023818", "464872228995989515", "464872228996120617", "475594143448694787", "464872228819959819", "489790082585329669", "481101689550536714", "482898838722707466", "936257245178634261", "934449629800587325", "927992007157252136"]
     uhg.dc.cache.split.badges = []
-    let minigames = ['SkyWars', 'Bedwars', 'Blitz SG', 'Duels', 'Build Battle', 'CaC', 'Arena Brawl', 'Paintball', 'Quakecraft', 'The Walls', 'TKR', 'VampireZ', 'UHC Champions', 'Speed UHC']
+    let minigames = ['SkyWars', 'Bedwars', /*'Blitz SG',*/ 'Duels', 'Build Battle', 'CaC', 'Arena Brawl', 'Paintball', 'Quakecraft', 'The Walls', 'TKR', 'VampireZ', 'UHC Champions', 'Speed UHC']
     let newBadges = guild.roles.cache.filter(n => uhg.endsWithArray(n.name, ['God', 'Expert', 'Trained']) && !n.name.startsWith('Build Battle'))
     newBadges.set('996722012284264488', guild.roles.cache.get('996722012284264488'))
     newBadges.set('996722019108409414', guild.roles.cache.get('996722019108409414'))
