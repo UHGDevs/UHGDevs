@@ -1,0 +1,6 @@
+[
+     {"stat": "level", "color": null, "font": null, "size": null, "x": 315, "y": 68},
+     {"stat": "quests", "color": null, "font": null, "size": null, "x": 500, "y": 68, "customText": "%%quests%%/%%challenges%%"},
+     {"stat": "firstLogin", "color": null, "font": null, "size": null, "x": 315, "y": 124},
+     {"stat": "lastLogin", "color": null, "font": null, "size": null, "x": 315, "y": 168}
+]

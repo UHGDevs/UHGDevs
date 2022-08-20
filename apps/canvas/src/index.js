@@ -1,5 +1,5 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
-
+const fs = require('fs');
 const { f, fCtx } = require('./util/Functions')
 
 async function run(mode = 'general', api = {}) {
@@ -39,6 +39,7 @@ async function run(mode = 'general', api = {}) {
    
    // TADY PRIDAT RUZNE HRY? (require(`./games/${mode}`))
 
+   let cache = JSON.parse(fs.readFileSync(`../canvas/src/games/${mode}.json`, 'utf8'));
 
    ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
@@ -49,13 +50,13 @@ async function run(mode = 'general', api = {}) {
    // general example
    let skin = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`)
    ctx.drawImage(skin, 20, 70, 198, 320)
-   let general = drawGame(ctx, api, 'general', 'overall', ['level', 'quests', 'challenges'])
+   let game = drawGame(ctx, api, mode, 'overall', cache)
 
-   ctx.drawImage(general.level, 315 - general.level.width/2, 68)
-   ctx.drawImage(general.quests, 500 - general.quests.width/2, 68)
+   for (let i of cache) {
+      ctx.drawImage(game[i.stat], i.x - game[i.stat].width/2, i.y)
+   }
    let aps = displayText(ctx.measureText(""), ctx, "aps", api)
    ctx.drawImage(aps, 694 - aps.width/2, 68)
-   //ctx.drawImage(general.aps, 685 - general.aps.width/2, 68)
 
    let toDiscord = await canvas.toBuffer()
    return {
@@ -152,12 +153,14 @@ function displayText(dim, oldctx, text, api) {
 }
 
 // example of possible method of displaying minigames
-function drawGame(ctx, api, game, gamemode, req = []) {
+function drawGame(ctx, api, game, gamemode, settings = []) {
    let result = {}
-   for (let stat of req) {
+   for (let obj of settings) {
+      let stat = obj.stat 
       let fApi = api.hypixel.stats[game] || api.hypixel
+   
 
-      let res = require(`./games/${game}`).draw(ctx, stat, fApi, gamemode)
+      let res = require(`./games/${game}`).draw(ctx, obj, fApi, gamemode)
       result[stat] = res //createCanvas({ text: f(text), ctx: ctx, color: color, font: font })
    }
 

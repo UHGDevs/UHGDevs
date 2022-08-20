@@ -45,6 +45,11 @@ class ApiFunctions {
 
     static clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
 
+    static toDate(unix) {
+      let date = new Date(unix)
+      return date.toLocaleDateString("cs-CZ")
+    }
+
     static fCtx(ctx, options = {}) {
         ctx.font = options.font || '24px Minecraft'
         ctx.fillStyle = options.fillStyle || options.color || ''
