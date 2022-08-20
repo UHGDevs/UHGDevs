@@ -13,7 +13,7 @@ class Counts {
     if (limit <= 0) return {success: false, type: "counts", reason: 'Hypixel API key limit reached!'};
 
     let counts;
-    try { counts = await client.callHypixel.get('counts', {params: { key: apikey }}).then( n => n.data ) } catch (e) {return {success: false, type: "counts", reason: 'Hypixel GameCounts API is getting touble!'}};
+    try { counts = await client.callHypixel.get('counts', {params: { key: apikey }}).then( n => n.data ) } catch (e) {return {success: false, type: "counts", reason: e.response.data.cause}};
     if (!counts.success) return  {success: false, type: "counts", reason: counts.cause};
 
     let gamecounts = counts.games

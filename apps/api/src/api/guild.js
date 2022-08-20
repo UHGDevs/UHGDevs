@@ -16,7 +16,7 @@ class Guild {
     if (limit <= 0) return {success: false, type: "guild", reason: 'Hypixel API key limit reached!'};
 
     let guild;
-    try { guild = await client.callHypixel.get('guild', {params: { key: apikey, player: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "guild", reason: 'Hypixel Guild API is getting touble!'}};
+    try { guild = await client.callHypixel.get('guild', {params: { key: apikey, player: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "guild", reason: e.response.data.cause}};
     if (!guild.success) return  {success: false, type: "guild", reason: guild.cause};
     if (!guild.guild) return { success: true, type: 'guild', name: 'Žádná', guild: false }
     guild = guild.guild
