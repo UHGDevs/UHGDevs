@@ -27,6 +27,7 @@ class Hypixel {
 
     const api = await require('./games/general')(hypixel, uuid, client)
 
+    options.user.cache.hypixel_achievements = hypixel.achievements || {}
     
     const mw = hypixel.stats.Walls3 || {};
     const smash = hypixel.stats.SuperSmash || {};

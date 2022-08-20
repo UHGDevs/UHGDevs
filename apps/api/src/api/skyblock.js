@@ -1,4 +1,5 @@
 
+const Api = require('./Api');
 const func = require('../util/ApiFunctions');
 
 class Skyblock {
@@ -24,7 +25,7 @@ class Skyblock {
     const api = { success: true, type: 'skyblock', profiles: []}
 
     for (let p of profiles) {
-      console.log(p.community_upgrades)
+      let community = p.community_upgrades
 
       /* -- Declare every profile basic info */
       let profile = {
@@ -36,8 +37,8 @@ class Skyblock {
         bank_history: [ ],
         bank_interest: { },
 
-        upgrading: p.community_upgrades.currently_upgrading,
-        upgrades: { }, // tiers + oznacit maxed (a asi napsat co to dělá do description)
+        upgrading: func.comUpgrade(community.currently_upgrading),
+        upgrades: [ ],
         members: [ ]
       }
       /* - end - */
@@ -60,8 +61,36 @@ class Skyblock {
       /* - end - */
 
 
+      /* -- Community Upgrades Formating-- */
+      community.upgrade_states.sort((a, b) => b.tier - a.tier).forEach(e => {
+        if (profile.upgrades.find(n => n.name == e.upgrade.replaceAll('_', ' '))) return
+        profile.upgrades.push(func.comUpgrade(e))
+      })      
+      /* - end - */
 
-      console.log(profile)
+
+      /* -- Members -- */ 
+      for (let member in p.members) {
+        let uuid = member
+        member = p.members[uuid]
+
+        let cache = client.users.get(client.aliases.get(uuid))
+        if (!cache || !cache.cache || !cache.cache.hypixel) {
+          cache = new Api({user: uuid, call: ['hypixel'], client: client})
+          let usr = await cache.send
+          if (!usr.success) return { success: false, type: 'skyblock', reason: 'Fetching profile members error: ' + cache.reason + ' uuid: ' + uuid}
+        }
+
+
+        member.username = cache.username;
+        member.uuid = cache.uuid;
+        
+        let info = require('./skyblock/player') (member, profile, cache)
+        break
+      }
+      /* - end - */
+
+
       api.profiles.push(profile)
     }
     
@@ -75,21 +104,86 @@ module.exports = Skyblock;
 
 /* ---- SCHEMA ---- */
 
-/* -- profiles -- */
-`                                                                : api off
-profiles: array            - []
-  id: string               - profile id
-  name: string             - cutename
-  mode: string             - normal|ironman|stranded|bingo
+`
+-- profiles --                                                    : api off
 
-  bank: int                - island banking system               : -1
-  bank_history: array      - bank transactions                   : []
-  bank_interest: object    - maybe will be removed               : {}
-    count: int                                                   : undefined
-    money: int                                                   : undefined
+profiles: array             - []
+  id: string                - profile id
+  name: string              - cutename
+  mode: string              - normal|ironman|stranded|bingo
 
-  upgrading: object        - current community upgrade           : null
-  upgrades: object         - comunity upgrades
+  bank: int                 - island banking system               : -1
+  bank_history: array       - bank transactions                   : []
+  bank_interest: object     - maybe will be removed               : {}
+    count: int                                                    : undefined
+    money: int                                                    : undefined
 
-  members: array           - all island members
+  upgrading: object         - current community upgrade           : {}
+  upgrades: array           - comunity upgrades
+
+  members: array            - all island members
+
+
+
+ -- community upgrade -- 
+
+  name: string                - formatted name
+  tier: number                - if upgrading, the new one
+  desc: string                - basic description
+
+
+  -- island member -- 
+
+  username: string
+  uuid: string
+  updated: int                - by hypixel
+  joined: int                 - joined island time
+
+  skills_api: bool            - true = on, false = off
+  banking_api: bool
+  purse_api: bool
+
+  bank: object
+    purse: int                                                     : 0
+    bank: int                                                      : 0
+    total: int
+
+  fairy_souls: object
+    total: int                - fairysouls found
+    unclaimed: int            - unused fairysould
+    boosted: int              - claimed fairysouls times (claimed/5)
+
+  cakes: array                - copy of original
+
+  skills: object
+    social: object
+    runecrafting: object
+    carpentry: object
+    taming: object
+    alchemy: object
+    enchanting: object
+    fishing: object
+    foraging: object
+    combat: object
+    mining: object
+    farming: object
+      exp: int                - all exp
+      level: int              - skill level
+      exp_current: int        - current exp in level
+      missing_exp: int        - exp to next level
+      progress: int           - % to next level
+  skills_average: double_3
+  skills_average_progress: double_3
+
+  essence: object             - every hypixel essence
+    undead: int
+    wither: int
+    spider: int
+    ice: int
+    gold: int
+    diamond: int
+    dragon: int
+    crimson: int
+
+
 `

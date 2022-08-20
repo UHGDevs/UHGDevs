@@ -27,6 +27,7 @@ class Api extends CreateUser {
     
     options.client = this.client
     options.uuid = this.uuid
+    options.user = this
     
 
     const calls = options.call.filter(n => n.toLowerCase() !== 'mojang' && n.toLowerCase() !== 'mjg' );

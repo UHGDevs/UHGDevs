@@ -22,7 +22,7 @@ exports.uhg = async (uhg) => {
     newBadges.set('996722012284264488', guild.roles.cache.get('996722012284264488'))
     newBadges.set('996722019108409414', guild.roles.cache.get('996722019108409414'))
     newBadges.set('996722019108409414', guild.roles.cache.get('996722019108409414'))
-    uhg.dc.cache.badges = guild.roles.cache.filter(n => uhg.startsWithArray(n.name, minigames) && !newBadges.filter(a => a.id == n.id) || uhg.endsWithArray(n.name, minigames))
+    uhg.dc.cache.badges = guild.roles.cache.filter(n => uhg.startsWithArray(n.name, minigames) && !newBadges.find(a => a.id == n.id) || uhg.endsWithArray(n.name, minigames))
     uhg.dc.cache.badges.forEach(n => {uhg.dc.cache.split.badges.push(n.id)});
     uhg.dc.cache.newBadges = newBadges
 

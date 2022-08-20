@@ -1,4 +1,6 @@
 
+const constants = require('./skyblockconstants')
+
 class ApiFunctions {
 
   static f(number, max=2) {
@@ -336,6 +338,72 @@ class ApiFunctions {
           .replace('ironman', 'Ironman')
   }
 
+  static comUpgrade(upgrade) {
+    if (!upgrade) return {}
+    let com = {
+      name: upgrade.upgrade.replaceAll('_', ' '),
+      tier: upgrade.tier || upgrade.new_tier /*- 1*/,
+      desc: this.getUpgradeDesc(upgrade.upgrade, upgrade.tier || upgrade.new_tier)
+    }
+    return com
+  }
+
+  static getUpgradeDesc(name, tier) {
+    if (!name) return 'unknown name'
+    if (name == 'coins_allowance') return `Každý den příspěvek ${tier}0K.`
+    return 'description coming soon'
+  }
+
+  static getSkills(player, achievements) {
+    let skills = {}
+
+    for (let s of constants.skills) {
+      let skill = { exp: 0, level: 0, exp_current: 0, exp_missing: 0, progress: 0 }
+
+      let exp = player[`experience_skill_${s == 'social' ? 'social2' : s}`]
+      if (exp === undefined) {
+        skill.level = achievements[constants.skills_achievements[s]] || 0
+        skills[s] = skill
+        continue
+      }
+
+      exp = Math.floor(exp || 0)
+      skill.exp = exp
+
+      let xpTable = constants[s] || constants.leveling_xp;
+      let maxLevel = Math.max(...Object.keys(xpTable));
+      if (constants.skills_cap[s] > maxLevel) xpTable = Object.assign(constants.xp_past_50, xpTable);
+      maxLevel = constants.skills_cap[s]
+
+      let totalLevelExp = 0;
+      for (let x = 1; x <= maxLevel; x++) {
+        totalLevelExp += xpTable[x];
+        if (totalLevelExp > exp) {
+          totalLevelExp -= xpTable[x];
+          break;
+        } else {
+          skill.level = x;
+        }
+      }
+
+      skill.exp_current = exp - totalLevelExp;
+      let nextLevelExp = skill.level < maxLevel ? Math.ceil(xpTable[skill.level + 1]) : 0
+      if (skill.level < maxLevel) skill.exp_missing = nextLevelExp - skill.exp_current
+      skill.progress = Math.floor((Math.max(0, Math.min(skill.exp_current / (nextLevelExp||skill.exp_current), 1))) * 100);
+      skills[s] = skill
+    }
+
+    let sa = 0
+    let trueSa = 0
+    for (let s of constants.skill_average) {
+      sa += skills[s].level
+      trueSa += skills[s].level + skills[s].progress / 100
+    }
+    sa = Math.floor((sa / constants.skill_average.length) * 1000)/1000
+    trueSa = Math.floor((trueSa / constants.skill_average.length) * 1000)/1000
+
+    return { stats: skills, sa: sa, tSa: trueSa }
+  }
 
   static capitalize(string) {
     if (!string) return string
