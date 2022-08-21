@@ -29,12 +29,10 @@ function draw (ctx, obj, api, gamemode) {
     return createCanvas(options)
 }
 
-module.exports = async (ctx, api) => {
+module.exports = async (ctx, api, data) => {
     let prefix = api.guild.tag ? `${api.hypixel.prefix} [${api.guild.tag}]` : api.hypixel.prefix
 
-    let data = JSON.parse(fs.readFileSync(`./src/settings/imageCommands/general.json`, 'utf8'));
-
-    for (let i of data) {
+    for (let i of data.fields) {
         ctx = fCtx(ctx, i)
         let stat;
         if (!i.custom) stat = draw(ctx, i, api.hypixel, 'overall')

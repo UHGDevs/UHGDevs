@@ -9,7 +9,7 @@ module.exports = {
   emoji: '👥',
   time: '0 * * * * *', //'*/10 * * * * *'
   ignore: '* * 0,23 * * *', //'sec min hour den(mesic) mesic den(tyden)'
-  onstart: true,
+  onstart: false,
   run: async (uhg) => {
     let date = new Date()
     let event = time.start(uhg, eventName)

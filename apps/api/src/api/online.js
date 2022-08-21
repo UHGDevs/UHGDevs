@@ -42,8 +42,6 @@ class Online {
       api.title = "Online"
 
       let game = func.renameHypixelGames(online.gameType) || null
-      console.log(online)
-      console.log(game)
       api.game = game
 
       let mode = func.getGamemode(online.mode) || null

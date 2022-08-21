@@ -1,11 +1,12 @@
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
-const fs = require('fs');
 const { f, fCtx } = require('./util/Functions')
 
 /* FONTS -> */ FontLibrary.use("Minecraft", ['../canvas/src/fonts/MinecraftRegular-Bmg3.otf'])
 
-async function run(mode = 'general', api = {}) {
+async function run(data, api = {}) {
    /* HANDLE API ERROR -> */ if (!api.hypixel) { return api.reason }
+
+   let mode = data._id
 
    /* define CANVAS */
    let canvas = new Canvas(800, 480);
@@ -25,13 +26,14 @@ async function run(mode = 'general', api = {}) {
    ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
 
-   await require(`./games/${mode}`)(ctx, api)
+   await require(`./games/${mode}`)(ctx, api, data)
 
 
    let toDiscord = await canvas.toBuffer()
    return {
       attachment: toDiscord,
-      name: `${api.username}_${mode}.png`
+      name: `${api.username}_${mode}.png`,
+      data: data
    }
 }
 

@@ -1,9 +1,0 @@
-[
-     {"stat": "level", "color": null, "font": null, "size": null, "x": 315, "y": 68},
-     {"stat": "quests", "color": null, "font": null, "size": null, "x": 500, "y": 68, "customText": "%%quests%%/%%challenges%%"},
-     {"stat": "firstLogin", "color": null, "font": null, "size": null, "x": 315, "y": 124, "customText": "((%%firstLogin%%((" },
-     {"stat": "lastLogin", "color": null, "font": null, "size": null, "x": 315, "y": 168, "customText": "((%%lastLogin%%((" },
-     {"stat": "displayName", "x": 509, "y": 10, "custom": true },
-     {"stat": "aps", "x": 694, "y": 68, "custom": true },
-     {"stat": "skin", "x": 20, "y": 70, "custom": true }
-]

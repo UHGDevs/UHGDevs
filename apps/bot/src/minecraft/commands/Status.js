@@ -9,7 +9,6 @@ module.exports = {
 
       if (!api.online.online) return `[${api.online.title}] **${api.username}**`
 
-      console.log(api.online)
       if (api.online.game) onlinegame = " - " + api.online.game + " "
       if (api.online.mode) onlinemode =  api.online.mode + " "
       if (api.online.map) onlinemap = `(${api.online.map})`
