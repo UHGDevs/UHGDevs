@@ -17,7 +17,7 @@ class Skyblock {
     if (limit <= 0) return {success: false, type: "skyblock", reason: 'Hypixel API key limit reached!'};
 
     let skyblock;
-    try { skyblock = await client.callHypixel.get('skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response.data.cause}};
+    try { skyblock = await client.callHypixel.get('skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response ? e.response.data.cause : 'Skyblock API error'}};
     if (!skyblock.success) return  {success: false, type: "skyblock", reason: skyblock.cause};
 
     const profiles = skyblock.profiles.filter(n => !n.game_mode)

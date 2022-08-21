@@ -16,7 +16,7 @@ class Recent {
     if (limit <= 0) return {success: false, type: "recent", reason: 'Hypixel API key limit reached!'};
 
     let recent;
-    try { recent = await client.callHypixel.get('recentgames', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "recent", reason: e.response.data.cause}};
+    try { recent = await client.callHypixel.get('recentgames', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "recent", reason: e.response ? e.response.data.cause : 'RecentGames API error'}};
     if (!recent.success) return  {success: false, type: "recent", reason: recent.cause};
 
     const api = { success: true, type: 'recent', games: recent.games }    

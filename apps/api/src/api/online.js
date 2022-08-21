@@ -16,7 +16,7 @@ class Online {
     if (limit <= 0) return {success: false, type: "online", reason: 'Hypixel API key limit reached!'};
 
     let online;
-    try { online = await client.callHypixel.get('status', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "online", reason: e.response.data.cause}};
+    try { online = await client.callHypixel.get('status', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "online", reason: e.response ? e.response.data.cause : 'Online API error'}};
     if (!online.success) return  {success: false, type: "online", reason: online.cause};
     online = online.session
 
