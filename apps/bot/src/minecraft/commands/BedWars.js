@@ -11,7 +11,7 @@ module.exports = {
       let bedwars = api.hypixel.stats.bedwars
       let overall = bedwars.overall
 
-      let message = `**BedWars**: ${bedwars.levelformatted} **${uhg.dontFormat(api.username)}** - ${f(overall.finalKills)}Finals ${f(overall.wins)}Wins ${f(overall.fkdr)}FKDR ${f(overall.wlr)}WLR (Main gamemode - ${bedwars.main_mode})`
+      let message = `**BedWars**: ${bedwars.levelformatted} **${api.username}** - ${f(overall.finalKills)}Finals ${f(overall.wins)}Wins ${f(overall.fkdr)}FKDR ${f(overall.wlr)}WLR (Main gamemode - ${bedwars.main_mode})`
 
       let embed = new MessageEmbed()
       .setTitle('Bed Wars').setThumbnail('https://cdn.discordapp.com/attachments/875503798733385779/1000406344156844173/unknown.png').setColor("0x06ACEE")
