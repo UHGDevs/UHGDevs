@@ -1,4 +1,5 @@
 const { MessageEmbed, MessageButton, MessageActionRow, MessageSelectMenu, Modal, TextInputComponent } = require("discord.js");
+const { stat } = require("fs");
 const canva = require('uhg-canvas')
 const auth = ['378928808989949964', '312861502073995265', '379640544143343618']
 
@@ -26,9 +27,7 @@ try {
   if (!api.success) return console.log(api)
   interaction.message.api = api
 
-
-  let stats_options = interaction.message.components[0].components[0].options
-  interaction.message.stat = interaction.values ? interaction.values[0] : (interaction.message.stat ? interaction.message.stat : stats_options[0].value)
+  interaction.message.stat = interaction.values ? interaction.values[0] : interaction.message.components[0].components[0].options.find(n => n.default === true).value
 
   if (action == 'set' && arg == 'krok') {
     if (krok === 1) krok = 5
@@ -36,11 +35,12 @@ try {
     else if (krok === 10) krok = 50
     else krok = 1
   } else if (action == 'modal' && arg == 'settings-graphic') {
+    let stat = data.fields.find(n => n.stat = interaction.message.stat)
     let apply = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_apply`).setLabel("Stat").setStyle('SHORT').setPlaceholder(interaction.message.stat + ' | global'));
-    let color = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_color`).setLabel("Color - color code").setStyle('SHORT').setPlaceholder(' color code | null'));
+    let color = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_color`).setLabel("Color - color code").setStyle('LONG').setPlaceholder(`${stat.color || data.default.color} | null`));
     let font = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_font`).setLabel("Font").setStyle('SHORT').setPlaceholder(' Minecraft | any windows font | null'));
-    let size = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_size`).setLabel("Font Size").setStyle('SHORT').setPlaceholder('20 | null'));
-    let coords = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_coords`).setLabel("X/Y souřadnice").setStyle('SHORT').setPlaceholder('0, 0'));
+    let size = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_size`).setLabel("Font Size").setStyle('SHORT').setPlaceholder(`${stat.size || data.default.size} | null`));
+    let coords = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_coords`).setLabel("X/Y souřadnice").setStyle('SHORT').setPlaceholder(`${stat.x}, ${stat.y}`));
 
     const modal = new Modal().setCustomId(`ECMD_${type}_set_settings-graphic`).setTitle(`Nastavení ${type} commandu`).addComponents([apply, color, font, size, coords])
     return await interaction.showModal(modal);
@@ -73,25 +73,30 @@ try {
 
     img = await canva.run(data, api)
   } else if (action == 'modal' && arg == 'settings-info') {
+    let stat = data.fields.find(n => n.stat = interaction.message.stat)
     let apply = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_apply`).setLabel("Najít Stat").setStyle('SHORT').setPlaceholder(interaction.message.stat + ' | napsat \'new\' pro novy'));
     let editStat = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_stat`).setLabel("Stat").setStyle('SHORT').setPlaceholder('stat from uhg api'));
-    let editName = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_name`).setLabel("Název").setStyle('SHORT').setPlaceholder('title'));
-    let customText = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_customText`).setLabel("Custom Text").setStyle('SHORT').setPlaceholder('%%level%%/%%karma%%'));
+    let editName = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_name`).setLabel("Název").setStyle('SHORT').setPlaceholder(stat.name));
+    let path = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_path`).setLabel("Api Path").setStyle('SHORT').setPlaceholder('hypixel/stats/bedwars/overall/fkdr'));
+    let customText = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_customText`).setLabel("Custom Text").setStyle('SHORT').setPlaceholder(stat.customText || '%%hypixel/level%%/%%hypixel/karma%%'));
+    
 
-    const modal = new Modal().setCustomId(`ECMD_${type}_set_settings-info`).setTitle(`Nastavení ${type} commandu`).addComponents([apply, editStat, editName, customText])
+    const modal = new Modal().setCustomId(`ECMD_${type}_set_settings-info`).setTitle(`Nastavení ${type} commandu`).addComponents([apply, editStat, editName, path, customText])
     return await interaction.showModal(modal);
   } else if (action == 'set' && arg == 'settings-info') {
     let apply = String(interaction.fields.getTextInputValue(`ECMD_${type}_set_apply`) || interaction.message.stat).toLowerCase()
     let stat = data.fields.find(n => n.stat.toLowerCase() == apply || n.name.toLowerCase() == apply) || {}
-    let apiStat = String(interaction.fields.getTextInputValue(`ECMD_${type}_set_stat`) || stat.stat)
-    let apiName = String(interaction.fields.getTextInputValue(`ECMD_${type}_set_name`) || stat.name)
+    let apiStat = interaction.fields.getTextInputValue(`ECMD_${type}_set_stat`) || stat.stat
+    let apiName = interaction.fields.getTextInputValue(`ECMD_${type}_set_name`) || stat.name
+    let path = interaction.fields.getTextInputValue(`ECMD_${type}_set_path`)
     let customText = interaction.fields.getTextInputValue(`ECMD_${type}_set_customText`) || stat.customText
 
     let newcmd = apply == 'new' ? true : false
     if (newcmd && data.fields.find(n => n.stat == apiStat)) return interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`ERROR`).setDescription('Zadaný stat už je na obrázku!').setColor('RED')] })
-    if (newcmd && (!apiStat || !apiName)) return interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`ERROR`).setDescription('Nezadal jsi stat nebo jméno u nového commandu!').setColor('RED')] })
+    if (newcmd && (!apiStat || !apiName || !path)) return interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`ERROR`).setDescription('Nezadal jsi stat, jméno nebo path u nového commandu!').setColor('RED')] })
     stat.stat = apiStat || stat.stat
     stat.name = apiName || stat.apiName
+    stat.path = path || stat.path
     if (customText) stat.customText = customText
     stat.color = stat.color || null
     stat.font = stat.font || null
@@ -99,11 +104,13 @@ try {
     stat.x = stat.x || 0
     stat.y = stat.y || 0
 
+    if (customText === 'null') delete stat.customText
+
     if (newcmd) {
       data.fields.push(stat)
       interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`SUCCESS`).setDescription(`${stat.name}: ${uhg.f(api.hypixel.stats[type] ? (api.hypixel.stats[game][stat.stat] || api.hypixel.stats[game]['overall'][stat.stat]) : api.hypixel[stat.stat] )}\n Nezapoměň se přepnout do commandu a po nastavení grafiky command uložit!`).setColor('GREEN')] })
     }
-    console.log(data.fields)
+    
     img = await canva.run(data, api)
   } else if (action == 'set' && arg == 'save') {
     await uhg.mongo.run.post('general', 'commands', data)
@@ -160,14 +167,10 @@ const but3 = new MessageActionRow()
   .addComponents(new MessageButton().setCustomId(`ECMD_${type}_set_discard`).setStyle('DANGER').setEmoji('<:false:1011238405943865355>'))
   .addComponents(new MessageButton().setCustomId(`ECMD_${type}_set_save`).setStyle('SUCCESS').setEmoji('<:true:1011238431482974278>'));
 
-  let stat_options = new MessageSelectMenu().setCustomId(`ECMD_${type}_set`)
-  stat_options.options = []
+  let selectmenu = new MessageSelectMenu().setCustomId(`ECMD_${type}_set`).addOptions(data.fields.map(e => {return {label: e.name, value: e.stat, emoji: null, default: e.stat == interaction.message.stat}}))
 
-  data.fields.forEach((e, i) => {
-    stat_options.options.push({ label: e.name, value: e.stat,emoji: null, default: interaction.message.stat == e.stat})
-  });
-  const row = new MessageActionRow().addComponents(stat_options);
-
+  console.log(selectmenu.options)
+  const row = new MessageActionRow().addComponents(selectmenu);
   let zprava = { components: [row, but1, but2, but3] }
   if (!img.id) zprava.files = [img]
 

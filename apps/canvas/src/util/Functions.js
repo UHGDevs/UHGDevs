@@ -43,20 +43,20 @@ class ApiFunctions {
         return n
     }
 
-    static clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
+   static clear(message) { return message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '') }
 
-    static toDate(unix) {
+   static toDate(unix) {
       let date = new Date(Number(unix))
       return date.toLocaleDateString("cs-CZ")
-    }
+   }
 
-    static fCtx(ctx, options = {}) {
+   static fCtx(ctx, options = {}) {
         ctx.font = Number(String(options.font).replace(/[^0-9.]/g, '')) ? options.font : ((options.size ? (Number(options.size) ? options.size : options.size[0]) : 24) + 'px ' + options.font || 'Minecraft')
         ctx.fillStyle = options.fillStyle || options.color || ''
         return ctx
-    }
+   }
 
-     static displayText(ctx, text, api, options) {
+   static displayText(ctx, text, api, options) {
 
       let prefix = api.guild.tag ? `${api.hypixel.prefix} [${api.guild.tag}]` : api.hypixel.prefix
       let width = 0;
@@ -141,6 +141,9 @@ class ApiFunctions {
       }
       return canvas
    }
+
+   static path(path, api) { 
+      return path.split('/').reduce((o, n) => o[n], api) }
   }
   
   module.exports = ApiFunctions

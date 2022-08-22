@@ -3,14 +3,13 @@ const fs = require('fs');
 const { f, fCtx, toDate } = require('../util/Functions')
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
-function draw (ctx, obj, api, gamemode) {
-    let stat = obj.stat 
-    let text = f(api[stat] >= 0 ? api[stat] : api[gamemode][stat])
+function draw (ctx, obj, api) { 
+    let text = obj.customText ? null : f(func.path(obj.path + '/' + obj.stat, api))
     let customText = obj.customText
 
     if (customText) {
         customText.match(/%%(.*?)%%/gi).forEach(n => {
-          let apiStat = api[n.replace(/%%/g, '')] ? api[n.replace(/%%/g, '')] : api[gamemode][n.replace(/%%/g, '')]
+          let apiStat = func.path(n.replace(/%%/g, ''), api)
           customText = customText.replace(n, apiStat || n)
         })
 
@@ -43,9 +42,10 @@ module.exports = async (ctx, api, data) => {
             font: i.font || data.default.font
         }
 
+        i.path = i.path || 'hypixel'
         ctx = fCtx(ctx, options)
         let stat;
-        if (!i.custom) stat = draw(ctx, i, api.hypixel, 'overall')
+        if (!i.custom) stat = draw(ctx, i, api)
         else {
             if (i.stat === "skin") { let img = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`); ctx.drawImage(img, i.x, i.y, 198, 320); continue}
             else if (i.stat === 'aps') {stat = func.displayText(ctx, "aps", api, options) }
