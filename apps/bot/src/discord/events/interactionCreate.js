@@ -4,7 +4,7 @@ const fs = require('fs');
 module.exports = async (uhg, interaction) => {
   if (interaction.targetType === 'USER') require('../commandsCmd/profile.js').run(uhg, interaction)
   else if (interaction.isCommand()) require('../interactions/slashcommands')(uhg, interaction)
-  else if (interaction.isButton() && interaction.customId.startsWith('ECMD_'))  require('../interactions/editcmd')(uhg, interaction);
+  else if ((interaction.isButton() || interaction.isSelectMenu() || interaction.isModalSubmit()) && interaction.customId.startsWith('ECMD_'))  require('../interactions/editcmd')(uhg, interaction);
   else if (interaction.customId && interaction.customId.startsWith('ECMD_')) await interaction.update({ type:6 });
   else if (interaction.isButton() && (interaction.customId.startsWith('/g ') || interaction.customId == 'guild_denine')) require('../interactions/guild_command')(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('GEXP') ) require('../interactions/gexp')(uhg, interaction)

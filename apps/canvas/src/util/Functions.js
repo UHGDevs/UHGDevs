@@ -51,42 +51,30 @@ class ApiFunctions {
     }
 
     static fCtx(ctx, options = {}) {
-        ctx.font = options.font || '24px Minecraft'
+        ctx.font = Number(String(options.font).replace(/[^0-9.]/g, '')) ? options.font : ((options.size ? (Number(options.size) ? options.size : options.size[0]) : 24) + 'px ' + options.font || 'Minecraft')
         ctx.fillStyle = options.fillStyle || options.color || ''
      
         return ctx
     }
 
-    static createCanvas(options) {
-        if (!options.text) return {}
-        let dim = options.ctx.measureText(options.text)
-        let canvas = new Canvas(dim.width || 300, dim.height || 40);
-     
-        let ctx = canvas.getContext('2d')
-        ctx.fillStyle = options.color
-        ctx.font = options.font
+     static displayText(ctx, text, api, options) {
 
-        ctx.fillText(options.text, 0, 30)
-        return canvas
-     }
-
-     static displayText(dim, oldctx, text, api) {
-      let width = dim.width
+      let prefix = api.guild.tag ? `${api.hypixel.prefix} [${api.guild.tag}]` : api.hypixel.prefix
+      let width = 0;
       if (text == 'aps') {
-         var a = '18px Minecraft', b = '15px Minecraft'
-         oldctx.font = a
-         width += oldctx.measureText(`${this.f(api.hypixel.aps)}`).width
-         oldctx.font = b
-         width += oldctx.measureText(` [Legacy ${this.f(api.hypixel.legacyAps)}]`).width
-      }
+         let secondFont = this.fCtx(ctx, {font: ctx.font, size:  Array.isArray(options.size) ? options.size[1] : options.size -3 })
+         width += secondFont.measureText(` [Legacy ${this.f(api.hypixel.legacyAps)}]`).width
+         var b = secondFont.font
+         let firstFont = this.fCtx(ctx, {font: options.font, size: Array.isArray(options.size) ? options.size[0] : options.size})
+         width += firstFont.measureText(`${this.f(api.hypixel.aps)}`).width
+        
+      } else if (text == 'name') width = this.fCtx(ctx, options).measureText(prefix).width
+
       let canvas = new Canvas(width, 40);
-      let ctx = this.fCtx(canvas.getContext('2d'), {color: api.hypixel.color})
-   
+      ctx = this.fCtx(canvas.getContext('2d'), options)
+
       if (text == 'aps') {
          let x = 0, y = 30
-         ctx.fillStyle = '#FFAA00'
-   
-         ctx.font = a
          ctx.fillText(`${this.f(api.hypixel.aps)}`, x, y)
          x += ctx.measureText(`${this.f(api.hypixel.aps)}`).width
    
@@ -97,6 +85,7 @@ class ApiFunctions {
       else if (text == 'name') {
          let x = 0, y = 30
          let color = api.hypixel.color
+         ctx.fillStyle = color
    
          if (api.hypixel.rank.includes('MVP+')) {
             let plusColor = api.hypixel.color

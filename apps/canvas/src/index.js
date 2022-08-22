@@ -9,7 +9,7 @@ async function run(data, api = {}) {
    let mode = data._id
 
    /* define CANVAS */
-   let canvas = new Canvas(800, 480);
+   let canvas = new Canvas(data.width, data.height);
    let ctx = fCtx(canvas.getContext("2d"), {});
 
    let background_name = mode
@@ -32,8 +32,7 @@ async function run(data, api = {}) {
    let toDiscord = await canvas.toBuffer()
    return {
       attachment: toDiscord,
-      name: `${api.username}_${mode}.png`,
-      data: data
+      name: `${api.username}_${mode}.png`
    }
 }
 

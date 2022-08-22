@@ -8,7 +8,7 @@ module.exports = {
       let embed = new MessageEmbed()
         .setTitle("**Help**")
         .setThumbnail(uhg.dc.client.user.displayAvatarURL())
-        .setDescription("Ahoj, já jsem UHG Guild BOT, všechny dostupné příkazy najdeš v !commands")
+        .setDescription("Ahoj, já jsem UHG Guild BOT, všechny dostupné příkazy najdeš v !commands\n\nIcony z [Icon Serveru](https://discord.gg/9AtkECMX2P)")
         .setColor("0x06ACEE")
       return {mc: message, dc: embed}
     } catch (e) {
