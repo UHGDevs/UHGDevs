@@ -53,7 +53,6 @@ class ApiFunctions {
     static fCtx(ctx, options = {}) {
         ctx.font = Number(String(options.font).replace(/[^0-9.]/g, '')) ? options.font : ((options.size ? (Number(options.size) ? options.size : options.size[0]) : 24) + 'px ' + options.font || 'Minecraft')
         ctx.fillStyle = options.fillStyle || options.color || ''
-     
         return ctx
     }
 
@@ -62,7 +61,7 @@ class ApiFunctions {
       let prefix = api.guild.tag ? `${api.hypixel.prefix} [${api.guild.tag}]` : api.hypixel.prefix
       let width = 0;
       if (text == 'aps') {
-         let secondFont = this.fCtx(ctx, {font: ctx.font, size:  Array.isArray(options.size) ? options.size[1] : options.size -3 })
+         let secondFont = this.fCtx(ctx, {font: options.font, size: Array.isArray(options.size) ? options.size[1] : options.size - 3 })
          width += secondFont.measureText(` [Legacy ${this.f(api.hypixel.legacyAps)}]`).width
          var b = secondFont.font
          let firstFont = this.fCtx(ctx, {font: options.font, size: Array.isArray(options.size) ? options.size[0] : options.size})

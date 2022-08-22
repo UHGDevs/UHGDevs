@@ -29,14 +29,14 @@ module.exports = {
         .addComponents(but_null(1))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_move_up`).setStyle('PRIMARY').setLabel('▲'))
         .addComponents(but_null(2))
-        .addComponents(but_null(3))
-        .addComponents(but_null(4));
+        .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_modal_settings-graphic`).setStyle('SECONDARY').setEmoji('<:settings_graphic:1011333239434117130>'))
+        .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_modal_settings-info`).setStyle('SECONDARY').setEmoji('<:settings_info:1011333260384665610>'));
 
       const but2 = new MessageActionRow()
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_move_left`).setStyle('PRIMARY').setLabel('◄'))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_set_krok`).setStyle('SECONDARY').setLabel('1 px'))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_move_right`).setStyle('PRIMARY').setLabel('►'))
-        .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_modal_settings`).setStyle('SECONDARY').setEmoji('<:settings:1011235478164480000>'))
+        .addComponents(but_null(3))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_get_info`).setStyle('SECONDARY').setEmoji('<:info:1011235456429604864>'));
         
       const but3 = new MessageActionRow()
