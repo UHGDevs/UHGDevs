@@ -42,7 +42,7 @@ module.exports = {
       const but3 = new MessageActionRow()
         .addComponents(but_null(6))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_move_down`).setStyle('PRIMARY').setLabel('▼'))
-        .addComponents(but_null(7))
+        .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_set_sync`).setStyle('SECONDARY').setEmoji('<:refresh:1011620798278160384>'))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_set_discard`).setStyle('DANGER').setEmoji('<:false:1011238405943865355>'))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_set_save`).setStyle('SUCCESS').setEmoji('<:true:1011238431482974278>'));
 

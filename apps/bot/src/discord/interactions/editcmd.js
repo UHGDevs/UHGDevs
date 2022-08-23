@@ -88,7 +88,10 @@ try {
     }
 
     img = await canva.run(data, api)
-  } else if (action == 'modal' && arg == 'settings-info') {
+  }
+  
+  /* -- setup MODAL info settings -- */
+  else if (action == 'modal' && arg == 'settings-info') {
     let stat = data.fields.find(n => n.stat == interaction.message.stat) || data.fields[0] || {}
     if (stat.stat) interaction.message.stat = stat.stat
     
@@ -101,7 +104,9 @@ try {
 
     const modal = new Modal().setCustomId(`ECMD_${type}_set_settings-info`).setTitle(`Nastavení ${type} commandu`).addComponents([apply, editStat, editName, path, customText])
     return await interaction.showModal(modal);
-  } else if (action == 'set' && arg == 'settings-info') {
+  }
+  /* -- recieve MODAL graphic settings -- */
+  else if (action == 'set' && arg == 'settings-info') {
     let apply = String(interaction.fields.getTextInputValue(`ECMD_${type}_set_apply`) || interaction.message.stat).toLowerCase()
 
     let newcmd = false
@@ -135,11 +140,24 @@ try {
     }
     
     img = await canva.run(data, api)
-  } else if (action == 'set' && arg == 'save') {
+  }
+
+  /* -- save current EDIT settings -- */
+  else if (action == 'set' && arg == 'save') {
     await uhg.mongo.run.post('general', 'commands', data)
-    interaction.editReply({ components: [] })
-    return
-  } else if (action == 'get' && arg == 'info') {
+    //interaction.editReply({ components: [] })
+    //return
+    interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`SUCCESS`).setDescription(`Saved current design!`).setColor('GREEN')] })
+  }
+  
+  /* -- sync settings from DATABAZE -- */
+  else if (action == 'set' && arg == 'sync') {
+    data = await uhg.mongo.run.get('general', 'commands', { _id: type }).then(n=> n[0] || null)
+    img = await canva.run(data, api)
+  }
+
+  /* -- view STAT settings -- */
+  else if (action == 'get' && arg == 'info') {
     let stat = data.fields.find(n => n.stat == interaction.message.stat)
     let info = `Coords: ${stat.x}:${stat.y}`
     if (stat.color !== undefined) info = info + `\nColor: ${stat.color ? stat.color : ('Default - ' + data.default.color)}`
@@ -151,7 +169,10 @@ try {
 
     let info_e = new MessageEmbed().setTitle(`${stat.name} v ${type} commandu`).setColor('#ff51fd').setDescription(info)
     interaction.followUp({ ephemeral: true, embeds: [info_e] })
-  } else if (action == 'move') {
+  } 
+
+  /* -- move STAT around the picture -- */
+  else if (action == 'move') {
     let stat = data.fields.find(n => n.stat == interaction.message.stat)
     if (arg == 'up') stat.y -= krok
     else if (arg == 'down') stat.y += krok
@@ -186,7 +207,7 @@ try {
   const but3 = new MessageActionRow()
     .addComponents(but_null(6))
     .addComponents(new MessageButton().setCustomId(`ECMD_${type}_move_down`).setStyle('PRIMARY').setLabel('▼'))
-    .addComponents(but_null(7))
+    .addComponents(new MessageButton().setCustomId(`ECMD_${type}_set_sync`).setStyle('SECONDARY').setEmoji('<:refresh:1011620798278160384>'))
     .addComponents(new MessageButton().setCustomId(`ECMD_${type}_set_discard`).setStyle('DANGER').setEmoji('<:false:1011238405943865355>'))
     .addComponents(new MessageButton().setCustomId(`ECMD_${type}_set_save`).setStyle('SUCCESS').setEmoji('<:true:1011238431482974278>'));
 
