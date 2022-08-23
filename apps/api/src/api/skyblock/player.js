@@ -48,6 +48,5 @@ module.exports = (player, profile, cache) => {
     },
 
   }
-console.log(api)
   return (api)
 }

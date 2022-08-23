@@ -1,5 +1,5 @@
-const constants = require('../data/constants');
-const helper = require('../data/helper');
+const constants = require('../../data/constants');
+const helper = require('../../data/helper');
 
 const findProfits = function (db) {
   const forgeItems = constants.forge_recipes;

@@ -2,14 +2,14 @@
 const Collection = require('@discordjs/collection').Collection
 
 const { Error } = require('../errors')
-const MongoDB = require('./MongoDB');
+const Nw = require('./Nw');
 const Util = require('../util/Util');
 const Options = require('../util/Options');
 
 const Api = require('../api/Api');
 const { getLegacy } = require('../util/achievements');
 
-class Client extends MongoDB {
+class Client extends Nw {
   constructor(options = {}) {
     super(options);
 

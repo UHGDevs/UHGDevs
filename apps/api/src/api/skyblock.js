@@ -20,10 +20,10 @@ class Skyblock {
     try { skyblock = await client.callHypixel.get('skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response ? e.response.data.cause : 'Skyblock API error'}};
     if (!skyblock.success) return  {success: false, type: "skyblock", reason: skyblock.cause};
 
-    const profiles = skyblock.profiles.filter(n => !n.game_mode)
+    const profiles = skyblock.profiles
 
     const api = { success: true, type: 'skyblock', profiles: []}
-
+console.time('Cele Api')
     for (let p of profiles) {
       let community = p.community_upgrades
 
@@ -38,8 +38,7 @@ class Skyblock {
         bank_interest: { },
 
         upgrading: func.comUpgrade(community.currently_upgrading),
-        upgrades: [ ],
-        members: [ ]
+        upgrades: [ ]
       }
       /* - end - */
 
@@ -69,32 +68,32 @@ class Skyblock {
       /* - end - */
 
 
-      /* -- Members -- */ 
-      for (let member in p.members) {
-        let uuid = member
-        member = p.members[uuid]
+      /* -- Member -- */ 
+      let member = p.members[uuid]
+      member.banking = p.banking
+      member.experience_skill_social2 = Object.values(p.members).reduce((a, b)=>a += b.experience_skill_social2 || 0, 0)
 
-        let cache = client.users.get(client.aliases.get(uuid))
-        if (!cache || !cache.cache || !cache.cache.hypixel) {
-          cache = new Api({user: uuid, call: ['hypixel'], client: client})
-          let usr = await cache.send
-          if (!usr.success) return { success: false, type: 'skyblock', reason: 'Fetching profile members error: ' + cache.reason + ' uuid: ' + uuid}
-        }
-
-
-        member.username = cache.username;
-        member.uuid = cache.uuid;
-        
-        let info = require('./skyblock/player') (member, profile, cache)
-        break
+      let cache = client.users.get(client.aliases.get(uuid))
+      if (!cache || !cache.cache || !cache.cache.hypixel) {
+        cache = new Api({user: uuid, call: ['hypixel'], client: client})
+        let usr = await cache.send
+        if (!usr.success) return { success: false, type: 'skyblock', reason: 'Fetching profile member error: ' + cache.reason + ' uuid: ' + uuid}
       }
+
+
+      member.username = cache.username;
+      member.uuid = cache.uuid;
+      
+      let player = require('./skyblock/player') (member, profile, cache)
+      player.nw = await client.getNetworth(member)
+      profile.member = player
       /* - end - */
 
 
       api.profiles.push(profile)
     }
     
-
+    console.timeEnd('Cele Api')
     return api
   }
 }
@@ -121,7 +120,7 @@ profiles: array             - []
   upgrading: object         - current community upgrade           : {}
   upgrades: array           - comunity upgrades
 
-  members: array            - all island members
+  member: object            - only CALLED MEMBER
 
 
 
@@ -184,6 +183,8 @@ profiles: array             - []
     diamond: int
     dragon: int
     crimson: int
+
+  nw : object                 - from maro api
 
 
 `

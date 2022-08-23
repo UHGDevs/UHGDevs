@@ -1,7 +1,7 @@
 const petGenerator = require('./petGenerator');
-const constants = require('../data/constants');
+const constants = require('../../data/constants');
 const nbt = require('prismarine-nbt');
-const helper = require('../data/helper');
+const helper = require('../../data/helper');
 const utils = require('util');
 const parseNbt = utils.promisify(nbt.parse);
 

@@ -1,5 +1,5 @@
-const constants = require('../data/constants');
-const helper = require('../data/helper');
+const constants = require('../../data/constants');
+const helper = require('../../data/helper');
 
 const getPricesFromDb = function (pet, db) {
   const lvl1 = db[`lvl_1_${pet.tier}_${pet.type}`.toLowerCase()];

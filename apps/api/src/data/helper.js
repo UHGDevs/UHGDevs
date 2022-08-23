@@ -156,7 +156,7 @@ const getMode = function (numbers) {
 };
 
 const getAttributes = function (item, itemName) {
-  const petGenerator = require('../generators/petGenerator')
+  const petGenerator = require('../util/generators/petGenerator')
   let itemId = item.id.value;
 
   if (itemId == 'ENCHANTED_BOOK' && item.enchantments) {

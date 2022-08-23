@@ -1,8 +1,8 @@
 
 const MongoDB = require('./MongoDB');
 
-const itemGenerator = require('../generators/itemGenerator');
-const networthGenerator = require('../generators/networthGenerator');
+const itemGenerator = require('../util/generators/itemGenerator');
+const networthGenerator = require('../util/generators/networthGenerator');
 
 const axios = require('axios');
 const helper = require('../data/helper.js')
@@ -10,7 +10,7 @@ const helper = require('../data/helper.js')
 const fs = require('fs');
 const path = require('path');
 
-class Commands extends MongoDB {
+class Nw extends MongoDB {
   constructor(options = {}) {
     super(options);
     this.prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices.json'), 'utf8'))
@@ -117,4 +117,4 @@ class Commands extends MongoDB {
 
 }
 
-module.exports = Commands;
+module.exports = Nw;
