@@ -85,7 +85,7 @@ console.time('Cele Api')
       member.uuid = cache.uuid;
       
       let player = require('./skyblock/player') (member, profile, cache)
-      player.nw = await client.getNetworth(member)
+      player.networth = await client.getNetworth(member)
       profile.member = player
       /* - end - */
 
