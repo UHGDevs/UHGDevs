@@ -7,6 +7,7 @@ async function run(data, api = {}) {
    /* HANDLE API ERROR -> */ if (!api.hypixel) { return api.reason }
 
    let mode = data._id
+   if (!mode){ console.log('Chybí definovat hru'); console.log(data); return}
 
    /* define CANVAS */
    let canvas = new Canvas(data.width, data.height);
@@ -19,17 +20,18 @@ async function run(data, api = {}) {
       background_name = files[Math.floor(Math.random()*files.length)]
    }
 
-   let background = await loadImage(`../canvas/src/templates/${background_name}.png`)
+   let background = await loadImage(`../canvas/src/templates/${background_name||'general_1'}.png`)
    let img = await loadImage(`../canvas/src/templates/${mode}_command.png`)
 
    ctx.drawImage(background, 0, 0, 800, 480) // Background Image
    ctx.drawImage(img, 0, 0, 800, 480) // Command Image
 
 
-   await require(`./games/${mode}`)(ctx, api, data)
+   await require(`./games/general`)(ctx, api, data)
 
 
    let toDiscord = await canvas.toBuffer()
+
    return {
       attachment: toDiscord,
       name: `${api.username}_${mode}.png`

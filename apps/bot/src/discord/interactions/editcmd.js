@@ -25,6 +25,7 @@ try {
   /* -- DATA fetching -- */
   let data = interaction.message.cache || await uhg.mongo.run.get('general', 'commands', { _id: type }).then(n=> n[0] || null) || undefined
   if (!data) return
+  if (!data._id) data._id = type
 
   /* -- API fetching -- */
   let api = interaction.message.api || await uhg.api.call(img.name.split('_')[0], ['hypixel', 'guild'])
@@ -54,7 +55,6 @@ try {
     let coords = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`ECMD_${type}_set_coords`).setLabel("X/Y souřadnice").setStyle('SHORT').setPlaceholder(`${stat.x}, ${stat.y}`));
 
     const modal = new Modal().setCustomId(`ECMD_${type}_set_settings-graphic`).setTitle(`Nastavení ${type} commandu`).addComponents([apply, color, font, size, coords])
-    console.log(modal)
     return await interaction.showModal(modal);
   }
 
@@ -68,7 +68,8 @@ try {
 
     let stat = data.fields.find(n => n.stat.toLowerCase() == apply || n.name.toLowerCase() == apply) || {}
     if (stat.stat) interaction.message.stat = stat.stat
-    
+    if (!data._id) data._id = type
+
     if (size && size.includes(',')) size = size.split(',').map(n => Number(n)||20)
     if (coords) coords = coords.split(',').map(n => Number(n)||0)
 
@@ -77,7 +78,7 @@ try {
       data.default.font = font ? (font.match(/null/i) ? data.default.font : font) : data.default.font
       data.default.size = size ? (String(size).match(/null/i) ? data.default.size : size) : data.default.size
       interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`SUCCESS`).setDescription('Úspěšně jsi změnil defaultní hodnoty! Klikni na <:true:1011238431482974278> pro uložení nebo na <:false:1011238405943865355> pro zrušení!').setColor('GREEN')] })
-    } else if (!stat) {
+    } else if (!stat.stat) {
       return interaction.followUp({ ephemeral: true, embeds: [new MessageEmbed().setTitle(`ERROR`).setDescription('Použij prosím info settings pro vytvoření nového commandu').setColor('RED')] })
     } else {
       stat.color = color ? (color.match(/null/i) ? null : color ) : stat.color
@@ -86,7 +87,6 @@ try {
       stat.x = coords ? (coords[0] || 0) : stat.x
       stat.y = coords ? (coords[1] || 0) : stat.y
     }
-
     img = await canva.run(data, api)
   }
   
@@ -159,7 +159,7 @@ try {
   /* -- view STAT settings -- */
   else if (action == 'get' && arg == 'info') {
     let stat = data.fields.find(n => n.stat == interaction.message.stat)
-    let info = `Coords: ${stat.x}:${stat.y}`
+    let info = `Coords: ${stat.x}, ${stat.y}`
     if (stat.color !== undefined) info = info + `\nColor: ${stat.color ? stat.color : ('Default - ' + data.default.color)}`
     if (stat.font !== undefined) info = info + `\nFont: ${stat.font ? stat.font : ('Default - ' + data.default.font)}`
     if (stat.size !== undefined) info = info + `\nSize: ${stat.size ? stat.size : ('Default - ' + data.default.size)}\n`
@@ -215,7 +215,7 @@ try {
 
   const row = new MessageActionRow().addComponents(selectmenu);
   let zprava = { components: [row, but1, but2, but3] }
-  if (!img.id) zprava.files = [img]
+  if (img && !img.id) zprava.files = [img]
 
   await interaction.editReply(zprava)
 } catch (e) {
