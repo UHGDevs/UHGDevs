@@ -21,6 +21,7 @@ module.exports = {
         uhg.api.call(member.uuid, ["hypixel"]).then(n => {
           if (!n.success) return uhg.dc.client.channels.cache.get('548772550386253824').send(`${member.username} database refresh error:\n${n.reason}`)
         })
+        await delay(100)
         //await uhg.mongo.run.update("stats", "stats", {_id: api.uuid}, api.hypixel)
       });
       //await uhg.delay(5000)

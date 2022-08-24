@@ -4,9 +4,9 @@ exports.setup = (uhg, guild) => {
     let info = {
         name: 'Turbo Kart Racers',
         path: 'hypixel/stats/tkr/',
-        stats: ['gold'],
-        statsNames: ['zlaté medaile'],
-        req: [[50, 250, 500]]
+        stats: ['gold', 'trophies'],
+        statsNames: ['Zlaté medaile', 'Celkové medaile'],
+        req: [[25, 100, 250], [50, 350, 750]]
     }
     let find = new RegExp(`(${info.name}) (god|expert|trained)`, 'i')
 
