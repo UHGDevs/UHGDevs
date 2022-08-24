@@ -47,7 +47,7 @@ module.exports = async (ctx, api, data) => {
         let stat;
         if (!i.custom) stat = draw(ctx, i, api)
         else {
-            if (i.stat === "skin") { let img = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`); ctx.drawImage(img, i.x, i.y, 198, 320); continue}
+            if (i.stat === "skin") { let img = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`); ctx.drawImage(img, i.x, i.y, 109, 177); continue}
             else if (i.stat === 'aps') {stat = func.displayText(ctx, "aps", api, options) }
             else if (i.stat === 'displayName') { stat = func.displayText(ctx, "name", api, options)}
         }
