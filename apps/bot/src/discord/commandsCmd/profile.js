@@ -38,7 +38,7 @@ module.exports = {
       )
 
       if (api.hypixel.nicks.length > 1) {
-        embed.addField(`${api.hypixel.nicks.length} nicks`, uhg.dontFormat(api.hypixel.nicks.join(', ')), false)
+        embed.addFields({ name:`${api.hypixel.nicks.length} nicks`, value: uhg.dontFormat(api.hypixel.nicks.join(', ')), inline: false})
       }
 
       if (api.guild.guild) embed.addFields(
@@ -74,17 +74,18 @@ module.exports = {
       dUhg = await dUhg
       dUhg = dUhg[0]
 
-      embed.addField('ㅤ', 'ㅤ', false)
+      embed.addFields({ name: 'ㅤ', value: 'ㅤ', inline: false})
       if (api.hypixel.links.DISCORD) {
         let member;
         if (verify.length || dUhg) member = interaction.guild.members.cache.get(verify[0]._id || dUhg._id)
-        embed.addField('Discord:', member ? `<@${member.id}>` :  uhg.dontFormat(api.hypixel.links.DISCORD), true)
+       
+        embed.addFields({ name: 'Discord:', value: member ? `<@${member.id}>` :  uhg.dontFormat(api.hypixel.links.DISCORD), inline: true})
       }
 
-      embed.addField('Verified', verify.length ? '✅':'🟥', true)
+      embed.addFields({ name: 'Verified', value: verify.length ? '✅':'🟥', inline: true })
       stats = await stats
       if (api.guild.name == 'UltimateHypixelGuild' || dUhg || stats.length) {
-        embed.addField('UHG Database', (dUhg ? '✅':'🟥') + ' | ' +(stats.length ? `✅ - <t:${Math.round(stats[0].updated/1000)}:R>`: '🟥'), true)
+       embed.addFields({ name: 'UHG Database', value: (dUhg ? '✅':'🟥') + ' | ' +(stats.length ? `✅ - <t:${Math.round(stats[0].updated/1000)}:R>`: '🟥'), inline: true })
       }
 
       return interaction.editReply({ embeds: [embed] })

@@ -13,6 +13,7 @@ module.exports = async (uhg, interaction) => {
   else if (interaction.isAutocomplete() && interaction.commandName == 'lb') require('../interactions/lb_autocomplete')(uhg, interaction)
   else if (interaction.isAutocomplete() && interaction.commandName == 'cmd') require('../interactions/cmd_autocomplete')(uhg, interaction)
   else if (interaction.isAutocomplete() && interaction.commandName == 'loot') require('../interactions/loot_autocomplete')(uhg, interaction)
+  else if (interaction.isAutocomplete() && interaction.commandName == 'badges') require('../interactions/badges_autocomplete')(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('uhg_embeds_')) require('../interactions/uhg_embeds')(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('create_modal_')) require(`../interactions/modal/${fs.readdirSync(`src/discord/interactions/modal`).filter(n => n == interaction.customId.split('_')[2]+'.js')[0]}`).send(uhg, interaction)
   else if (interaction.isModalSubmit() ) require(`../interactions/modal/${fs.readdirSync(`src/discord/interactions/modal`).filter(n => n == interaction.customId.split('_')[2]+'.js')[0]}`).get(uhg, interaction)

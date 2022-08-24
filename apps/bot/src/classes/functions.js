@@ -7,6 +7,21 @@ module.exports = class Functions extends EventEmitter {
   constructor() {
     super()
     this.getApi = require("../utils/api")
+
+    this.getBadgeRoles = (name, api) => {
+      let info = this.badges ? this.badges.find(n => n.name == name) : null
+      if (!info) return {}
+      let stats = info.stats.map(n => this.path(info.path+n, api))
+      stats = stats.map((n, i) => {
+          if (n < info.req[i][0]) return -1
+          else if (n < info.req[i][1]) return 0
+          else if (n < info.req[i][2]) return 1
+          else return 2
+      })
+      let role_i = Math.min(...stats)
+      let stat_role = role_i >= 0 ? info.roles[role_i] : {}
+      return {name: info.name, role: stat_role.id ? stat_role : 'Žádná role', delete: info.roles.filter(n => n.id !== stat_role.id )}
+    }
   }
 
   getDiscordIds() {return JSON.parse(fs.readFileSync('src/settings/discord.json', 'utf8'));}
@@ -823,4 +838,12 @@ module.exports = class Functions extends EventEmitter {
     }
     return result;
   }
+
+  path(path, api) { 
+    return path.split('/').filter(n => n).reduce((o, n, i) => {
+      if (o[n] === undefined) return o
+      return o[n]
+    }, api)
+  }
+  
 }

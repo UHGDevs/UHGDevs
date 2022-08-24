@@ -163,7 +163,7 @@ module.exports = {
           .setColor(5592575)
           .setFooter({ text: `${i+1}/${pages}` })
           .setTitle(title)
-          .addField('ㅤ', value, false);
+          .addFields({ name: 'ㅤ', value: value, inline: false });
         embeds.push(embed)
       })
 
@@ -174,7 +174,7 @@ module.exports = {
           .setColor(5592575)
           .setFooter({ text: `${i + 1 + lb.send.length}/${pages}` })
           .setTitle(title)
-          .addField("Lidi, kteří guildu odpojili", value, false);
+          .addFields({ name: "Lidi, kteří guildu odpojili", value: value, inline: false });
         embeds.push(embed)
       })
 

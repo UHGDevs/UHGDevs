@@ -131,7 +131,7 @@ module.exports = {
           .setColor(5592575)
           .setFooter({ text: `${i+1}/${lb.send.length}` })
           .setTitle(title)
-          .addField('ㅤ', value, false);
+          .addFields({ name: 'ㅤ', value: value, inline: false});
         embeds.push(embed)
       })
 
@@ -141,7 +141,7 @@ module.exports = {
           .setColor(5592575)
           .setFooter({ text: `${0}/${lb.send.length}` })
           .setTitle(title)
-          .addField('ㅤ', '**V databázi nejsou uloženi žádní hráči**', false);
+          .addFields({ name: 'ㅤ', value: '**V databázi nejsou uloženi žádní hráči**', inline: false });
         embeds.push(embed)
       }
 
