@@ -4,8 +4,9 @@ const func = require('../../util/ApiFunctions');
 module.exports = (hypixel) => {
   const arcade = hypixel.stats.Arcade || {}
   const achievements = hypixel.achievements || {}
-  return ({
+  let api = {
     coins: arcade.coins || 0,
+    wins: 0,
     holeinthewall: {
       wins: arcade.wins_hole_in_the_wall || 0,
       rounds: arcade.rounds_hole_in_the_wall || 0,
@@ -185,5 +186,12 @@ module.exports = (hypixel) => {
         knocked: arcade.times_knocked_down_zombies_alienarcadium || 0,
       },
     },
-  })
+  }
+
+  for (let stat in api) {
+    if (!api[stat] || typeof api !== 'object') continue
+    if (api[stat].wins !== undefined) api.wins += api[stat].wins
+    else Object.values(api[stat]).forEach(n => { api.wins += n.wins||0})
+  }
+  return api
 }

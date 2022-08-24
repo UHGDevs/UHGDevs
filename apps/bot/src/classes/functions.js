@@ -19,8 +19,8 @@ module.exports = class Functions extends EventEmitter {
           else return 2
       })
       let role_i = Math.min(...stats)
-      let stat_role = role_i >= 0 ? info.roles[role_i] : {}
-      return {name: info.name, role: stat_role.id ? stat_role : 'Žádná role', delete: info.roles.filter(n => n.id !== stat_role.id )}
+      let stat_role = role_i >= 0 ? info.roles[role_i] : null
+      return {name: info.name, role: stat_role || 'Žádná role', delete: stat_role ? info.roles.filter(n => n.id !== stat_role.id) : info.roles }
     }
   }
 

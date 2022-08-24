@@ -39,6 +39,7 @@ module.exports = (hypixel) => {
       assists: wwstats.assists || 0,
       blocks_broken: wwstats.blocks_broken || 0,
       blocks_placed: wwstats.wool_placed || 0,
+      blocks: (wwstats.blocks_broken || 0) + (wwstats.wool_placed || 0),
       powerups: wwstats.powerups_gotten || 0,
       selected_class: wwexpand.selected_class || "NONE",
       main_class: ww_main_class || [ 'None', 0 ],

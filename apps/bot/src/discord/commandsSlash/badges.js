@@ -22,7 +22,7 @@ module.exports = {
   ],
   type: 'slash',
   run: async (uhg, interaction, args) => {
-    await interaction.deferReply({ ephemeral: true })
+    await interaction.deferReply({ ephemeral: false })
     if (!uhg.badges) return interaction.editReply({ content: 'Badges nejsou načtené!' })
     try {
 
@@ -51,8 +51,7 @@ module.exports = {
         return interaction.editReply({ embeds: [ new MessageEmbed().setTitle(`**Hypixel Badges** seznam her`).setColor('GREEN').setDescription(badges.join('\n'))] })
       }
 
-      badge = uhg.badges.find(n => n.name = badge)
-    
+      badge = uhg.badges.find(n => n.name == badge)
       if (!badge) return interaction.editReply({ content: 'Badge nebyla nalezena!' })
 
   
