@@ -1,6 +1,6 @@
-const func = require('../util/Functions')
+const func = require('./util/Functions')
 const fs = require('fs');
-const { f, fCtx, toDate } = require('../util/Functions')
+const { f, fCtx, toDate } = require('./util/Functions')
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
 function draw (ctx, obj, api) { 

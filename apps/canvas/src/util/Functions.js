@@ -69,7 +69,7 @@ class ApiFunctions {
         
       } else if (text == 'name') width = this.fCtx(ctx, options).measureText(prefix).width
 
-      let canvas = new Canvas(width, 40);
+      let canvas = new Canvas(width, Array.isArray(options.size) ? 100 : options.size);
       ctx = this.fCtx(canvas.getContext('2d'), options)
 
       if (text == 'aps') {

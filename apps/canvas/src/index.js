@@ -15,7 +15,7 @@ async function run(data, api = {}) {
 
    let background_name = mode
 
-   if (mode == "general") {
+   if (mode == "general" || mode == 'bedwars') {
       let files = ["general_1", "general_2", "general_3", "general_4"]
       background_name = files[Math.floor(Math.random()*files.length)]
    }
@@ -23,11 +23,11 @@ async function run(data, api = {}) {
    let background = await loadImage(`../canvas/src/templates/${background_name||'general_1'}.png`)
    let img = await loadImage(`../canvas/src/templates/${mode}_command.png`)
 
-   ctx.drawImage(background, 0, 0, 800, 480) // Background Image
-   ctx.drawImage(img, 0, 0, 800, 480) // Command Image
+   ctx.drawImage(background, 0, 0, data.width, data.height) // Background Image
+   ctx.drawImage(img, 0, 0, data.width, data.height) // Command Image
 
 
-   await require(`./games/general`)(ctx, api, data)
+   await require(`./command`)(ctx, api, data)
 
 
    let toDiscord = await canvas.toBuffer()
