@@ -21,6 +21,7 @@ module.exports = async (hypixel = {} , uuid, client) => {
     legacyAps: legacyAps,
     nicks: hypixel.knownAliases || {},
     links: hypixel.socialMedia ? hypixel.socialMedia.links || {} : {},
+    discord: (hypixel.socialMedia ? (hypixel.socialMedia.links ? hypixel.socialMedia.links.DISCORD : null) : null) || 'Žádný',
     fishing: {
       fish: achievements.general_master_lure || 0,
       junk: achievements.general_trashiest_diver || 0,
@@ -38,7 +39,7 @@ module.exports = async (hypixel = {} , uuid, client) => {
       helmet: hypixel.vanityMeta.packages.includes("suit_treasure_helmet"),
       chestplate: hypixel.vanityMeta.packages.includes("suit_treasure_chestplate"),
       leggings: hypixel.vanityMeta.packages.includes("suit_treasure_leggings"),
-      boots: hypixel.vanityMeta.packages.includes("suit_treasure_boots")
+      boots: hypixel.vanityMeta.packages.includes("suit_treasure_boots"),
     } : {},
     seasonal: hypixel.seasonal ? {
       summer: hypixel.seasonal.summer ? {
@@ -48,6 +49,8 @@ module.exports = async (hypixel = {} , uuid, client) => {
       } : {},
       silver: hypixel.seasonal.silver || 0,
     } : {summer: {}},
+    totalDailyRewards: hypixel.totalDailyRewards || 0,
+    dailyRewards: hypixel.rewardHighScore || 0,
     updated: Number(new Date())
 
   })

@@ -28,6 +28,7 @@ class Online {
       api.icon = "https://cdn.discordapp.com/attachments/875503784086892617/896772378678394890/unknown.png"
       api.footer ='Vývojáři Farmans & DavidCzPdy'
       api.title = 'Offline'
+      api.status = '🔴 Offline'
 
       let hypCache = client.users.get(client.aliases.get(uuid)).cache.hypixel
       if (hypCache && hypCache.lastLogin == -1) api.title = 'API OFF'
@@ -61,7 +62,7 @@ class Online {
         api.map = online.map || null
         api.mode = func.getStatus(mode)
       }
-
+      api.status = '🟢 ' + api.footer
       api.online = true,
       api.icon = "https://cdn.discordapp.com/attachments/875503784086892617/896771219817365514/unknown.png"
     }
