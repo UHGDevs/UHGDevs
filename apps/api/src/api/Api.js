@@ -10,11 +10,10 @@ class Api extends CreateUser {
 
   async getApi(options) {
     return new Promise(async resolve => {
-
     /* First time call */
     if (!this.username) {
       let launch = this.basic ? await this.basic : {success: false}
-      if (!launch.success) launch = await require(`./mojang`).call(options)
+      if (!launch.success && Number(this.created) < Number(new Date()) - 10000) launch = await require(`./mojang`).call({ user: launch.input, client: options.client })
       if (!launch.success) return resolve(launch)
 
       this.username = launch.username

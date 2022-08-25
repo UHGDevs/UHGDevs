@@ -86,6 +86,7 @@ class Login extends Functions {
       if (!this.data.verify) this.data.verify = []
       let ver = await this.mongo.run.get("general", "verify")
       this.data.verify = ver
+      this.api.setVerify(ver)
     }
 
     if (reload.includes("stats") || reload.includes("mongo")  || !reload.length) {

@@ -104,10 +104,10 @@ exports.uhg_refresh = async (uhg, member, api, guilda) => {
   else if (guilda.member) grank = ('Guild ' + guilda.member.rank).replace('Guild Guild', 'Guild')
 
   /* -- Change username -- */
-  if (member.nickname && member.nickname !== api.username || member.nickname === null && user.username !== api.username) { try { await member.setNickname(api.username) } catch (e) {errors = errors + 'UHG - Change nickname\n'}}
+  if (api.username && (member.nickname && member.nickname !== api.username || member.nickname === null && user.username !== api.username)) { try { await member.setNickname(api.username) } catch (e) {errors = errors + 'UHG - Change nickname\n'}}
   
   /* -- Default role -- */
-  if (!member._roles.includes("478816107222925322")) await member.roles.add(guild.roles.cache.get("478816107222925322"))
+  if (api.username && !member._roles.includes("478816107222925322")) await member.roles.add(guild.roles.cache.get("478816107222925322"))
 
   /* -- Guild role -- */
   if (guilda.name === "UltimateHypixelGuild" || guilda.guildrank) {
@@ -228,7 +228,27 @@ exports.unverify = async (uhg, user) => {
   if (uMember) {
     if (uMember.nickname) {try { await uMember.setNickname(null) } catch (e) {}}
     for (let role of uhg.dc.cache.uhgroles) { if (uMember._roles.includes(role[1].id)) {try { await uMember.roles.remove(role[1].role) } catch (e) {}}}
-    for (let role of uhg.dc.cache.badges) {if (uMember._roles.includes(role[1].id)) {try { await uMember.roles.remove(role[1]) } catch (e) {}}}
+    for (let role of [].concat(...uhg.badges.map(n => n.roles))) {if (uMember._roles.includes(role.id)) {try { await uMember.roles.remove(role) } catch (e) {}}}
+
+
+    /* ---- UHG Split role ---- */
+    try {
+      /* -- Guild Split -- */
+      let split_guild = uhg.dc.cache.splits.get('guild')
+      if (uMember._roles.some(n=>uhg.dc.cache.split.guild.includes(n)) && !uMember._roles.includes(split_guild.id)) await uMember.roles.add(split_guild.role)
+      else if (!uMember._roles.some(n=>uhg.dc.cache.split.guild.includes(n)) && uMember._roles.includes(split_guild.id)) await uMember.roles.remove(split_guild.role)
+  
+      /* -- Discord Split -- */
+      let split_discord = uhg.dc.cache.splits.get('discord')
+      if (uMember._roles.some(n=>uhg.dc.cache.split.discord.includes(n)) && !uMember._roles.includes(split_discord.id)) await uMember.roles.add(split_discord.role)
+      else if (!uMember._roles.some(n=>uhg.dc.cache.split.discord.includes(n)) && uMember._roles.includes(split_discord.id)) await uMember.roles.remove(split_discord.role)
+  
+      /* -- Badges Split -- */
+      let split_badges = uhg.dc.cache.splits.get('badges')
+      if (uMember._roles.some(n=>uhg.dc.cache.split.badges.includes(n)) && !uMember._roles.includes(split_badges.id)) await uMember.roles.add(split_badges.role)
+      else if (!uMember._roles.some(n=>uhg.dc.cache.split.badges.includes(n)) && uMember._roles.includes(split_badges.id)) await uMember.roles.remove(split_badges.role)
+
+    } catch (e) {}
   }
 
   if (bwMember) {
@@ -237,25 +257,6 @@ exports.unverify = async (uhg, user) => {
       if (bwMember._roles.includes(role.id)) {try { await bwMember.roles.remove(role) } catch (e) {}}
     }
   }
-
-    /* ---- UHG Split role ---- */
-    try {
-      /* -- Guild Split -- */
-      let split_guild = uhg.dc.cache.splits.get('guild')
-      if (member._roles.some(n=>uhg.dc.cache.split.guild.includes(n)) && !member._roles.includes(split_guild.id)) await member.roles.add(split_guild.role)
-      else if (!member._roles.some(n=>uhg.dc.cache.split.guild.includes(n)) && member._roles.includes(split_guild.id)) await member.roles.remove(split_guild.role)
-  
-      /* -- Discord Split -- */
-      let split_discord = uhg.dc.cache.splits.get('discord')
-      if (member._roles.some(n=>uhg.dc.cache.split.discord.includes(n)) && !member._roles.includes(split_discord.id)) await member.roles.add(split_discord.role)
-      else if (!member._roles.some(n=>uhg.dc.cache.split.discord.includes(n)) && member._roles.includes(split_discord.id)) await member.roles.remove(split_discord.role)
-  
-      /* -- Badges Split -- */
-      let split_badges = uhg.dc.cache.splits.get('badges')
-      if (member._roles.some(n=>uhg.dc.cache.split.badges.includes(n)) && !member._roles.includes(split_badges.id)) await member.roles.add(split_badges.role)
-      else if (!member._roles.some(n=>uhg.dc.cache.split.badges.includes(n)) && member._roles.includes(split_badges.id)) await member.roles.remove(split_badges.role)
-
-    } catch (e) {}
   
 }
 

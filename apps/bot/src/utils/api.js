@@ -1509,7 +1509,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
   // api.plancke = `https://plancke.io/hypixel/player/stats/${nickname || hypixel.displayname || "hypixel"}`
   // api.hypixellogo = `https://cdn.discordapp.com/attachments/875503784086892617/896765939285114960/hypixel.png`
 
-  let test = true
+  let test = false
   if (test && api.hypixel) {
     const mongo = require("./mongodb.js")
     mongo.update("stats", "stats", {_id: api.uuid}, api.hypixel, false)

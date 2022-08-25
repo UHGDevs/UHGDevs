@@ -35,9 +35,9 @@ class Client extends Nw {
 
     input = input.toLowerCase();
     let user = this.users.get(input) || this.users.get(this.aliases.get(input));
+    options.client = this
     if (!user) {
       options.user = input
-      options.client = this
 
       user = new Api(options)
 
@@ -79,6 +79,10 @@ class Client extends Nw {
     }
     this.aps = aps
     return aps
+  }
+
+  setVerify(array) {
+    this.data_verify = array
   }
 
 }

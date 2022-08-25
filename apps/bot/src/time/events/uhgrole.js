@@ -1,3 +1,4 @@
+const { skills } = require('../../settings/values/skyblockconstants.js')
 const refresh = require('../../utils/serverroles.js')
 const time = require('../../utils/timehandler.js')
 
@@ -66,9 +67,12 @@ module.exports = {
 
       for (let member of discordMembers) {
         member = member[1]
+        if (member.id !== '938050255683981373') continue
         if (member.user.bot) continue;
         let verify = dVerify.find(n => n._id == member.id)
         let uhgD = dUhg.find(n => n._id == member.id) || {}
+
+        console.log(verify)
        // let loot = dLoot.find(n => n._id == member._id)
         
         if (!verify) {
@@ -77,6 +81,7 @@ module.exports = {
             if (role[1].id == '478816107222925322') continue;
             if (member._roles.includes(role[1].id)) try { await member.roles.remove(role[1]) } catch (e) {} // Delete other guild roles
           }
+          //await refresh.uhg_refresh(uhg, member, {}, {})
           continue;
         }
 
@@ -86,13 +91,21 @@ module.exports = {
           if (data.username !== verify.nickname || !(verify.nicks && data.nicks.length === verify.names.length)) uhg.mongo.run.update("general", "verify", {_id:verify._id, nickname: data.username, names: data.nicks })
           if (uhgD && uhgD.username && data.username !== uhgD.username) uhg.mongo.run.update("general", "uhg", {_id:verify._id, username: data.username })
         } else {
-          if (uhgD._id) console.log('Přidat '+ verify.nickname + ' do databáze!')
+          //if (uhgD._id) console.log('Přidat '+ verify.nickname + ' do databáze!')
           data = { username: verify.nickname }
         }
-
         verIds.push(member.id)
         await refresh.uhg_refresh(uhg, member, data, uhgD)
       }
+
+
+      // for (let member of dcUnVer) {
+      //   console.log(member.user.username)
+      //   for (let role of member.roles.cache) {
+      //     await member.roles.remove(role)
+      //     await uhg.delay(500)
+      //   }
+      // }
 
       let notInDb = []
       for (let n of dVerify.filter(n => verIds.includes(n._id))) {
