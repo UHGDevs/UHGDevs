@@ -34,6 +34,12 @@ module.exports = async (hypixel = {} , uuid, client) => {
     userLanguage: hypixel.userLanguage || "ENGLISH",
     firstLogin: hypixel.firstLogin || -1,
     lastLogin: hypixel.lastLogin || -1,
+    treasureHunter: hypixel.vanityMeta && hypixel.vanityMeta.packages ? {
+      helmet: hypixel.vanityMeta.packages.includes("suit_treasure_helmet"),
+      chestplate: hypixel.vanityMeta.packages.includes("suit_treasure_chestplate"),
+      leggings: hypixel.vanityMeta.packages.includes("suit_treasure_leggings"),
+      boots: hypixel.vanityMeta.packages.includes("suit_treasure_boots")
+    } : {},
     seasonal: hypixel.seasonal ? {
       summer: hypixel.seasonal.summer ? {
         experience: hypixel.seasonal.summer["2022"].levelling.experience || 0,
