@@ -62,7 +62,6 @@ module.exports = class Functions extends EventEmitter {
 
   r(n){
     try {Number(n)} catch {return n}
-    console.log(n)
     let d = String(n).length
     let s;
     d = Math.pow(10,d)
