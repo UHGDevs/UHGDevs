@@ -17,6 +17,7 @@ module.exports = async (uhg, packet) => {
   pmsg.msg = pmsg.msg.replace(/\s+/g, ' ').trim()
 
   console.log(pmsg.msg)
+  if (uhg.mc.temp) uhg.mc.temp.push(pmsg.msg)
 
   //["Guild", ">", "jmenonnona:", "zprava"]
   let content = pmsg.msg.split(" ")
@@ -149,6 +150,5 @@ module.exports = async (uhg, packet) => {
   let chats = fs.readdirSync(`src/minecraft/chats/`).filter((file) => file.endsWith(".js"))
   chats = chats.filter(chat => chat.split(".")[0] == pmsg.channel.toLowerCase())
   if (chats.length) return require(`./chats/${chats[0]}`)(uhg, pmsg)
-  return require("./chats/all")(uhg, pmsg)
 
 }

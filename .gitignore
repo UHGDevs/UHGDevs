@@ -6,3 +6,4 @@ package-lock.json
 apps/bot/src/settings/minecraft
 farmanstest.js
 yarn.lock
+apps/bot/src/mc

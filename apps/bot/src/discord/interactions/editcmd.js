@@ -28,7 +28,7 @@ try {
   if (!data._id) data._id = type
 
   /* -- API fetching -- */
-  let api = interaction.message.api || await uhg.api.call(img.name.split('_')[0], ['hypixel', 'guild'])
+  let api = interaction.message.api || await uhg.api.call(img.name.split('_')[0], ['hypixel', 'guild'], { premium: true})
   if (!api.success) return console.log(api)
   interaction.message.api = api
 
