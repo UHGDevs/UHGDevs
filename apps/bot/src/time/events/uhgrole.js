@@ -67,7 +67,6 @@ module.exports = {
 
       for (let member of discordMembers) {
         member = member[1]
-        if (member.id !== '938050255683981373') continue
         if (member.user.bot) continue;
         let verify = dVerify.find(n => n._id == member.id)
         let uhgD = dUhg.find(n => n._id == member.id) || {}
