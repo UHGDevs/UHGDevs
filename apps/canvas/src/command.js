@@ -4,13 +4,13 @@ const { f, fCtx, toDate } = require('./util/Functions')
 const {Canvas, loadImage, FontLibrary} = require('skia-canvas');
 
 function draw (ctx, obj, api) { 
-    let text = obj.customText ? null : f(func.path(obj.path + '/' + obj.stat, api))
+    let text = obj.customText ? 0 : f(func.path(obj.path + '/' + obj.stat, api))
     let customText = obj.customText
 
     if (customText) {
         customText.match(/%%(.*?)%%/gi).forEach(n => {
           let apiStat = func.path(n.replace(/%%/g, ''), api)
-          customText = customText.replace(n, apiStat || n)
+          customText = customText.replace(n, f(apiStat))
         })
 
         if (customText.includes('((')) {

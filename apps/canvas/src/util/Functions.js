@@ -3,7 +3,7 @@ const { Canvas } = require('skia-canvas');
 class ApiFunctions {
 
     static f(number, max=2) {
-      if (!Number(number)) return number
+      if (!Number(number)) return String(number)
       return Number(number).toLocaleString('en', {minimumFractionDigits: 0, maximumFractionDigits: max})
     }
   
@@ -142,9 +142,10 @@ class ApiFunctions {
       return canvas
    }
 
-   static path(path, api) { 
-      return path.split('/').reduce((o, n) => o[n], api) }
+   static path(path, api) {
+      try { return path.split('/').filter(n =>n).reduce((o, n) => o[n], api) || 0 } catch(e) {return 0}
   }
+}
   
   module.exports = ApiFunctions
   

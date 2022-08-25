@@ -23,9 +23,12 @@ class Guild {
 
     const api = { success: true, type: 'guild', guild: guild, name: guild.name, tag: guild.tag, color: func.getPlusColor(null, guild.tagColor).hex, members: guild.members }
 
-    if (uuid && guild.members.find(n => n.uuid == uuid)) api.member = guild.members.find(n => n.uuid == uuid)
-    
-
+    if (uuid && guild.members.find(n => n.uuid == uuid)) {
+      let gmember = guild.members.find(n => n.uuid == uuid)
+      gmember.dailygexp = Object.values(gmember.expHistory)[0] || 0
+      gmember.weeklygexp = Object.values(gmember.expHistory).reduce((a, b) => a+b, 0)
+      api.member = gmember
+    }
 
     return api
   }
