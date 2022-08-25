@@ -70,7 +70,6 @@ module.exports = {
         if (member.user.bot) continue;
         let verify = dVerify.find(n => n._id == member.id)
         let uhgD = dUhg.find(n => n._id == member.id) || {}
-)
        // let loot = dLoot.find(n => n._id == member._id)
         
         if (!verify) {
