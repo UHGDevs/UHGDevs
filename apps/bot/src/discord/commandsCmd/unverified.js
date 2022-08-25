@@ -52,7 +52,6 @@ module.exports = {
         if (n.links && n.links.DISCORD) zprava = zprava + ` dc: ${n.links.DISCORD}`
         if (n.autoverify) zprava = zprava + ` ✅`
         desc.push(zprava)
-        //embed.addField(`**${n.name}**`, `${n.date || 'error'} (${n.joined || "nic"})`, false)
       });
       if (unDC.length) desc.push("")
       unDC.forEach(n => {

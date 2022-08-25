@@ -9,14 +9,12 @@ module.exports = async (uhg, interaction) => {
   if (!event) return interaction.editReply({ embeds: [new MessageEmbed().setTitle(`**TIME EVENT ERROR**`).setColor('RED').setDescription(`**${type} Time Event** není načtený`)] })
   
   let embed = new MessageEmbed().setTitle(`${event.emoji} **__${type} Time Event__** ${event.emoji}`).setColor('#ff51fd').setDescription(event.description)
-  embed.addFields({ name: `ㅤ`, value: `**__Basic Info__**`, inline: false})
-  embed.addField('Toggle', (toggle ? '✅' : '🟥') + (event.onstart ? ' | 🕐' : ''), true)
-  
+  embed.addFields({ name: `ㅤ`, value: `**__Basic Info__**`, inline: false}, { name: 'Toggle', value: (toggle ? '✅' : '🟥') + (event.onstart ? ' | 🕐' : ''), inline: true})
+
   let execution = event.executedAt ? `<t:${Math.round(Number(new Date(event.executedAt))/1000)}:R>` : `🟥 `// | <t:${Math.round(new Date().getTime()/1000)}:R>`
   if (!uhg.time.ready[type]) execution = '👟' + ` | <t:${Math.round(Number(new Date(event.executedAt || new Date()))/1000)}:R>`
-  embed.addField('Last Execution', execution, true)
+  embed.addFields({ name: 'Last Execution', value: execution, inline: true})
 
-  //embed.addField(`ㅤ`, `ㅤ`, false)
   embed.addFields(
     { name: 'Next execution', value: `<t:${Math.round(new Date(event.start.nextDates()).getTime()/1000)}:R>`, inline: true },
     { name: 'Period', value: `\`${event.start.cronTime.source}\``, inline: true },

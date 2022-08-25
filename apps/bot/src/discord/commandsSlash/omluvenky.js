@@ -25,7 +25,7 @@ module.exports = {
     try {
       let verify = uhg.data.verify.filter(n => n._id == interaction.user.id) || await uhg.mongo.run('general', 'verify', {_id: interaction.user.id})
       console.log(verify)
-      let embed = new MessageEmbed().setTitle(`Omluvenka od ${interaction.nickname || interaction.user.username}`).setColor(5592575).addField('USER:', `${interaction.user}\n**IGN:**\n${verify[0].nickname||'unverified'}`).addField('DATUM:', interaction.options.getString('datum')).addField('REASON:', interaction.options.getString('reason'))
+      let embed = new MessageEmbed().setTitle(`Omluvenka od ${interaction.nickname || interaction.user.username}`).setColor(5592575).addFields({ name: 'USER:', value: `${interaction.user}\n**IGN:**\n${verify[0].nickname||'unverified'}`, inline: false, }, { name:'DATUM:', value: interaction.options.getString('datum'), inline: false}, { name: 'REASON:', value: interaction.options.getString('reason'), inline: false})
       
       uhg.dc.client.channels.cache.get('947234635375595520').send({ embeds: [embed] })
       await interaction.editReply({ content: 'Omluvenka přijata', ephemeral: true })

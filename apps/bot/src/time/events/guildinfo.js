@@ -133,9 +133,11 @@ module.exports = {
         let emsend = new MessageEmbed()
             .setTitle(`UHG vs TKJK`)
             .setColor(16109582)
-            .addField("UHG", `Level: ${Math.round(uhglvl*10000)/10000}`, true)
-            .addField("TKJK", `Level: ${Math.round(tkjklvl*10000)/10000}`, true)
-            .addField("Rozdíl:", `Celkový: ${Math.round(rozdil*10000)/10000}\nDen:${perday}`, false);
+            .addFields(
+              {name: "UHG", value: `Level: ${Math.round(uhglvl*10000)/10000}`, inline: true},
+              {name: "TKJK", value: `Level: ${Math.round(tkjklvl*10000)/10000}`, inline: true },
+              {name: "Rozdíl:", value: `Celkový: ${Math.round(rozdil*10000)/10000}\nDen:${perday}`, inline: false}
+              )
         channel.send({ embeds: [emsend] })
       }
       
