@@ -23,9 +23,8 @@ module.exports = {
         }
       }
       let profil = coins[profile]
-      if (apioff == true) return `Coins: **${api.username}** - Purse: ${uhg.f(purse).split(".")[0]} (BANK API OFF)`
-      console.log(profile)
-      let message = `Coins: [${uhg.f(sum).split(".")[0]}] **${api.username}** - Purse: ${uhg.f(purse).split(".")[0]} - Bank: ${uhg.f(bank).split(".")[0]}`
+      if (apioff == true) return `Coins: **${api.username}** - Purse: ${uhg.f(String(purse)).split(".")[0]} (BANK API OFF)`
+      let message = `Coins: [${uhg.f(sum).split(".")[0]}] **${api.username}** - Purse: ${uhg.f(String(purse)).split(".")[0]} - Bank: ${uhg.f(String(bank)).split(".")[0]}`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)
