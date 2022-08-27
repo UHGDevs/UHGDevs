@@ -50,7 +50,7 @@ module.exports = async (ctx, api, data) => {
             if (i.stat === "skin") { let img = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`); ctx.drawImage(img, i.x, i.y, 109, 177); continue}
             else if (i.stat === 'aps') {stat = func.displayText(ctx, "aps", api, options) }
             else if (i.stat === 'displayName') { stat = func.displayText(ctx, "name", api, options)}
-            else if (i.path.includes('hypixel/treasureHunter') && api.hypixel.treasureHunter[i.stat])  {let img = await loadImage(`../canvas/src/icons/suit_treasure_${i.stat}.png`); {ctx.drawImage(img, i.x, i.y, i.stat=='leggins'?15:28, i.stat == 'boots'?21:28)}; continue}
+            else if (i.path.includes('hypixel/treasureHunter') && api.hypixel.treasureHunter[i.stat])  {let img = await loadImage(`../canvas/src/icons/suit_treasure_${i.stat}.png`); {ctx.drawImage(img, i.x, i.y, i.stat=='leggings'?22:28, i.stat == 'boots'?21:28)}; continue}
         }
         if (!stat) continue
 
