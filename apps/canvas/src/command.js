@@ -10,7 +10,7 @@ function draw (ctx, obj, api) {
     if (customText) {
         customText.match(/%%(.*?)%%/gi).forEach(n => {
           let apiStat = func.path(n.replace(/%%/g, ''), api)
-          customText = customText.replace(n, f(apiStat))
+          customText = customText.replace(n, apiStat)
         })
 
         if (customText.includes('((')) {
@@ -50,8 +50,8 @@ module.exports = async (ctx, api, data) => {
             if (i.stat === "skin") { let img = await loadImage(`https://visage.surgeplay.com/full/512/${api.hypixel.uuid}.png`); ctx.drawImage(img, i.x, i.y, 109, 177); continue}
             else if (i.stat === 'aps') {stat = func.displayText(ctx, "aps", api, options) }
             else if (i.stat === 'displayName') { stat = func.displayText(ctx, "name", api, options)}
+            else if (i.path.includes('hypixel/treasureHunter') && api.hypixel.treasureHunter[i.stat])  {let img = await loadImage(`../canvas/src/icons/suit_treasure_${i.stat}.png`); {ctx.drawImage(img, i.x, i.y, i.stat=='leggings'?22:28, i.stat == 'boots'?21:28)}; continue}
         }
-
         if (!stat) continue
 
         ctx.drawImage(stat, i.x - stat.width/2, i.y)

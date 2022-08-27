@@ -1,15 +1,17 @@
 const { Collection, Permissions } = require('discord.js');
-module.exports = async (uhg) => {
+
+module.exports = async (uhg, client) => {
   console.log(`Discord Bot is online! (${uhg.dc.client.user.tag})`.bold.brightGreen)
   uhg.dc.client.user.setActivity(' Guild Chat', { type: 'WATCHING' });
 
   let guild = uhg.dc.client.guilds.cache.get("455751845319802880")
   if (!guild) return console.log("\nBot není na UHG dc\n".bgRed)
 
-  let botSlashCmds = []
-  uhg.dc.slash.forEach(cmd => { botSlashCmds.push({ name: cmd.name, description: cmd.description||"", options: cmd.options || [], permissions: cmd.permissions||[], type: cmd.type, defaultPermission: cmd.permissions.length ? false:true }) });
+   let botSlashCmds = uhg.dc.slash.map(cmd => { return{ name: cmd.name, description: cmd.description||"", options: cmd.options || [], type: cmd.type, defaultPermission: cmd.permissions.length ? false : true } });
   botSlashCmds.push({ name: 'Profile Command', type: 'USER'})
   let cmds = await uhg.dc.client.application.commands.set(botSlashCmds)
+
+  //console.log(cmds)
   
   uhg.dc.cache.channels = new Collection()
   if (uhg.settings.minecraft === true) {

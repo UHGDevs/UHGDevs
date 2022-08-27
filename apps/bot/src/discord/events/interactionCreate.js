@@ -20,4 +20,5 @@ module.exports = async (uhg, interaction) => {
   else if (interaction.isButton() && interaction.customId.startsWith('VERLANG')) require(`../interactions/verlang`)(uhg, interaction)
   else if (interaction.isSelectMenu() && interaction.customId == 'TIME_menu') require(`../interactions/time_gui`)(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('TIME_RUN_')) require(`../interactions/time_run`)(uhg, interaction)
+  else if (interaction.isButton() && interaction.customId.startsWith('CROLE_')) require(`../interactions/customroles`)(uhg, interaction)
 }

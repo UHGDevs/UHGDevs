@@ -17,7 +17,7 @@ module.exports = {
       let data = await uhg.mongo.run.get('general', 'commands', { _id: cmd }).then(n=> n[0]|| null)
       if (!data) return 'Command nebyl nalezen'
 
-      let api = await uhg.api.call(args[1] || 'DavidCzPdy', ['hypixel', 'guild'], { premium: true} )
+      let api = await uhg.api.call(args[1] || 'DavidCzPdy', ['hypixel', 'guild', 'friends', 'online'], { premium: true} )
       if (!api.success) return api.reason
       
       let img = await canva.run(data, api)
@@ -26,7 +26,7 @@ module.exports = {
 
       let but_null = ((a, b='SECONDARY') => {return new MessageButton().setCustomId(`ECMD_${cmd}_null_${a}`).setStyle(b).setDisabled(true).setLabel(" ")})
       const but1 = new MessageActionRow()
-        .addComponents(but_null(1))
+      .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_set_rotate`).setStyle('SECONDARY').setEmoji('<:rotate:1012443366421696512>'))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_move_up`).setStyle('PRIMARY').setLabel('▲'))
         .addComponents(but_null(2))
         .addComponents(new MessageButton().setCustomId(`ECMD_${cmd}_modal_settings-graphic`).setStyle('SECONDARY').setEmoji('<:settings_graphic:1011333239434117130>'))
@@ -50,7 +50,8 @@ module.exports = {
         stat_options.options = []
 
         data.fields.forEach((e, i) => {
-          stat_options.options.push({ label: e.name, value: e.stat,emoji: null, default: i==0 ? true: false})
+          if (i >= 25) return
+          stat_options.options.push({ label: e.name, value: e.stat, emoji: null, default: i==0 ? true: false})
         });
 
         const row = new MessageActionRow().addComponents(stat_options);

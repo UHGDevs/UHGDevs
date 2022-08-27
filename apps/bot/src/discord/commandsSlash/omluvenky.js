@@ -3,8 +3,8 @@ const fs = require('fs');
 
 module.exports = {
   name: 'omluvenky',
-  description: 'Time Event GUI',
-  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}],
+  description: 'Omluvenky',
+  permissions: [],
   options: [
     {
       name: 'datum',
