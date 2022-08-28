@@ -3,7 +3,7 @@ module.exports = {
   aliases: ["commands", "command", "cmd", "cmds", "cmnd", "cmnds"],
   run: async (uhg, pmsg) => {
     try{
-      let message = `Dostupné příkazy: https://shorturl.at/ipDR8`
+      let message = `Dostupné příkazy: https://imgur.com/a/GAsBy5o`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)
