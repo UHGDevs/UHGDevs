@@ -23,7 +23,7 @@ module.exports = {
         {name: 'ㅤ', value: `Kills: \`${uhg.f(overall.kills)}\`\nDeaths: \`${uhg.f(overall.deaths)}\`\nKDR: \`${uhg.f(overall.kdr)}\``, inline: true}
       )
 
-      if (pmsg.command) embed.setFooter({text:`Command requested by ${uhg.dontFormat(pmsg.username)}`})
+      if (pmsg.command) embed.setFooter({text:`Command requested by ${pmsg.username}`})
       //.setDescription(`${bedwars.levelformatted} **${api.username}**`)
       return {mc: message, dc:embed}
     } catch (e) {

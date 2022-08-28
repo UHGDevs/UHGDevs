@@ -23,9 +23,9 @@ class Skyblock {
     const profiles = skyblock.profiles
 
     const api = { success: true, type: 'skyblock', profiles: []}
-console.time('Cele Api')
+
     for (let p of profiles) {
-      let community = p.community_upgrades
+      let community = p.community_upgrades || {}
 
       /* -- Declare every profile basic info */
       let profile = {
@@ -61,8 +61,8 @@ console.time('Cele Api')
 
 
       /* -- Community Upgrades Formating-- */
-      community.upgrade_states.sort((a, b) => b.tier - a.tier).forEach(e => {
-        if (profile.upgrades.find(n => n.name == e.upgrade.replaceAll('_', ' '))) return
+      community.upgrade_states?.sort((a, b) => b.tier - a.tier).forEach(e => {
+        if (profile.upgrades?.find(n => n.name == e.upgrade.replaceAll('_', ' '))) return
         profile.upgrades.push(func.comUpgrade(e))
       })      
       /* - end - */
@@ -93,7 +93,8 @@ console.time('Cele Api')
       api.profiles.push(profile)
     }
     
-    console.timeEnd('Cele Api')
+    api.profiles.sort((a, b) => b.member.updated - a.member.updated)
+    
     return api
   }
 }
