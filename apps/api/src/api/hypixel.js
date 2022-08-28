@@ -19,7 +19,7 @@ class Hypixel {
     if (limit <= 0) return {success: false, type: "hypixel", reason: 'Hypixel API key limit reached!'};
 
     let hypixel;
-    try { hypixel = await client.callHypixel.get('player', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "hypixel", reason: e.response ? e.response.data.cause : 'Hypixel API error'}};
+    try { hypixel = await client.callHypixel.get('player', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) { hypixel = e.response?.data || {}};
     if (!hypixel.success) return  {success: false, type: "hypixel", reason: `Hypixel API: ${hypixel.cause || 'error'}`};
     if (!hypixel.player) return  {success: false, type: "hypixel", reason: `Hypixel API: Hráč nikdy nebyl na Hypixelu`};
     if (!hypixel.player.stats) return  {success: false, type: "hypixel", reason: `Hypixel API: Hráč nehrál žádnou minihru`};

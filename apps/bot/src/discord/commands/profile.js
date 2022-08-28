@@ -51,6 +51,7 @@ module.exports = {
       embed.addFields({ name: 'ㅤ', value: 'ㅤ', inline: false})
       if (api.hypixel.links.DISCORD) {
         let member;
+        if (verify.length || dUhg) member = message.guild.members.cache.get(verify[0]._id || dUhg._id)
         embed.addFields({ name: 'Discord:', value: member ? `<@${member.id}>` :  uhg.dontFormat(api.hypixel.links.DISCORD), inline: true})
       }
 

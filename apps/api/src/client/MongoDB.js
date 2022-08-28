@@ -12,6 +12,12 @@ class MongoDB extends ApiKey {
 
       this.mongo = new MongoClient(this.options.db);
       this.mongo.connect()
+
+      this.mongo.once('open', async () => {
+        this.mRefresh()
+
+        setInterval(this.mRefresh, 1700000);
+      })
     } else this.mongo = {}
   }
 
@@ -66,6 +72,11 @@ class MongoDB extends ApiKey {
       return "neni"
       console.log(e)
     }
+  }
+
+  async mRefresh() {
+    let uhgdata = await this.mGet('data', 'users', {})
+    this.uhgdata = uhgdata
   }
 
 

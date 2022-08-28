@@ -2,7 +2,7 @@
 
 exports.setup = (uhg, guild) => {
     let info = {
-        name: 'Arcade',
+        name: 'Arcade Games',
         path: 'hypixel/stats/arcade/',
         stats: ['wins'],
         statsNames: ['Výhry'],

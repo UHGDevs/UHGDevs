@@ -24,18 +24,21 @@ class Client extends Nw {
     this.createCalls()
     this.cacheAps()
   }
-  call(input, opt = {}) {
-    let options = opt;
+  call(input, call = [], options = {}) {
+    options.call = call
 
     if (typeof input !== 'string') throw new Error('INVALID_TYPE', 'username or uuid', 'string');
     if (typeof options !== 'object') throw new Error('INVALID_TYPE', 'options', 'object');
-    if (Array.isArray(options)) options = {call: options};
+    if (typeof call !== 'object') throw new Error('INVALID_TYPE', 'api calls', 'object');
 
     options = Util.mergeSettings(Options.createCall(this), options);
 
     input = input.toLowerCase();
     let user = this.users.get(input) || this.users.get(this.aliases.get(input));
     options.client = this
+
+    options.premium = options.premium ?? (options.verify ? this.uhgdata?.find(n => n.uuid == options.verify.uuid)?.premium ?? false : false)
+
     if (!user) {
       options.user = input
 

@@ -6,7 +6,7 @@ module.exports = {
     const f = uhg.f
     try {
       let nickname = pmsg.nickname
-      let api = await uhg.api.call(nickname)
+      let api = await uhg.api.call(nickname, ['hypixel'], { verify: pmsg.verify_data })
       if (!api.success) return api.reason
       let bedwars = api.hypixel.stats.bedwars
       let overall = bedwars.overall

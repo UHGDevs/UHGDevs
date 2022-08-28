@@ -23,7 +23,7 @@ class Mojang {
     finally {
       if (!call) return {success: false, reason: 'Error ve volání MOJANGU', type: 'mojang', input: input} 
       if (!call.data) {
-        if (typeof call.data === 'string' && client.data_verify) {
+        if (typeof call.data === 'string' && options.premium) {
             let oldname = client.data_verify.find(n => { if (n.names && n.names.find(a => a.toLowerCase() == input.toLowerCase())) return true; return n.uuid.toLowerCase() == input.toLowerCase()})
             if (oldname || false) return { success: true, username: oldname.nickname, uuid: oldname.uuid, type: 'mojang' };
         }

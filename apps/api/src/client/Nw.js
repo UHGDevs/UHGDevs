@@ -15,6 +15,7 @@ class Nw extends MongoDB {
     super(options);
     this.prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices.json'), 'utf8'))
 
+    setInterval(this.reload, 1800000);
   }
 
   async reload() {
