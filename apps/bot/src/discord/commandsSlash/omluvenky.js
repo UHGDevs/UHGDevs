@@ -4,7 +4,7 @@ const fs = require('fs');
 module.exports = {
   name: 'omluvenky',
   description: 'Omluvenky',
-  permissions: [],
+  permissions: [ {id: '530504032708460584', type: 'ROLE', permission: true }],
   options: [
     {
       name: 'datum',

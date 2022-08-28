@@ -5,7 +5,7 @@ const fs = require('fs');
 module.exports = {
   name: 'time',
   description: 'Time Event GUI',
-  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}],
+  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}, { id: '312861502073995265', type: 'USER', permission: true},  { id: '379640544143343618', type: 'USER', permission: true}],
   options: [
     {
       name: 'visibility',

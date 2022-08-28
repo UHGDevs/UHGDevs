@@ -6,7 +6,7 @@ const guildrefresh = require('../../utils/guildrefresh');
 module.exports = {
   name: 'unelites',
   description: 'Show most unactive members',
-  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}],
+  permissions: [],
   options: [
     {
       name: 'guild',

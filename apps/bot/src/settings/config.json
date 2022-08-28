@@ -1,19 +1,19 @@
 {
-    "prefix": ",",
-    "minecraft": false,
+    "prefix": ".",
+    "minecraft": true,
     "test": false,
-    "deleteverify": false,
+    "deleteverify": true,
     "time": {
-        "database": false,
-        "finder": false,
-        "elites": false,
-        "guildinfo": false,
-        "uhgrole": false,
+        "database": true,
+        "finder": true,
+        "elites": true,
+        "guildinfo": true,
+        "uhgrole": true,
         "loot": false,
         "sniper": false,
-        "gameplayers": false,
-        "bwroles": false,
-        "achievements": false
+        "gameplayers": true,
+        "bwroles": true,
+        "achievements": true
     },
-    "dev_mode": true
+    "dev_mode": false
 }

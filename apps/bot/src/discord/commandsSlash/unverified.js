@@ -3,7 +3,7 @@ const fs = require('fs');
 module.exports = {
   name: "unverified",
   description: 'Zobrazí uhg guild membery, kteří nejsou verifikovaní',
-  permissions: [ {type: 'USER', id: '378928808989949964', permission: true }, {type: 'ROLE', id: '475585340762226698', permission: true }, {type: 'ROLE', id: '537252847025127424', permission: true }, {type: 'ROLE', id: '530504766225383425', permission: true }  ],
+  permissions: [ {type: 'USER', id: '378928808989949964', permission: true }, {type: 'ROLE', id: '530504567528620063', permission: true, guild: '455751845319802880' }, {type: 'ROLE', id: '475585340762226698', permission: true, guild: '455751845319802880' }, {type: 'ROLE', id: '537252847025127424', permission: true, guild: '455751845319802880' }, {type: 'ROLE', id: '530504766225383425', permission: true, guild: '455751845319802880' }  ],
   type: "slash",
   run: async (uhg, interaction) => {
     try {
