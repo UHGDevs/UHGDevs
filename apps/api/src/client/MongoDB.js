@@ -16,7 +16,7 @@ class MongoDB extends ApiKey {
       this.mongo.once('open', async () => {
         this.mRefresh()
 
-        setInterval(this.mRefresh, 1700000);
+        setInterval(this.mRefresh.bind(this), 1700000);
       })
     } else this.mongo = {}
   }
@@ -75,7 +75,11 @@ class MongoDB extends ApiKey {
   }
 
   async mRefresh() {
-    let uhgdata = await this.mGet('data', 'users', {})
+    if (!this.mongo) return console.log('nenaslo se mongo - mRefresh')
+    const collection = this.mongo.db('data').collection('users');
+    let uhgdata = await collection.find({}).toArray()
+
+    if (!uhgdata) return console.log('nenasly se users data v mRefresh')
     this.uhgdata = uhgdata
   }
 
