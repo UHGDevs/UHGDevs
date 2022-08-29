@@ -5,7 +5,6 @@ const getPricesFromDb = function (pet, db) {
   const lvl1 = db[`lvl_1_${pet.tier}_${pet.type}`.toLowerCase()];
   const lvl100 = db[`lvl_100_${pet.tier}_${pet.type}`.toLowerCase()];
   const lvl200 = db[`lvl_200_${pet.tier}_${pet.type}`.toLowerCase()];
-
   return { lvl1, lvl100, lvl200 };
 };
 
@@ -36,8 +35,9 @@ const calculateSkillLevel = function (pet) {
 
 const getPetPrice = function (pet, db) {
   const { lvl1, lvl100, lvl200 } = getPricesFromDb(pet, db);
-  if (lvl1 == undefined || lvl100 == undefined) {
-    return pet;
+  if (lvl1 == undefined || lvl100 == undefined ) {
+    console.log(pet)
+    if (pet.type !== 'GOLDEN_DRAGON') return pet;
   }
 
   const data = calculateSkillLevel(pet);

@@ -16,13 +16,6 @@ module.exports = (uhg) => {
         }
         console.log(`${uhg.dc.slash.size} Discord Slash Commands`.brightGreen);
 
-        const cmd = fs.readdirSync(`src/discord/commandsCmd/`).filter((file) => file.endsWith(".js"));
-        for (let file of cmd) {
-            let pull = require(`./commandsCmd/${file}`);
-            if (pull.name) uhg.dc.cmd.set(pull.name, pull);
-        }
-        console.log(`${uhg.dc.cmd.size} Discord cmd Commands`.brightGreen);
-
         const loot = fs.readdirSync(`src/discord/lootBoxes/commands/`).filter((file) => file.endsWith(".js"));
         for (let file of loot) {
             let pull = require(`./lootBoxes/commands/${file}`);

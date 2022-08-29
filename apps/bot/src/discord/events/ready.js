@@ -9,6 +9,7 @@ module.exports = async (uhg, client) => {
 
    let botSlashCmds = uhg.dc.slash.map(cmd => { return{ name: cmd.name, description: cmd.description||"", options: cmd.options || [], type: cmd.type, defaultPermission: cmd.permissions.length ? false : true } });
   botSlashCmds.push({ name: 'Profile Command', type: 'USER'})
+  botSlashCmds.push({ name: 'verify', description: 'Verify command'})
   let cmds = await uhg.dc.client.application.commands.set(botSlashCmds)
 
   //console.log(cmds)

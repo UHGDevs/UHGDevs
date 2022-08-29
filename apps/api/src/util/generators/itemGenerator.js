@@ -25,7 +25,6 @@ const parseItems = async function (base64, db) {
   const data = nbt.simplify(await parseNbt(buf));
 
   const items = data.i;
-
   for (const [index, item] of items.entries()) {
     if (item.tag?.display?.Name.includes('Backpack')) {
       let backpackData;
@@ -72,7 +71,7 @@ const parseItems = async function (base64, db) {
         if (enchants.length == 1) {
           const value = ExtraAttributes.enchantments[enchants[0]];
 
-          price = db[`${enchants[0]}_${value}`] ?? 0;
+          price = db[`enchantment_${enchants[0]}_${value}`] ?? 0;
           itemName = helper.capitalize(`${enchants[0]} ${value}`);
         }
       }
@@ -82,7 +81,7 @@ const parseItems = async function (base64, db) {
           if (constants.blocked_enchants[itemId]?.includes(enchant[0])) continue;
 
           if (constants.allowed_enchants.includes(enchant[0])) {
-            price += db[`${enchant[0]}_${enchant[1]}`] ?? 0;
+            price += db[`enchantment_${enchant[0]}_${enchant[1]}`] ?? 0;
           }
         }
       }

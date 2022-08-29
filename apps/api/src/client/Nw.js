@@ -15,7 +15,7 @@ class Nw extends MongoDB {
     super(options);
     this.prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices.json'), 'utf8'))
 
-    setInterval(this.reload.bind(this), 1800000);
+    setInterval(this.reload.bind(this), 7200000); // každé 2 hodiny aktualizovat ceny ? - mozna udelat pres client a rovnou fixnout ceny?
   }
 
   async reload() {
@@ -55,8 +55,9 @@ class Nw extends MongoDB {
     let auctions = {}
     let pages = 2
     for (let i = 0; i <= pages; i++) {
-      const auctionPage = await axios(`https://api.hypixel.net/skyblock/auctions?page=${i}`).then( n=> n.data)
-      if (!auctionPage.success) continue;
+      let auctionPage;
+      try {auctionPage = await axios(`https://api.hypixel.net/skyblock/auctions?page=${i}`).then( n=> n.data)} catch(e) {auctionPage = e.response?.data}
+      if (!auctionPage?.success) continue;
   
       pages = auctionPage.totalPages - 1;
       auctionPage.auctions.filter(a => a.bin).forEach(async auction => {
@@ -90,7 +91,8 @@ class Nw extends MongoDB {
   async updateBazaar() {
     let bazaarProducts = {};
   
-    const response = await axios('https://api.hypixel.net/skyblock/bazaar');
+    let response;
+    try { response = await axios('https://api.hypixel.net/skyblock/bazaar') } catch (e) {response = e.response}
     const products = response.data.products
   
     for (const item of Object.keys(products)) {

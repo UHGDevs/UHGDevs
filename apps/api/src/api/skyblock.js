@@ -19,6 +19,7 @@ class Skyblock {
     let skyblock;
     try { skyblock = await client.callHypixel.get('skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response ? e.response.data.cause : 'Skyblock API error'}};
     if (!skyblock.success) return  {success: false, type: "skyblock", reason: skyblock.cause};
+    if (!skyblock.profiles) return  {success: false, type: "skyblock", reason: 'Hráč nemá žádný profil!'};
 
     const profiles = skyblock.profiles
 

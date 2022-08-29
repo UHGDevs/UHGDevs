@@ -14,6 +14,15 @@ module.exports = {
       if (!profil) return "Neplatný profil"
       else if (typeof profil.member.networth !== 'object') return profil.member.networth
 
+      if (pmsg.args?.includes(' dev')) {
+        let nw = profil.member.networth
+        for (let cat in nw.categories) {
+          console.log(`${cat} - ${uhg.money(nw.categories[cat].total)}`)
+        }
+        console.log()
+        console.log(nw.categories.pets.top_items.slice(0, 5))
+      }
+
       let message = `**NetWorth:** **${api.username}** - ${uhg.money(profil.member.networth.networth)} z toho ${uhg.money(profil.member.networth.bank + profil.member.networth.purse)} coins (${profil.name})`
       return message
     } catch (e) {
