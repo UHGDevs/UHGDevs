@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 
 module.exports = async (uhg, interaction) => {
-  try { await interaction.update({ type: 6 }) } catch (e) {}
+  try { await interaction.update({ type: 6, ephemeral: true }) } catch (e) {}
   try {
     let guild = interaction.guild
     if (guild.id !== '455751845319802880') return interaction.followUp({ embeds: [new MessageEmbed().setTitle(`Tato funkce funguje jen na UHG discordu`).setColor("RED")], ephemeral: true })

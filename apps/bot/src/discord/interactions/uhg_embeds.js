@@ -6,7 +6,7 @@ let invited =  new MessageActionRow().addComponents(new MessageButton().setCusto
 
 module.exports = async (uhg, interaction) => {
   let type = interaction.customId.split('_')[2]
-  //await interaction.update({ type:6, ephemeral: true })
+  try { await interaction.update({ type: 6 }) } catch (e) {}
 
   let embed;
 
@@ -29,10 +29,10 @@ module.exports = async (uhg, interaction) => {
     .addComponents(new MessageButton().setCustomId(`CROLE_1003713647845052466`).setStyle('SECONDARY').setEmoji('<:games:1003709662941675541>'))
     .addComponents(new MessageButton().setCustomId(`CROLE_936257245178634261`).setStyle('SECONDARY').setEmoji('🎬'))
     .addComponents(new MessageButton().setCustomId(`CROLE_927992007157252136`).setStyle('SECONDARY').setEmoji('💸'));
-    interaction.reply({ ephemeral: true, embeds: [embed], components: [buttons]})
+    return interaction.followUp({ ephemeral: true, embeds: [embed], components: [buttons]})
   }//.setFooter({ text: 'not woking yet' })
 
-  if (!embed) return interaction.reply({ content: 'fatal error LOL', ephemeral: true })
-  interaction.reply({ ephemeral: true, embeds: [embed] })
+  if (!embed) return interaction.followUp({ content: 'fatal error LOL', ephemeral: true })
+  interaction.followUp({ ephemeral: true, embeds: [embed] })
 
 }
