@@ -15,9 +15,9 @@ module.exports = {
       let gg = cac.gungame
       let message = `**CaC**: **${api.username}** - ${f(overall.wins)} Wins | ${f(overall.kills)} Kills | ${f(overall.headshotkills)} Headshots | ${f(overall.kdr)} KDR | ${f(overall.wlr)} WLR | ${f(defusal.bombsplanted)} Bombs Planted and ${f(defusal.bombsdefused)} Defused`
       
-      let besttime = `${uhg.toTime(gg.besttime, true).m}m ${uhg.toTime(gg.besttime, true).s}s`; 
+      let besttime = `${Math.floor(uhg.toTime(gg.besttime, true).m)}m ${Math.floor(uhg.toTime(gg.besttime, true).s)}s`; 
       if (gg.besttime/1000 < 60) {
-        besttime = `${uhg.toTime(gg.besttime, true).s}s`
+        besttime = `${Math.floor(uhg.toTime(gg.besttime, true).s)}s`
       }
 
       let embed = new MessageEmbed()
