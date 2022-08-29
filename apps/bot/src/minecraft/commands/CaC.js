@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 module.exports = {
   name: "CaC",
-  aliases: ["cac", "crops", "crims", "cropsandcrims", "cvc", "copsvcrims", "copsacrims", "copsvscrims", "cvsc"],
+  aliases: ["cac", "crops", "crims", "cropsandcrims", "cvc", "copsvcrims", "copsacrims", "copsvscrims", "cvsc", "cnc", "copsncrims"],
   run: async (uhg, pmsg) => {
     const f = uhg.f
     try{
