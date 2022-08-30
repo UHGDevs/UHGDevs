@@ -185,6 +185,16 @@ profiles: array             - []
     diamond: int
     dragon: int
     crimson: int
+  
+  mining: object
+    powder: int
+    powder_mithril: int
+    powder_gemstone: int
+    hotm_xp: int
+    hotm_tier: int
+    nucleus: int
+    commissions: int
+    scatha: int
 
   nw : object                 - from maro api
 

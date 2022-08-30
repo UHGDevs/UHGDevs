@@ -8,6 +8,8 @@ module.exports = (player, profile, cache) => {
 
   let skills = func.getSkills(player, achievements)
 
+  let mining = player.mining_core || {}
+
   let api = {
     username: player.username,
     uuid: player.uuid,
@@ -47,6 +49,18 @@ module.exports = (player, profile, cache) => {
       crimson: player.essence_crimson || 0,
     },
 
+    mining: {
+      powder: (mining.powder_mithril || 0) + (mining.powder_spent_mithril || 0) + (mining.powder_gemstone || 0) + (mining.powder_spent_gemstone || 0),
+      powder_mithril: (mining.powder_mithril || 0) + (mining.powder_spent_mithril || 0),
+      powder_gemstone: (mining.powder_gemstone || 0) + (mining.powder_spent_gemstone || 0),
+      hotm_xp: mining.experience || 0,
+      hotm_tier: func.getHotmTier(mining.experience || 0),
+      nucleus: mining.crystals && Object.values(mining.crystals).filter(n => n.total_placed).length === 5 ? Math.min(...Object.values(mining.crystals).filter(n => n.total_placed).map(n => n.total_placed ?? 0)) : 0,
+      commissions: achievements.skyblock_hard_working_miner || 0,
+      scatha: player.stats?.kills_scatha || 0,
+    },
+
   }
+
   return (api)
 }

@@ -20,7 +20,6 @@ class Nw extends MongoDB {
     this.default_prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices_def.json'), 'utf8'))
     this.set_prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices_set.json'), 'utf8'))
 
-    this.reload().then(n => console.log('reloaded'))
     setInterval(this.reload.bind(this), 7200000); // každé 2 hodiny aktualizovat ceny ? - mozna udelat pres client a rovnou fixnout ceny?
   }
 
