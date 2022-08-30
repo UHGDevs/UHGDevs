@@ -20,10 +20,10 @@ module.exports = {
           console.log(`${cat} - ${uhg.money(nw.categories[cat].total)}`)
         }
         console.log()
-        console.log(nw.categories.pets.top_items.slice(0, 5))
+        console.log(nw.categories.wardrobe_inventory.top_items.slice(0, 10))
       }
 
-      let message = `**NetWorth:** **${api.username}** - ${uhg.money(profil.member.networth.networth)} z toho ${uhg.money(profil.member.networth.bank + profil.member.networth.purse)} coins (${profil.name})`
+      let message = `**NetWorth:** **${api.username}** - ${uhg.money(profil.member.networth.total)} z toho ${uhg.money(profil.member.networth.bank + profil.member.networth.purse)} coins (${profil.name})`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)

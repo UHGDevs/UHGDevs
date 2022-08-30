@@ -10,11 +10,17 @@ const helper = require('../data/helper.js')
 const fs = require('fs');
 const path = require('path');
 
+const Util = require('../util/Util');
+const Options = require('../util/Options');
+
 class Nw extends MongoDB {
   constructor(options = {}) {
     super(options);
     this.prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices.json'), 'utf8'))
+    this.default_prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices_def.json'), 'utf8'))
+    this.set_prices = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/prices_set.json'), 'utf8'))
 
+    this.reload().then(n => console.log('reloaded'))
     setInterval(this.reload.bind(this), 7200000); // každé 2 hodiny aktualizovat ceny ? - mozna udelat pres client a rovnou fixnout ceny?
   }
 
@@ -25,13 +31,15 @@ class Nw extends MongoDB {
   }
 
   async generatePrices() {
-    let prices = {};
+    let prices = this.default_prices
     for (const item of await this.mGet('maro', 'auctions', {})) {
       prices[item.id.toLowerCase()] = parseInt(item.auction.price);
     }
     for (const product of await this.mGet('maro', 'bazaar', {})) {
       prices[product.id.toLowerCase()] = parseInt(product.buyPrice);
     }
+    // prices = Util.mergeSettings(this.default_prices, prices);
+    prices = Util.mergeSettings(prices, this.set_prices);
     this.prices = prices
     fs.writeFile(path.resolve(__dirname, '../data/prices.json'), JSON.stringify(prices, null, 4), 'utf8', data =>{})
   }

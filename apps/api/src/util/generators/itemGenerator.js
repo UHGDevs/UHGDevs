@@ -110,6 +110,7 @@ const parseItems = async function (base64, db) {
 
       if (ExtraAttributes.dungeon_item_level > 5) {
         const starsUsed = ExtraAttributes.dungeon_item_level - 5;
+        console.log(starsUsed)
 
         for (const star of Array(starsUsed).keys()) {
           price += db[constants.master_stars[star]] ?? 0;
@@ -122,8 +123,8 @@ const parseItems = async function (base64, db) {
         }
       }
 
-      if (ExtraAttributes.gemstone_slots) {
-        price += ExtraAttributes.gemstone_slots * db['gemstone_chamber'];
+      if (ExtraAttributes.gems && ExtraAttributes.gems.unlocked_slots) {
+        price += ExtraAttributes.gems.unlocked_slots.length * db['gemstone_chamber'];
       }
 
       if (ExtraAttributes.drill_part_upgrade_module) {
@@ -144,6 +145,8 @@ const parseItems = async function (base64, db) {
 
       item.price = price ?? 0;
       item.modified = { id: itemId, name: itemName };
+      if (itemId.includes('power_wither_chestplate')) console.log(ExtraAttributes)
+      if (itemId.includes('power_wither_chestplate')) console.log(price)
     }
   }
 
