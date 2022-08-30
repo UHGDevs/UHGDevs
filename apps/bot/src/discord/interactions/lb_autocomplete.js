@@ -187,6 +187,23 @@ module.exports = async (uhg, interaction) => {
         { name: 'KDR', value: 'kdr' },
         { name: 'Zlata nakoupeno', value: 'goldbought' }
       ])
+    } else if (game == "cac") {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Výhry kol', value: 'roundwins' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Zabití do hlavy', value: 'headshotkills'},
+        { name: 'Zabití granátem', value: 'grenadekills'},
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Střely', value: 'shots' },
+        { name: 'Položené bomby', value: 'bombsplanted' },
+        { name: 'Zneškodněné bomby', value: 'bombsdefused' },
+        { name: 'Nejlepší čas', value: 'besttime' }
+
+      ])
     }
   } else if (focused.name == 'gamemode') {
     if (!stat) return
@@ -210,10 +227,6 @@ module.exports = async (uhg, interaction) => {
         { name: 'Doubles Insane', value: 'doubles_insane' },
         { name: 'Rankedy', value: 'ranked' }
       ]);
-    } else if (game == 'general') {
-      return interaction.respond([
-        { name: 'Celkové', value: 'overall' }
-      ]);
     } else if (game == 'arena') {
       if (stat == 'keys' || stat == 'coins') return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
       return interaction.respond([
@@ -232,6 +245,18 @@ module.exports = async (uhg, interaction) => {
         { name: 'Assassins', value: 'assassins' },
         { name: 'Infection', value: 'infection' }
       ])
+    } else if (game == 'cac') {
+      if (stat == 'coins' || stat == 'shots' || stat == 'granadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([{name: 'Celkové', value: 'overall'}]);
+      if (stat == 'bombsdefused' || stat == 'bombsplanted') return interaction.respond([{name: 'Defusal', value: 'defusal'}]);
+      if (stat == 'besttime') return interaction.respond([{name: 'Gun Game', value: 'gungame'}]);
+      return interaction.respond([
+        { name: 'Celkové', value: 'overall' },
+        { name: 'Defusal', value: 'defusal' },
+        { name: 'Team Deathmatch', value: 'deathmatch' },
+        { name: 'Gun Game', value: 'gungame' }
+      ])
+    } else if (game == 'general') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == 'tkr') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == 'duels') {
