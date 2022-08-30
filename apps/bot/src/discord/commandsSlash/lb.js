@@ -70,6 +70,10 @@ module.exports = {
         {
           name: 'Build Battle',
           value: 'bb'
+        },
+        {
+          name: 'Cops and Crims',
+          value: 'cac'
         }
       ]
     },
@@ -101,7 +105,7 @@ module.exports = {
 
       if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'walls' || game == 'vampirez') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
-      else if (game == "paintball" && stat == 'level') stat = "kills"
+      else if ((game == "paintball" || game == 'cac') && stat == 'level') stat = "kills"
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
