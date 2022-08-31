@@ -176,6 +176,8 @@ profiles: array             - []
   skills_average: double_3
   skills_average_progress: double_3
 
+  collection: object
+
   essence: object             - every hypixel essence
     undead: int
     wither: int
