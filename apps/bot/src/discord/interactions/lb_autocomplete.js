@@ -193,14 +193,18 @@ module.exports = async (uhg, interaction) => {
         { name: 'Výhry', value: 'wins' },
         { name: 'Výhry kol', value: 'roundwins' },
         { name: 'Zabití', value: 'kills' },
-        { name: 'Zabití do hlavy', value: 'headshotkills'},
-        { name: 'Zabití granátem', value: 'grenadekills'},
+        { name: 'Zabití do hlavy', value: 'headshotkills' },
+        { name: 'Zabití granátem', value: 'grenadekills' },
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
         { name: 'Asistence', value: 'assists' },
         { name: 'Střely', value: 'shots' },
         { name: 'Položené bomby', value: 'bombsplanted' },
         { name: 'Zneškodněné bomby', value: 'bombsdefused' },
+      ])
+    } else if (game == 'blitz') {
+      return interaction.respond([
+        {name: ''}
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -244,7 +248,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Infection', value: 'infection' }
       ])
     } else if (game == 'cac') {
-      if (stat == 'coins' || stat == 'shots' || stat == 'granadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([{name: 'Celkové', value: 'overall'}]);
+      if (stat == 'coins' || stat == 'shots' || stat == 'grenadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([{name: 'Celkové', value: 'overall'}]);
       if (stat == 'bombsdefused' || stat == 'bombsplanted') return interaction.respond([{name: 'Defusal', value: 'defusal'}]);
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },

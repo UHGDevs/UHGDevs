@@ -14,7 +14,7 @@ module.exports = (hypixel) => {
         kills: (cac.kills || 0)+(cac.headshot_kills || 0)+(cac.grenade_kills || 0)+(cac.kills_deathmatch || 0)+(cac.kills_gungame || 0),
         kdr: ratio((cac.kills || 0)+(cac.headshot_kills || 0)+(cac.grenade_kills || 0)+(cac.kills_deathmatch || 0)+(cac.kills_gungame || 0), (cac.deaths || 0)+(cac.deaths_deathmatch || 0)+(cac.deaths_gungame || 0)),
         headshotkills: cac.headshot_kills || 0,
-        granadekills: cac.grenade_kills || 0,
+        grenadekills: cac.grenade_kills || 0,
         deaths: (cac.deaths || 0)+(cac.deaths_deathmatch || 0)+(cac.deaths_gungame || 0),
         assists: (cac.assists || 0)+(cac.assists_gungame || 0)+(cac.assists_deathmatch || 0),
         shots: cac.shots_fired || 0,
