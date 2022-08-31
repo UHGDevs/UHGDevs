@@ -60,6 +60,13 @@ module.exports = class Functions extends EventEmitter {
     else return Math.floor(n/10000000)/100 + "B"
   }
 
+  fPowder(n) {
+    if (!Number(n)) return n
+    if (n<1000) return n
+    else if (n>=1000 && n<1000000) return Math.floor(n/100)/10 + "K"
+    else  return Math.floor(n/1000)/1000 + "M"
+  }
+
   r(n){
     try {Number(n)} catch {return n}
     let d = String(n).length

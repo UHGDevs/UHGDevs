@@ -38,6 +38,8 @@ module.exports = (player, profile, cache) => {
     skill_average: skills.sa,
     skill_average_progress: skills.tSa,
 
+    collection: Object.keys(player.collection || {}).reduce((object, key) => {object[key.toLowerCase()] = player.collection[key]; return object}, {}),
+
     essence: {
       undead: player.essence_undead || 0,
       wither: player.essence_wither || 0,
