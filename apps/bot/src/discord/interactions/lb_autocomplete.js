@@ -204,7 +204,15 @@ module.exports = async (uhg, interaction) => {
       ])
     } else if (game == 'blitz') {
       return interaction.respond([
-        {name: ''}
+        { name: 'Mince', value: 'coins' },
+        { name: 'Hry', value: 'games' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Poškození', value: 'damage' },
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -273,6 +281,8 @@ module.exports = async (uhg, interaction) => {
     } else if (game == "walls") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "vampirez") {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == "blitz") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }
