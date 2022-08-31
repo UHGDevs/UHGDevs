@@ -201,8 +201,6 @@ module.exports = async (uhg, interaction) => {
         { name: 'Střely', value: 'shots' },
         { name: 'Položené bomby', value: 'bombsplanted' },
         { name: 'Zneškodněné bomby', value: 'bombsdefused' },
-        { name: 'Nejlepší čas', value: 'besttime' }
-
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -248,7 +246,6 @@ module.exports = async (uhg, interaction) => {
     } else if (game == 'cac') {
       if (stat == 'coins' || stat == 'shots' || stat == 'granadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([{name: 'Celkové', value: 'overall'}]);
       if (stat == 'bombsdefused' || stat == 'bombsplanted') return interaction.respond([{name: 'Defusal', value: 'defusal'}]);
-      if (stat == 'besttime') return interaction.respond([{name: 'Gun Game', value: 'gungame'}]);
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },
         { name: 'Defusal', value: 'defusal' },
