@@ -4,9 +4,9 @@ exports.setup = (uhg, guild) => {
     let info = {
         name: 'BedWars',
         path: 'hypixel/stats/bedwars/',
-        stats: ['level', 'overall/fkdr',  'overall/finalKills'],
-        statsNames: ['Level', 'FKDR', 'Finální Zabití'],
-        req: [[100, 300, 500], [3, 5, 7], [2000, 5000, 10000]]
+        stats: ['level', 'overall/finalKills'],
+        statsNames: ['Level', 'Finální Zabití'],
+        req: [[100, 300, 500], [2000, 5000, 10000]]
     }
     let find = new RegExp(`(${info.name}) (god|expert|trained)`, 'i')
 

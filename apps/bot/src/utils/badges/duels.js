@@ -4,9 +4,9 @@ exports.setup = (uhg, guild) => {
     let info = {
         name: 'Duels',
         path: 'hypixel/stats/duels/',
-        stats: ['wins', 'wlr'],
-        statsNames: ['Výhry', 'WLR'],
-        req: [[1000, 5000, 10000], [3, 5, 7]]
+        stats: ['wins'],
+        statsNames: ['Výhry'],
+        req: [[1000, 5000, 10000]]
     }
     let find = new RegExp(`(${info.name}) (god|expert|trained)`, 'i')
 
