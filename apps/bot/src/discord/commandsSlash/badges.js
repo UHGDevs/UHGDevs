@@ -72,10 +72,8 @@ module.exports = {
       let desc_info = ''
       for (const i in badge.roles) {
         let role = badge.roles[i]
-          console.log(role.req)
-          let stats_info = badge.statsNames.map((n, a) => `${n}: ${role.req ? role.req[a] : `Error - ${String(role.req)}`}` )
-          console.log(stats_info)
-          desc_info = desc_info + `\n<@&${role.id}> ➜ ${stats_info.join(', ')}`
+        let stats_info = badge.statsNames.map((n, a) => `${n}: ${role.req ? role.req[a] : `Error - ${String(role.req)}`}` )
+        desc_info = desc_info + `\n<@&${role.id}> ➜ ${stats_info.join(', ')}`
       }
       let badge_info = new MessageEmbed().setTitle(`**${badge.name} Hypixel Badge**`).setColor(badge.roles[0] ? badge.roles[0].color : 'RED').setDescription(desc_info)
       
