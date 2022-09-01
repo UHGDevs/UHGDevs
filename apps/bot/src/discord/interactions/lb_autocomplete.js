@@ -205,10 +205,7 @@ module.exports = async (uhg, interaction) => {
     } else if (game == 'blitz') {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
-        { name: 'Hry', value: 'games' },
         { name: 'Výhry', value: 'wins' },
-        { name: 'Prohry', value: 'losses' },
-        { name: 'WLR', value: 'wlr' },
         { name: 'Zabití', value: 'kills' },
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
