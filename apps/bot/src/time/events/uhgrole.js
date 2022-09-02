@@ -85,7 +85,6 @@ module.exports = {
         let data = await uhg.mongo.run.get('stats', 'stats', { uuid: verify.uuid })
         if (data.length) {
           data = data[0]
-          if (data.username !== verify.nickname || !(verify.nicks && data.nicks.length === verify.names.length)) uhg.mongo.run.update("general", "verify", {_id:verify._id, nickname: data.username, names: data.nicks })
           if (uhgD && uhgD.username && data.username !== uhgD.username) uhg.mongo.run.update("general", "uhg", {_id:verify._id, username: data.username })
         } else {
           //if (uhgD._id) console.log('Přidat '+ verify.nickname + ' do databáze!')

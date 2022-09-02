@@ -5,8 +5,7 @@ module.exports = {
     try{
       let api = await uhg.api.call(pmsg.nickname)
       if (!api.success) return api.reason
-      let nicks = api.hypixel
-      let message = `**${api.username}** - ${nicks.nicks.join(", ")}`
+      let message = `**${api.username}** - ${api.names.join(", ")}`
       //if (message.length > 256) message = "Pro jistotu ty nicky nenapíšu, abych se nepřehřál, těch nicků jich je moc na mě"
       return message
     } catch (e) {

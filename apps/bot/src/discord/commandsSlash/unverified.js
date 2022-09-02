@@ -25,15 +25,15 @@ module.exports = {
       unNames = []
       for (let uuid of unUuid) {
         let autoverify = false
-        let uApi = await uhg.getApi(uuid, ["mojang", "guild", 'hypixel'])
-        if (uApi instanceof Object == false) {unNames.push({name:uuid}); continue;}
+        let uApi = await uhg.api.call(uuid, ["guild", 'hypixel'])
+        if (!uApi.success) {unNames.push({name:uuid}); continue;}
         let joined = Math.floor((new Date().getTime()-uApi.guild.member.joined)/ 86400000)
         if (uApi.hypixel.links.DISCORD) {
           let discord = uhg.dc.client.users.cache.find(n => `${n.username}#${n.discriminator}` == uApi.hypixel.links.DISCORD)
           if (discord) {
-            await uhg.mongo.run.post("general", "verify", { _id: discord.id, uuid: uApi.uuid, nickname: uApi.username, updated: Number(new Date()) })
+            await uhg.mongo.run.post("general", "verify", { _id: discord.id, uuid: uApi.uuid, nickname: uApi.username, names: uApi.names, textures: uApi.textures, date: uApi.date })
             autoverify = true
-            //uhg.dc.cache.channels.get('achat').send(`Autoverified ${uApi.username} - <@${discord.id}> (${uApi.hypixel.links.DISCORD})`)
+            uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `Autoverified ${uApi.username} - <@${discord.id}> (${uApi.hypixel.links.DISCORD})`})
           }
         }
         unNames.push( {name:uApi.username, joined: joined, date: `<t:${Math.round(uApi.guild.member.joined/1000)}:R>`, lastLogin: uApi.hypixel.lastLogin, lastOnline: `<t:${Math.round(uApi.hypixel.lastLogin/1000)}:R>`, links: uApi.hypixel.links, autoverify: autoverify} )

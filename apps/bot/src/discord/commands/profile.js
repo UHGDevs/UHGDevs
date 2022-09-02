@@ -33,8 +33,8 @@ module.exports = {
           { name: `ㅤ`, value: `ㅤ`, inline: false}
       )
 
-      if (api.hypixel.nicks.length > 1) {
-        embed.addFields({ name:`${api.hypixel.nicks.length} nicks`, value: uhg.dontFormat(api.hypixel.nicks.join(', ')), inline: false})
+      if (api.names.length > 1) {
+        embed.addFields({ name:`${api.names.length} nicks`, value: uhg.dontFormat(api.names.join(', ')), inline: false})
       }
 
       if (api.guild.guild) embed.addFields(

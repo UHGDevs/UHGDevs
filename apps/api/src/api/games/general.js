@@ -19,7 +19,6 @@ module.exports = async (hypixel = {} , uuid, client) => {
     karma: hypixel.karma || 0,
     aps: hypixel.achievementPoints || 0,
     legacyAps: legacyAps,
-    nicks: hypixel.knownAliases || {},
     links: hypixel.socialMedia ? hypixel.socialMedia.links || {} : {},
     discord: (hypixel.socialMedia ? (hypixel.socialMedia.links ? hypixel.socialMedia.links.DISCORD : null) : null) || 'Žádný',
     fishing: {

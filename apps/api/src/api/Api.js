@@ -11,18 +11,22 @@ class Api extends CreateUser {
   async getApi(options) {
     return new Promise(async resolve => {
     /* First time call */
-    if (!this.username) {
+    if (!this.username || !this.uuid || !this.names) {
       let launch = this.basic ? await this.basic : {success: false}
       if (!launch.success && Number(this.created) < Number(new Date()) - 10000) launch = await require(`./mojang`).call({ user: launch.input, client: options.client })
       if (!launch.success) return resolve(launch)
 
       this.username = launch.username
       this.uuid = launch.uuid
+      this.names = launch.names
+      this.textures = launch.textures
+
+      this.date = new Date(launch.created_at)
 
       delete this.basic
     }
 
-    const api = {success: true, username: this.username, uuid: this.uuid}
+    const api = {success: true, username: this.username, uuid: this.uuid, names: this.names, textures: this.textures, date: this.date,  }
     
     options.client = this.client
     options.uuid = this.uuid

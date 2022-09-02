@@ -73,8 +73,9 @@ exports.get = async (uhg, interaction) => {
 
     await interaction.reply({ content: 'Starting verification!', ephemeral: true });
 
-    let api = await uhg.getApi(username, ["key", "hypixel", "mojang", "guild"])
-    if (api instanceof Object == false) return interaction.editReply({ content: api })
+    //let api = await uhg.getApi(username, ["key", "hypixel", "mojang", "guild"])
+    let api = await uhg.api.call(username, ["hypixel", "guild"])
+    if (!api.sucess) return interaction.editReply({ content: api })
     username = api.username
     if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
     
@@ -109,7 +110,7 @@ exports.get = async (uhg, interaction) => {
         await uhg.mongo.run.post("general", "uhg", {_id: user.id, username: username, uuid: api.uuid, guildrank: rank})
     }
 
-    let post = await uhg.mongo.run.post("general", "verify", { _id: user.id, uuid: api.uuid, nickname: username, names: api.hypixel.nicks })
+    let post = await uhg.mongo.run.post("general", "verify", { _id: user.id, uuid: api.uuid, nickname: username, names: api.names, textures: api.textures, date: api.date })
     if (!post.acknowledged) {return interaction.editReply({ content: 'Nastala chyba v nahrávání informací do databáze!' })}
     if (!custom && !verified.length && post.insertedId==user.id) await interaction.editReply({ content: `Úspěšná verifikace jako \`${username}\`!` });
     else if (custom) await interaction.editReply({ content: `Úspěšně jsi verifikoval ${user} na \`${username}\`!` });
