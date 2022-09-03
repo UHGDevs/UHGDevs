@@ -24,16 +24,17 @@ module.exports = async (uhg, pmsg) => {
 }
 
 async function guildfinder(uhg, pmsg, finder) {
-  if (finder[5] && !finder[5].match(/[A-Z]+/gi)) return;
+  if (!finder[5]) return
+  if (!finder[5].match(/[A-Z]+/gi)) return;
   let user = await uhg.mongo.run.get("general", "guildfind", {_id: pmsg.username}) || {}
   if (user.length) user = user[0]
 
   let userdata = user.data || []
 
-  let game;
-  if (finder[5]) game = uhg.mc.aliases.get(finder[5].toLowerCase()) ||finder[5]
+  game = uhg.mc.aliases.get(finder[5]?.toLowerCase()) || finder[5]
+  if (game === undefined) return
 
-  userdata.push( {game: game || finder[5], message: pmsg.content, time: Number(new Date())} )
+  userdata.push( {game: String(game), message: pmsg.content, time: Number(new Date())} )
 
   if (userdata.length>1) userdata.sort((a, b) => b.time - a.time);
 
@@ -44,9 +45,7 @@ async function guildfinder(uhg, pmsg, finder) {
     if (item._id == pmsg.username) return
     let same;
     if (game && item.data) { 
-      console.log(game)
-      console.log(item.data)
-      same = item.data.filter(a => a.game.toLowerCase() == game.toLowerCase())
+      same = item.data.filter(a => a.game?.toLowerCase() === game?.toLowerCase())
     }
 
     if (!same) return
