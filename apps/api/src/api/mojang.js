@@ -9,7 +9,9 @@ class Mojang {
     if (!input) return {success: false, reason: 'Mojang API - není zadaný input', type: 'mojang'} 
     let call;
     try {
+      console.time('Mojang FETCH')
         call = await axios.get(`https://api.ashcon.app/mojang/v2/user/${input}`)
+        console.timeEnd('Mojang FETCH')
     } catch (e) { call = e.response }
     finally {
       if (!call) return {success: false, reason: 'Error ve volání MOJANGU', type: 'mojang', input: input} 
