@@ -75,7 +75,7 @@ exports.get = async (uhg, interaction) => {
 
     //let api = await uhg.getApi(username, ["key", "hypixel", "mojang", "guild"])
     let api = await uhg.api.call(username, ["hypixel", "guild"])
-    if (!api.sucess) return interaction.editReply({ content: api })
+    if (!api.success) return interaction.editReply({ content: api })
     username = api.username
     if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
     
