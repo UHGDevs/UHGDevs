@@ -25,7 +25,7 @@ class Client extends Nw {
     this.cacheAps()
   }
   call(input, call = [], options = {}) {
-    console.timeEnd('API entry')
+    console.log('IN API')
 
     options.call = call
 

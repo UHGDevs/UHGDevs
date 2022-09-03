@@ -8,7 +8,7 @@ class CreateUser {
     let user = Mojang.call(options)
     this.basic = user
     this.created = new Date()
-    console.time('Create User')
+    console.timeEnd('Create User')
     user.then(user => {
       console.log('mojang fetched')
       this.success = user.success
