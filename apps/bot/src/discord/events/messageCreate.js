@@ -32,9 +32,8 @@ module.exports = async (uhg, message) => {
     if (msg) await message.channel.send(msg)
     return
   }
-  console.time('getCmd')
+
   if (!command) command = uhg.mc.commands.get(uhg.mc.aliases.get(content.split(" ")[0].toLowerCase()));
-  console.timeEnd('getCmd')
   if (command) {
     let user = uhg.data.verify.find(n=>n._id==message.author.id) || {}
     console.time('CelyCmdMsg')

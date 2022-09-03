@@ -25,6 +25,8 @@ class Client extends Nw {
     this.cacheAps()
   }
   call(input, call = [], options = {}) {
+    console.timeEnd('API entry')
+
     options.call = call
 
     if (typeof input !== 'string') throw new Error('INVALID_TYPE', 'username or uuid', 'string');
@@ -38,7 +40,6 @@ class Client extends Nw {
     options.client = this
 
     options.premium = options.premium ?? (options.verify ? this.uhgdata?.find(n => n.uuid == options.verify.uuid)?.premium ?? false : false)
-
     if (!user) {
       options.user = input
 
