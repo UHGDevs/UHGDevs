@@ -103,14 +103,6 @@ module.exports = {
       //   }
       // }
 
-      let notInDb = []
-      for (let n of dVerify.filter(n => verIds.includes(n._id))) {
-        let data = await uhg.mongo.run.get('stats', 'stats', { uuid: n.uuid })
-        if (!data.length) { notInDb.push(n); continue}
-        if (n.nickname !== data[0].username || !(n.names && n.names.length === data[0].nicks.length)) uhg.mongo.run.update("general", "verify", {_id :n._id,}, { nickname: data[0].username, names: data[0].nicks })
-      }
-
-      //notInDb.forEach(n => console.log(n.nickname))
 
     } catch(e) {
       if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
