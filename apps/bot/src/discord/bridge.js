@@ -7,11 +7,11 @@ module.exports = async (uhg, message) => {
   if (!chat) return;
 
   let user = uhg.data.verify?.length ? uhg.data.verify.find(n=>n._id==message.author.id) : {nickname: message.guild.members.cache.get(message.author.id).nickname || message.author.username}
-  if (!user) return message.reply(`Nejsi verifikovaný, zpráva nebyla odeslána.\nVerifikuj se pomocí ${uhg.settings.prefix}verify *\`nick\`*`)
-  if (message.content == "") return message.reply("Zpráva nelze odeslat")
-  if (message.content.length>245) message.reply({ content: "Zpráva byla useknuta" })
+  if (!user) return message.reply({ content: `Nejsi verifikovaný, zpráva nebyla odeslána.\nVerifikuj se pomocí ${uhg.settings.prefix}verify *\`nick\`*`, failIfNotExists: false })
+  if (message.content == "") return message.reply({ content: "Zpráva nelze odeslat", failIfNotExists: false})
+  if (message.content.length>245) message.reply({ content: "Zpráva byla useknuta", failIfNotExists: false })
 
-  if (uhg.includesWithArray(message.content.toLowerCase(), banned) || message.content.toLowerCase().endsWith(' ip')) try {return message.reply({ content: "Zpráva obsahuje nepovolené slovo" })} catch (e) {console.log(e)}
+  if (uhg.includesWithArray(message.content.toLowerCase(), banned) || message.content.toLowerCase().endsWith(' ip')) try {return message.reply({ content: "Zpráva obsahuje nepovolené slovo", failIfNotExists: false })} catch (e) {console.log(e)}
 
   let username = user.nickname
   if (message.reference) {
