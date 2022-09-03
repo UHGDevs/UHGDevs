@@ -7,7 +7,7 @@ module.exports = {
   name: eventName,
   description: "UHG QOTD",
   emoji: '❓',
-  time: '0 0 14 * * *', //'*/10 * * * * *'
+  time: '0 0 7 * * *', //'*/10 * * * * *'
   ignore: '* * * * * *', //'sec min hour den(mesic) mesic den(tyden)'
   onstart: false,
   run: async (uhg) => {
