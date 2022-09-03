@@ -27,10 +27,11 @@ module.exports = async (uhg, interaction) => {
     .addComponents(new MessageButton().setCustomId(`CROLE_1003713161238679652`).setStyle('SECONDARY').setEmoji('<:discord:1003709661335277569>'))
     .addComponents(new MessageButton().setCustomId(`CROLE_1003713511710543952`).setStyle('SECONDARY').setEmoji('<:saturn:1012080877242687500>'))
     .addComponents(new MessageButton().setCustomId(`CROLE_1003713647845052466`).setStyle('SECONDARY').setEmoji('<:games:1003709662941675541>'))
-    .addComponents(new MessageButton().setCustomId(`CROLE_1015349927318139022`).setStyle('SECONDARY').setLabel('QOTD')/*.setEmoji('💸')*/)
+    .addComponents(new MessageButton().setCustomId(`CROLE_1015349927318139022`).setStyle('SECONDARY').setEmoji('❓'));
+    let buttons_view =  new MessageActionRow()
     .addComponents(new MessageButton().setCustomId(`CROLE_936257245178634261`).setStyle('SECONDARY').setEmoji('🎬'))
     .addComponents(new MessageButton().setCustomId(`CROLE_927992007157252136`).setStyle('SECONDARY').setEmoji('💸'));
-    return interaction.followUp({ ephemeral: true, embeds: [embed], components: [buttons]})
+    return interaction.followUp({ ephemeral: true, embeds: [embed], components: [buttons, buttons_view]})
   }//.setFooter({ text: 'not woking yet' })
 
   if (!embed) return interaction.followUp({ content: 'fatal error LOL', ephemeral: true })
