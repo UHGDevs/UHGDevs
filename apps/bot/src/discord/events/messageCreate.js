@@ -32,11 +32,14 @@ module.exports = async (uhg, message) => {
     if (msg) await message.channel.send(msg)
     return
   }
-
+  console.time('getCmd')
   if (!command) command = uhg.mc.commands.get(uhg.mc.aliases.get(content.split(" ")[0].toLowerCase()));
+  console.timeEnd('getCmd')
   if (command) {
     let user = uhg.data.verify.find(n=>n._id==message.author.id) || {}
+    console.time('CelyCmdMsg')
     let msg = await command.run(uhg, {username: user.nickname||content.split(" ")[0], args:content.toLowerCase().replace(content.split(" ")[0].toLowerCase(), "").trim()||"", nickname:content.split(" ")[1]||user.nickname||"neni_nactene_verify!", verify_data: user}) || "error v posilani mc commandu z discordu"
+    console.timeEnd('CelyCmdMsg')
     if (mcchat) {
       let mcchannel = "/go "
       if (message.channel.id == uhg.getDiscordIds().channels.guild) mcchannel = "/gc "
