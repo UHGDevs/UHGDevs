@@ -3,7 +3,7 @@ module.exports = {
   aliases: ["nickhistory", "namehistory", "history", "names", "nicks"],
   run: async (uhg, pmsg) => {
     try{
-      let api = await uhg.api.call(pmsg.nickname)
+      let api = await uhg.api.call(pmsg.nickname, ['mojang'], {verify: pmsg.verify_data})
       if (!api.success) return api.reason
       let message = `**${api.username}** - ${api.names.join(", ")}`
       //if (message.length > 256) message = "Pro jistotu ty nicky nenapíšu, abych se nepřehřál, těch nicků jich je moc na mě"
