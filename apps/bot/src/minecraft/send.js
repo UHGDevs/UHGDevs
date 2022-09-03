@@ -84,7 +84,8 @@ exports.write = async function (uhg, pmsg) {
 
 async function pings(message, uhg) {
   let data = uhg.data.verify
-  if (!data.length) data = await uhg.mongo.run.get("general", "verify")
+  if (!data.length && uhg.mongo && uhg.mongo.run) data = await uhg.mongo.run.get("general", "verify")
+  else if (!data.length) data = []
 
   let msg = message
   let ids = msg.match(/<@.?[0-9]*?>/g)
