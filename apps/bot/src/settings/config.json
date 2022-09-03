@@ -13,8 +13,8 @@
         "sniper": false,
         "gameplayers": true,
         "bwroles": true,
-        "achievements": true
-        "qotd": true,
+        "achievements": true,
+        "qotd": true
     },
     "dev_mode": false
 }
