@@ -16,7 +16,8 @@ module.exports = async (uhg, message) => {
   let username = user.nickname
   if (message.reference) {
     let msg = await uhg.dc.client.channels.cache.get(message.reference.channelId).messages.fetch(message.reference.messageId)
-    let replied = uhg.data.verify?.length ? uhg.data.verify.find(n=>n._id==msg.author.id) : {nickname: msg.guild.members.cache.get(msg.author.id).nickname || msg.author.username}
+    let replied = (uhg.data.verify?.length ? uhg.data.verify.find(n=>n._id==msg.author.id) : null) ||  {nickname: msg.guild.members.cache.get(msg.author.id).nickname || msg.author.username}
+    
     username = `${username} replied to ${replied.nickname}`
   }
 
