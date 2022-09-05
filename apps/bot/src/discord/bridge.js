@@ -6,6 +6,9 @@ module.exports = async (uhg, message) => {
   if (message.channel.id==uhg.getDiscordIds().channels.guild) chat = "/gc"
   if (!chat) return;
 
+  if (socket._host !== 'mc.hypixel.net') return uhg.settings.offline ? message.reply({ content: "Bot není na hypixelu.", failIfNotExists: false }) : false
+  console.log(uhg.mc.client)
+
   let user = uhg.data.verify?.length ? uhg.data.verify.find(n=>n._id==message.author.id) : {nickname: message.guild.members.cache.get(message.author.id).nickname || message.author.username}
   if (!user) return message.reply({ content: `Nejsi verifikovaný, zpráva nebyla odeslána.\nVerifikuj se pomocí ${uhg.settings.prefix}verify *\`nick\`*`, failIfNotExists: false })
   if (message.content == "") return message.reply({ content: "Zpráva nelze odeslat", failIfNotExists: false})
