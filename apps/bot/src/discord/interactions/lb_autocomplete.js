@@ -55,7 +55,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Level', value: 'level' },
         { name: 'Karma', value: 'karma' },
         { name: 'AP', value: 'aps' },
-        { name: 'Wins', value: 'wins' },
+       // { name: 'Wins', value: 'wins' },
         { name: 'Ranks Gifted', value: 'ranksGiven' },
         { name: 'Gifts Gifted', value: 'giftsGiven' },
         { name: 'Quests', value: 'quests' },
