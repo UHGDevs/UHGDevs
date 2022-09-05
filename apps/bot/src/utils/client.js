@@ -10,7 +10,7 @@ module.exports = (uhg) => {
         password: process.env.password,
         auth: 'microsoft',
         onMsaCode: msaCode,
-        keepAlive: false,
+        checkTimeoutInterval: 30 * 1000 * 4,
         profilesFolder: 'src/settings/minecraft/'
       })
     } else {
@@ -20,7 +20,7 @@ module.exports = (uhg) => {
         username: process.env.email,
         auth: 'microsoft',
         onMsaCode: msaCode,
-        keepAlive: false,
+        checkTimeoutInterval: 30 * 1000 * 4,
         profilesFolder: 'src/settings/minecraft/'
       })
     }
