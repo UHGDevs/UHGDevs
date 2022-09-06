@@ -186,6 +186,15 @@ module.exports = (hypixel) => {
         knocked: arcade.times_knocked_down_zombies_alienarcadium || 0,
       },
     },
+    pixelparty: arcade.pixel_party ? {
+      wins: arcade.pixel_party.wins || 0,
+      games: arcade.pixel_party.games_played || 0,
+      losses: (arcade.pixel_party.games_played || 0)-(arcade.pixel_party.wins || 0),
+      wlr: func.ratio(arcade.pixel_party.wins || 0, (arcade.pixel_party.games_played || 0)-(arcade.pixel_party.wins || 0)),
+      highestround: arcade.pixel_party.highest_round || 0,
+      rounds: arcade.pixel_party.rounds_completed || 0,
+      powerups: arcade.pixel_party.power_ups_collected || 0,
+    } : {}
   }
 
   for (let stat in api) {
