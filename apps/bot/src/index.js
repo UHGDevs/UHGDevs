@@ -1,3 +1,5 @@
+process.on('uncaughtException', function (error) {console.log(error)})
+
 const fs = require('fs');
 const colors = require("colors");
 const { Client, Intents } = require('discord.js');
