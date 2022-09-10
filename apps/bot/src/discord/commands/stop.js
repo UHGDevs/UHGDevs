@@ -5,7 +5,7 @@ module.exports = {
     platform: "dc",
     run: async (uhg, message, content) => {
         await message.channel.send("Kód byl ukončen")
-        throw new Error("Kód byl vynuceně ukončen přes Discord příkaz".bgRed);
+        process.exit()
     }
   }
   
