@@ -1,5 +1,6 @@
 const fs = require('fs');
-const hypixie = require("hypixie");
+
+let hypixel = require('hypixel-api-nodejs')
 module.exports = {
   name: "version",
   aliases: ["verze"],
@@ -11,10 +12,7 @@ module.exports = {
 
       await uhg.delay(500)
       console.time('API')
-      await hypixie("player", {
-        uuid: "56da43a4-088d-4a76-82b6-dd431535015e",
-        key: process.env.api_key
-    });
+      await hypixel.getKeyInformations(process.env.api_key);
       console.timeEnd('API')
 
       console.time('oldTIME')
