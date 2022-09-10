@@ -1,5 +1,5 @@
 const fs = require('fs');
-const hyp = require('hypixel.ts');
+const hypixie = require("hypixie");
 module.exports = {
   name: "version",
   aliases: ["verze"],
@@ -7,10 +7,14 @@ module.exports = {
   platform: "dc",
   run: async (uhg, message, content) => {
     try {
-      const client = new hyp.Client(process.env.api_key);
+      
+
       await uhg.delay(500)
       console.time('API')
-      let player = await client.players.fetch('DavidCzPdy')
+      await hypixie("player", {
+        uuid: "56da43a4-088d-4a76-82b6-dd431535015e",
+        key: process.env.api_key
+    });
       console.timeEnd('API')
 
       console.time('oldTIME')
