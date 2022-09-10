@@ -5,6 +5,8 @@ const Util = require('../util/Util');
 const Options = require('../util/Options');
 
 const { create } = require('axios');
+const https = require('https')
+const httpsAgent = new https.Agent({ keepAlive: true });
 
 class ApiKey extends EventEmitter {
   constructor(options) {
@@ -25,7 +27,7 @@ class ApiKey extends EventEmitter {
       if (this.options.key.length !== this.options.key_count) throw new Error('API_KEY_COUNT', this.options.key_count, this.options.key.length);
     }
 
-    this.callHypixel = create({ baseURL: 'https://api.hypixel.net/' })
+    this.callHypixel = create({ baseURL: 'https://api.hypixel.net/', httpsAgent })
 
     this.testKeys()
     this.resetKeyTimer()

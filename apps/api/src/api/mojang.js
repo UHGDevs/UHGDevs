@@ -1,5 +1,7 @@
 
 const axios = require('axios')
+const https = require('https')
+const httpsAgent = new https.Agent({ keepAlive: true });
 
 class Mojang {
 
@@ -9,7 +11,7 @@ class Mojang {
     if (!input) return {success: false, reason: 'Mojang API - není zadaný input', type: 'mojang'} 
     let call;
     try {
-        call = await axios.get(`https://api.ashcon.app/mojang/v2/user/${input}`)
+        call = await axios.get(`https://api.ashcon.app/mojang/v2/user/${input}`, {httpsAgent})
     } catch (e) { call = e.response }
     finally {
       if (!call) return {success: false, reason: 'Error ve volání MOJANGU', type: 'mojang', input: input} 
