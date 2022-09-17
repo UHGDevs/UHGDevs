@@ -6,7 +6,7 @@ module.exports = (hypixel) => {
   const achievements = hypixel.achievements || {}
   let api = {
     coins: arcade.coins || 0,
-    wins: 0,
+    wins: achievements.arcade_arcade_winner || 0,
     holeinthewall: {
       wins: arcade.wins_hole_in_the_wall || 0,
       rounds: arcade.rounds_hole_in_the_wall || 0,
