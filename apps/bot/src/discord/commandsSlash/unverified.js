@@ -7,6 +7,7 @@ module.exports = {
   type: "slash",
   run: async (uhg, interaction) => {
     try {
+      await interaction.deferReply({ ephemeral: false }).catch(() => {});
       let unDC = []
       let unUuid = []
       let dVerify = await uhg.mongo.run.get("general", "verify")

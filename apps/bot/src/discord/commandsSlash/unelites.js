@@ -51,7 +51,6 @@ module.exports = {
   ],
   type: 'slash',
   run: async (uhg, interaction, args) => {
-    console.log(args)
 
     let ephemeral = !interaction.options.getBoolean('visibility')
 
