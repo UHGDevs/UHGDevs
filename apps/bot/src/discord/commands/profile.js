@@ -33,10 +33,6 @@ module.exports = {
           { name: `ㅤ`, value: `ㅤ`, inline: false}
       )
 
-      if (api.names.length > 1) {
-        embed.addFields({ name:`${api.names.length} nicks`, value: uhg.dontFormat(api.names.join(', ')), inline: false})
-      }
-
       if (api.guild.guild) embed.addFields(
         { name: `ㅤ`, value: `ㅤ`, inline: false},
         { name: `Guild`, value: `${uhg.dontFormat(api.guild.name)}`, inline: true},

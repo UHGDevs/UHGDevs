@@ -166,8 +166,8 @@ if (date.getMinutes() !== 50) return
   
           await uhg.mongo.run.post(db, 'info', info)
   
-          let members = await uhg.get(db, 'members', {})
-          let left = await uhg.get(db, 'left', {})
+          let members = await uhg.mongo.run.get(db, 'members', {})
+          let left = await uhg.mongo.run.get(db, 'left', {})
   
           let refreshed = false
           /* -- Handle left MEMBERS --*/
