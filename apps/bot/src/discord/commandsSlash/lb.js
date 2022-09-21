@@ -24,48 +24,16 @@ module.exports = {
           value: 'general'
         },
         {
-          name: 'BedWars',
-          value: 'bedwars'
-        },
-        {
-          name: 'SkyWars',
-          value: 'skywars'
-        },
-        {
-          name: 'Duels',
-          value: 'duels'
-        },
-        {
-          name: 'Murder Mystery',
-          value: 'murder'
-        },
-        {
           name: 'Arena Brawl',
           value: 'arena'
         },
         {
-          name: 'TKR',
-          value: 'tkr'
+          name: 'BedWars',
+          value: 'bedwars'
         },
         {
-          name: 'Quakecraft',
-          value: 'quake'
-        },
-        {
-          name: 'Paintball',
-          value: 'paintball'
-        },
-        {
-          name: 'The Walls',
-          value: 'walls'
-        },
-        {
-          name: 'VampireZ',
-          value: 'vampirez'
-        },
-        {
-          name: 'Wool Wars',
-          value: 'ww'
+          name: 'Blitz SG',
+          value: 'blitz'
         },
         {
           name: 'Build Battle',
@@ -76,8 +44,40 @@ module.exports = {
           value: 'cac'
         },
         {
-          name: 'Blitz SG',
-          value: 'blitz'
+          name: 'Duels',
+          value: 'duels'
+        },
+        {
+          name: 'Murder Mystery',
+          value: 'murder'
+        },
+        {
+          name: 'Paintball',
+          value: 'paintball'
+        },
+        {
+          name: 'Quakecraft',
+          value: 'quake'
+        },
+        {
+          name: 'SkyWars',
+          value: 'skywars'
+        },
+        {
+          name: 'The Walls',
+          value: 'walls'
+        },
+        {
+          name: 'Turbo Kart Racers',
+          value: 'tkr'
+        },
+        {
+          name: 'VampireZ',
+          value: 'vampirez'
+        },
+        {
+          name: 'Wool Wars',
+          value: 'ww'
         }
       ]
     },
