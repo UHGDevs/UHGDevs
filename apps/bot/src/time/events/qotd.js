@@ -34,6 +34,8 @@ module.exports = {
 
       await uhg.mongo.run.update('general', 'qotd', {_id: day}, {completed: true, message: msg.id, thread: thread.id})
 
+      if (qotd.length == 1) uhg.dc.client.users.cache.get('660441379310272513')?.send({ content: 'Není žádný QOTD!' })
+
     } catch(e) {
       if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
       else console.log(String(e.stack).bgRed + 'Time error v2');
