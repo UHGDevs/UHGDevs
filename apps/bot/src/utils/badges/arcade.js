@@ -11,7 +11,6 @@ exports.setup = (uhg, guild) => {
     let find = new RegExp(`(${info.name}) (god|expert|trained)`, 'i')
 
     info.roles = guild.roles.cache.filter(n => n.name.match(find)).map(role => {
-
         role.pos = role.name.endsWith('God') ? 2 : (role.name.endsWith('Expert') ? 1 : 0 )
         role.req = info.req.map(n => n[role.pos])
 
