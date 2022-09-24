@@ -3,7 +3,7 @@
 exports.setup = (uhg, guild) => {
     let info = {
         name: 'Murder Mystery',
-        path: 'hypixel/stats/murder',
+        path: 'hypixel/stats/murder/',
         stats: ['overall/wins', 'herowins'],
         statsNames: ['Výhry', 'Výhry za Hrdinu'],
         req: [[1000, 2500, 5000], [50, 250, 500]]
