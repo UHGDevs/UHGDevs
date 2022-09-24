@@ -5,7 +5,7 @@ module.exports = (hypixel) => {
   const arcade = hypixel.stats.Arcade || {}
   const achievements = hypixel.achievements || {}
 
-  let arcadewins = (arcade.wins_party || 0)+(arcade.wins_dayone || 0)+(arcade.wins_oneinthequiver || 0)+(arcade.wins_dragonwars2 || 0)+(arcade.wins_ender || 0)+(arcade.wins_farm_hunt || 0)+(arcade.wins_soccer || 0)+(arcade.sw_game_wins || 0)+(arcade.hider_wins_hide_and_seek || 0)+(arcade.seeker_wins_hide_and_seek || 0)+(arcade.wins_hole_in_the_wall || 0)+(arcade.wins_simon_says || 0)+(arcade.wins_mini_walls || 0)+(arcade.wins_draw_their_thing || 0)+(arcade.wins_throw_out || 0)+(arcade.wins_zombies || 0)+(arcade.wins_scuba_simulator || 0)+(arcade.wins_easter_simulator || 0)+(arcade.wins_halloween_simulator || 0)+(arcade.wins_grinch_simulator_v2 || 0)
+  let arcadewins = (arcade.pixel_party ? arcade.pixel_party.wins : 0)+(arcade.wins_party || 0)+(arcade.wins_dayone || 0)+(arcade.wins_oneinthequiver || 0)+(arcade.wins_dragonwars2 || 0)+(arcade.wins_ender || 0)+(arcade.wins_farm_hunt || 0)+(arcade.wins_soccer || 0)+(arcade.sw_game_wins || 0)+(arcade.hider_wins_hide_and_seek || 0)+(arcade.seeker_wins_hide_and_seek || 0)+(arcade.wins_hole_in_the_wall || 0)+(arcade.wins_simon_says || 0)+(arcade.wins_mini_walls || 0)+(arcade.wins_draw_their_thing || 0)+(arcade.wins_throw_out || 0)+(arcade.wins_zombies || 0)+(arcade.wins_scuba_simulator || 0)+(arcade.wins_easter_simulator || 0)+(arcade.wins_halloween_simulator || 0)+(arcade.wins_grinch_simulator_v2 || 0)
   let arcadewinsfinal = arcadewins > (achievements.arcade_arcade_winner || 0) ? arcadewins : achievements.arcade_arcade_winner || 0
 
   let api = {
