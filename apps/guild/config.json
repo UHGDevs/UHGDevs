@@ -1,0 +1,24 @@
+{
+    "dev": true,
+    "discord": {
+        "prefix": ".",
+        "prefix_DEV": ",",
+        "enabled": true,
+        "bot_messages": false,
+        "log_channel": false,
+        "clientID": "950076450478899270",
+        "clientID_DEV": "892275591682883604",
+        "serverID": "455751845319802880",
+        "serverID_DEV": "758650512827613195",
+        "guildChatChannel": "912776277361053758",
+        "guildChatChannel_DEV": "957005113149521930",
+        "loggingChannel": "1017334503066320906"
+    },
+    "minecraft": {
+        "enabled": "test",
+        "prefix": "!"
+    },
+    "time": {
+        "guilddb": true
+    }
+}
