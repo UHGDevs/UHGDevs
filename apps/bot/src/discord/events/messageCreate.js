@@ -7,6 +7,9 @@ module.exports = async (uhg, message) => {
     if (uhg.settings.deleteverify)setTimeout(() => message.delete().catch((error) => {}), 30000)
     message.guild.channels.cache.get("877432655954706473").send({content: `Autor: ${message.author} Zpráva: ${message.content}`, allowedMentions: { parse: [] }})
 }
+
+  if (message.channel.isDM()) message.guild.channels.cache.get("548772550386253824").send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
+
   if (!message.guild || !message.channel || message.author.bot) return;
   if (message.channel.partial) await message.channel.fetch();
   if (message.partial) await message.fetch();

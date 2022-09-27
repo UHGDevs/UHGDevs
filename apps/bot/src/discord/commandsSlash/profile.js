@@ -44,7 +44,7 @@ module.exports = {
         user = user.uuid
       }
       
-      let api = await uhg.api.call(user, ["hypixel", 'guild', 'friends'], { verify: uhg.data.verify?.find(n => n._id == interaction.user.id) || {}})
+      let api = await uhg.api.call(user, ["hypixel", 'guild', 'friends', 'online'], { verify: uhg.data.verify?.find(n => n._id == interaction.user.id) || {}})
       if (!api.success) return interaction.editReply({ embeds: [new MessageEmbed().setTitle(`**Error v api**`).setColor('RED').setDescription(api.reason)] })
 
       let style = interaction.options.getString('style')

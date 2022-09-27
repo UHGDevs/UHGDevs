@@ -21,8 +21,8 @@ class DiscordHandler {
   async init() {
     
     global.dc_client = new Client({
-      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
-      partials: [Partials.Channel]
+      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages],
+      partials: [Partials.Channel, Partials.GuildMember]
     });
 
     this.client = dc_client

@@ -16,7 +16,7 @@ module.exports = {
         .addComponents(new ButtonBuilder().setCustomId('embeds_merch').setStyle(2).setDisabled(false).setEmoji('👕'))
 
       let op = ["312861502073995265", "379640544143343618", "427198829935460353", "378928808989949964"]
-      if (content == 'rules' && op.includes(message.author.id)) global.client_dc?.channels.cache.get('784326140227616769')?.send({ embeds: [embed], components: [buttons]});
+      if (content == 'rules' && op.includes(message.author.id)) global.dc_client?.channels.cache.get('784326140227616769')?.send({ embeds: [embed], components: [buttons]});
       else message.channel.send({ embeds: [embed], components: [buttons] });
     }
 }

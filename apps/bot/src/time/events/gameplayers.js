@@ -21,9 +21,8 @@ module.exports = {
           if (botOnApi.success) {
             if (!botOnApi.online.online) {
               uhg.restartbot()
-              uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `ONLINE CHECK RESTART` })
             }
-          } else uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `ERROR V API - online check` })
+          }
         }
 
 
