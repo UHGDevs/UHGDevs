@@ -35,6 +35,6 @@ module.exports = {
         await user?.send({ content: msg })
       }
 
-      interaction.editReply({ content: 'done' })
+      interaction.editReply({ content: `Messaged ${role.members.size} lidí!` })
     }
 }

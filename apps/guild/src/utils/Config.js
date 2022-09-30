@@ -53,7 +53,7 @@ class Config {
   async stopBot(message = 'Discord BOT was stopped') {
     if (global.shuting === true) return
 
-    await this.mongo.close()
+    try { await this.mongo.close() } catch (e) {}
 
     global.shuting = true
 

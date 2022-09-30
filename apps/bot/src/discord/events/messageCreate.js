@@ -8,7 +8,7 @@ module.exports = async (uhg, message) => {
     message.guild.channels.cache.get("877432655954706473").send({content: `Autor: ${message.author} Zpráva: ${message.content}`, allowedMentions: { parse: [] }})
 }
 
-  if (!message.guild) message.guild.channels.cache.get("548772550386253824").send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
+  if (!message.guild && !message.author.bot) message.client.guilds.cache.get('455751845319802880')?.channels.cache.get("548772550386253824")?.send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
 
   if (!message.guild || !message.channel || message.author.bot) return;
   if (message.channel.partial) await message.channel.fetch();
