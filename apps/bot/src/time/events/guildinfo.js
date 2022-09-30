@@ -18,12 +18,9 @@ module.exports = {
       let names = false
       if (date.getHours() == 4 && date.getMinutes() == 2) names = true
 
-      let puhg = guildrefresh(uhg, 'UltimateHypixelGuild', names)
-      let tkjk = guildrefresh(uhg, 'tkjk', names)
+      let puhg = await guildrefresh(uhg, 'UltimateHypixelGuild', names)
+      let tkjk = await guildrefresh(uhg, 'tkjk', names)
       if (names || date.getHours() == 20 && date.getMinutes() == 10) guildrefresh(uhg, 'czsk', names)
-      let results = await Promise.all([puhg, tkjk])
-      puhg = results[0]
-      tkjk = results[1]
 
       let gmembers_channel = uhg.dc.client.channels.cache.get("811865691908603904");
       let uhglevel_channel = uhg.dc.client.channels.cache.get("825659339028955196");
