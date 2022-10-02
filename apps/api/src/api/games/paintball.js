@@ -14,7 +14,8 @@ module.exports = (hypixel) => {
         shots: pb.shots_fired || 0,
         killstreaks: pb.killstreaks || 0,
         hat: pb.hat || "None",
-        prefix: pb.selectedKillPrefix || ""
+        prefix: pb.selectedKillPrefix || "",
+        forcefield: achievements.paintball_invincible || 0,
     })
 
 }
