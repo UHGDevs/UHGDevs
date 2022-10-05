@@ -2,9 +2,7 @@
 
 const fs = require('fs');
 const path = require('node:path');
-
-const badges = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../features/badges/badges.json'), 'utf8'));
-const choices = badges.map(n => { return { value: n.name, name: n.name } })
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SelectMenuBuilder } = require('discord.js')
 
 module.exports = {
     name: 'badges',
@@ -16,7 +14,7 @@ module.exports = {
         description: 'Kterou badge chceš vidět?',
         type: 3,
         required: false,
-        choices: choices
+        autocomplete: true
       },
       {
         name: 'user',
@@ -34,22 +32,49 @@ module.exports = {
 
       let badge = interaction.options.getString('badge') || 'all'
       let user = interaction.options.getUser('user')
+
+      if (user && user.id === global.dc_client.user.id) {
+        if (!['378928808989949964', '379640544143343618', '312861502073995265'].includes(interaction.user.id)) return interaction.editReply({ content: 'Nemáš oprávnění na nastavení badges!' })
+
+        badge = badges.get(badge) || badges.badges[0]
+
+        const row = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_choice`).addOptions(badges.badges.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: i==0 ? true : false }} )));
+        const stat = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_stat`).addOptions(badge.stats.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: i == 0 ? true : false }} )));
+
+        const buttons = new ActionRowBuilder()
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_badge_edit').setStyle(ButtonStyle.Primary).setEmoji('🔧'))
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_badge_add').setStyle(ButtonStyle.Primary).setEmoji('🆕'))
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_badge_remove').setStyle(ButtonStyle.Primary).setEmoji('<:false:1011238405943865355>'));
+
+        const buttons_stat = new ActionRowBuilder()
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_stat_edit').setStyle(ButtonStyle.Primary).setEmoji('🔧'))
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_stat_add').setStyle(ButtonStyle.Primary).setEmoji('🆕'))
+        .addComponents(new ButtonBuilder().setCustomId('badgesGUI_stat_remove').setStyle(ButtonStyle.Primary).setEmoji('<:false:1011238405943865355>'));
+        
+        let info = { title: `BADGES SETTINGS GUI - ${badge.name}`, description: `Path: ${badge.path}\n\n${badge.stats.map((n, i) => `${badge.emoji ? badge.emoji + ' ' : ''}**${n.name}**:\nAPI: *${n.path}*\nREQ: *${n.req.join(', ')}*`).join('\n')}` }
+        return interaction.editReply({ embeds: [info], components: [row, buttons, stat, buttons_stat] })
+      }
+
       if (user) return interaction.editReply({ content: '\'User\' aktuálně nelze použít!' })
+
+      if (user && badge == 'all') {
+
+      }
       
       if (badge == 'all') {
-        return interaction.editReply({ embeds: [ { title: `**Hypixel Badges** seznam her`, description: badges.map(n => n.name).join('\n'), color: 5763719 }] })
+        return interaction.editReply({ embeds: [ { title: `**Hypixel Badges** seznam her`, description: badges.badges.map(n => n.name).join('\n'), color: 5763719 }] })
       }
 
       badge = badges.get(badge)
       if (!badge) return interaction.editReply({ content: 'Badge nebyla nalezena!' })
-      
-      let desc_info = ''
-      for (const i in badge.roles) {
-        let role = badge.roles[i]
-        let stats_info = badge.statsNames.map((n, a) => `${n}: ${role.req ? role.req[a] : `Error - ${String(role.req)}`}` )
-        desc_info = desc_info + `\n<@&${role.id}> ➜ ${stats_info.join(', ')}`
+
+      if (user) {
+        
       }
-      let badge_info = { title: `**${badge.name} Hypixel Badge**`, color: badge.roles[0] ? badge.roles[0].color : 15548997, description: desc_info }
+
+
+      let role_name = (role) => { return interaction.guild.id == '455751845319802880' ? role : role.name}
+      let badge_info = { title: `**${badge.name} Hypixel Badge**`, color: badge.roles[0] ? badge.roles[0].color : 15548997, description: badge.roles.map((n, i) => `${role_name(n)} ➜ ${badge.stats.map(s => `${s.name}: *${s.req[i]}*`).join(', ')}`).join('\n') }
       
       await interaction.editReply({ embeds: [badge_info] })
 
