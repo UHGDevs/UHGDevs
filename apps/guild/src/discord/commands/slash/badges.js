@@ -26,7 +26,7 @@ module.exports = {
     type: 'slash',
     platform: 'discord',
     run: async (uhg, interaction) => {
-      await interaction.deferReply({ ephemeral: true })
+      await interaction.deferReply({ ephemeral: false })
 
       let badges = uhg.badges
 
@@ -39,7 +39,7 @@ module.exports = {
         badge = badges.get(badge) || badges.badges[0]
 
         const row = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_choice`).addOptions(badges.badges.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: i==0 ? true : false }} )));
-        const stat = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_stat`).addOptions(badge.stats.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: i == 0 ? true : false }} )));
+        const stat = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_stat`).addOptions(badge.stats.length ? badge.stats.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: i == 0 ? true : false }} ) : { label: 'Přidej novou statistiku', value: 'void'} ));
 
         const buttons = new ActionRowBuilder()
         .addComponents(new ButtonBuilder().setCustomId('badgesGUI_badge_edit').setStyle(ButtonStyle.Primary).setEmoji('🔧'))
@@ -51,7 +51,7 @@ module.exports = {
         .addComponents(new ButtonBuilder().setCustomId('badgesGUI_stat_add').setStyle(ButtonStyle.Primary).setEmoji('🆕'))
         .addComponents(new ButtonBuilder().setCustomId('badgesGUI_stat_remove').setStyle(ButtonStyle.Primary).setEmoji('<:false:1011238405943865355>'));
         
-        let info = { title: `BADGES SETTINGS GUI - ${badge.name}`, description: `Path: ${badge.path}\n\n${badge.stats.map((n, i) => `${badge.emoji ? badge.emoji + ' ' : ''}**${n.name}**:\nAPI: *${n.path}*\nREQ: *${n.req.join(', ')}*`).join('\n')}` }
+        let info = { title: `${badge.name} Badge`, description: `Path: ${badge.path}\n\n${badge.stats.map((n, i) => `${badge.emoji ? badge.emoji + ' ' : ''}**${n.name}**:\nAPI: *${n.path}*\nREQ: *${n.req.join(', ')}*`).join('\n')}` }
         return interaction.editReply({ embeds: [info], components: [row, buttons, stat, buttons_stat] })
       }
 

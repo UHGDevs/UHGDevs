@@ -26,6 +26,7 @@ module.exports = async (uhg, interaction) => {
     msg.badge = interaction.values && action == 'choice' ? interaction.values[0] : (msg.components[0].components[0].data.options.find(n => n.default === true) ?  msg.components[0].components[0].data.options.find(n => n.default === true).value : msg.components[0].components[0].data.options[0].value)
     msg.stat = interaction.values && action == 'stat' ? interaction.values[0] : (msg.components[2].components[0].data.options.find(n => n.default === true) ?  msg.components[2].components[0].data.options.find(n => n.default === true).value : msg.components[2].components[0].data.options[0].value)
     if (!msg.rotate) msg.rotate = 0
+    if (msg.stat == 'void') return
 
     badge = await uhg.get('general', 'badges', {name: msg.badge}).then(n => n[0])
 
@@ -89,10 +90,10 @@ module.exports = async (uhg, interaction) => {
     }
 
 
-    let info = { title: `BADGES SETTINGS GUI - ${badge.name}`, description: `Path: ${badge.path}\n\n${badge.stats.map((n, i) => `${badge.emoji ? badge.emoji + ' ' : ''}**${n.name}**:\nAPI: *${n.path}*\nREQ: *${n.req.join(', ')}*`).join('\n')}` }
+    let info = { title: `${badge.name} Badge`, description: `Path: ${badge.path}\n\n${badge.stats.map((n, i) => `${badge.emoji ? badge.emoji + ' ' : ''}**${n.name}**:\nAPI: *${n.path}*\nREQ: *${n.req.join(', ')}*`).join('\n')}` }
 
     const row = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_choice`).addOptions(badges.badges.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: e.name == msg.badge ? true : false }} )));
-    const stat = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_stat`).addOptions(badge.stats.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: e.name == badge.stats.find(n => n.name == msg.stat) || e.name == badge.stats[0].name}} )));
+    const stat = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId(`badgesGUI_set_stat`).addOptions(badge.stats.length ? badge.stats.map((e, i) => { return {label: e.name, value: e.name, emoji: undefined, default: e.name == badge.stats.find(n => n.name == msg.stat) || e.name == badge.stats[0].name}} ) : { label: 'Přidej novou statistiku', value: 'void'}));
 
     const buttons = new ActionRowBuilder()
         .addComponents(new ButtonBuilder().setCustomId('badgesGUI_badge_edit').setStyle(ButtonStyle.Primary).setEmoji('🔧'))
