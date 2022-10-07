@@ -26,8 +26,8 @@ module.exports = async (uhg, interaction) => {
     msg.badge = interaction.values && action == 'choice' ? interaction.values[0] : (msg.components[0].components[0].data.options.find(n => n.default === true) ?  msg.components[0].components[0].data.options.find(n => n.default === true).value : msg.components[0].components[0].data.options[0].value)
     msg.stat = interaction.values && action == 'stat' ? interaction.values[0] : (msg.components[2].components[0].data.options.find(n => n.default === true) ?  msg.components[2].components[0].data.options.find(n => n.default === true).value : msg.components[2].components[0].data.options[0].value)
     if (!msg.rotate) msg.rotate = 0
-    if (msg.stat == 'void') return
 
+    if (interaction.values == 'void') return
     badge = await uhg.get('general', 'badges', {name: msg.badge}).then(n => n[0])
 
     /* -- ACTIONS -- */
@@ -42,10 +42,10 @@ module.exports = async (uhg, interaction) => {
                 const modal = new ModalBuilder().setCustomId(`badgesGUI_modal_badge-${action}`).setTitle(`Nastavení ${action == 'add' ? 'nové' : badge.name} badge`).addComponents([name, global_path])  
                 return await interaction.showModal(modal);  
             } else if (type == 'stat') {
-                let stat = badge.stats.find(n => n.name == msg.stat)
-                let name = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`name`).setLabel("Název").setStyle(1).setPlaceholder(stat.name).setRequired(action == 'add' ? true : false));
-                let path = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`path`).setLabel("Path").setStyle(1).setPlaceholder(stat.path).setRequired(action == 'add' ? true : false));
-                let req = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`req`).setLabel("Req").setStyle(1).setPlaceholder(stat.req.join(', ')).setRequired(action == 'add' ? true : false));
+                let stat = badge.stats.find(n => n.name == msg.stat) || {}
+                let name = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`name`).setLabel("Název").setStyle(1).setPlaceholder(stat.name || 'Výhry').setRequired(action == 'add' ? true : false));
+                let path = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`path`).setLabel("Path").setStyle(1).setPlaceholder(stat.path || 'wins').setRequired(action == 'add' ? true : false));
+                let req = new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId(`req`).setLabel("Req").setStyle(1).setPlaceholder(stat.req?.join(', ') || '[1, 2, 3]').setRequired(action == 'add' ? true : false));
     
                 const modal = new ModalBuilder().setCustomId(`badgesGUI_modal_stat-${action}`).setTitle(`Nastavení ${action == 'add' ? 'nové' : msg.stat} statistiky`).addComponents([name, path, req])  
                 return await interaction.showModal(modal);  
@@ -54,7 +54,7 @@ module.exports = async (uhg, interaction) => {
         }
 
         else if (action == 'remove') {
-            if (type == 'badge') await uhg.delete('general', 'badges', { name: msg.badge})
+            if (type == 'badge') await uhg.delete('general', 'badges', { name: msg.badge })
             if (type == 'stat') {
                 badge.stats = badge.stats.filter(n => n.name !== msg.stat)
                 await uhg.post('general', 'badges', badge)
