@@ -28,7 +28,7 @@ module.exports = {
   
       let msg = interaction.options.getString('message')
 
-      interaction.editReply({ content: `Sending \`${msg}\` to \`${members.size}\` people`})
+      await interaction.editReply({ content: `Sending \`${msg}\` to \`${members.size}\` people`})
       
       let errors = []
       let sent = members.size;
@@ -40,8 +40,8 @@ module.exports = {
         })
       }
   
-      interaction.editReply({ content: `Messages sent: \`${sent}/${members.size}\`` })
-      uhg.dc.client.channels.get('1027491511857840168')?.send({ content: msg, embeds: [{ title: `\`${sent}/${members.size}\` messages sent to ${role} members`, description: errors.length ? errors.join(', ') : undefined, color: errors.length ? 'RED': 'GREEN' }] })
+      await interaction.editReply({ content: `Messages sent: \`${sent}/${members.size}\`` })
+      uhg.dc.client.channels.cache.get('1027491511857840168')?.send({ content: msg, embeds: [{ title: `\`${sent}/${members.size}\` messages sent to ${role} members`, description: errors.length ? errors.join(', ') : undefined, color: errors.length ? 'RED': 'GREEN' }] })
 
 
     } catch (e) {
