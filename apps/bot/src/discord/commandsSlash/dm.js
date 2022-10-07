@@ -27,13 +27,22 @@ module.exports = {
       let members = role.members
   
       let msg = interaction.options.getString('message')
-  
+
+      interaction.editReply({ content: `Sending \`${msg}\` to \`${members.size}\` people`})
+      
+      let errors = []
+      let sent = members.size;
       for (let member of members) {
         let user = member[1].user
-        await user?.send({ content: msg })
+        await user?.send({ content: msg }).catch(e => {
+          sent -= 1
+          errors.push(user)
+        })
       }
   
-      interaction.editReply({ content: `Messages sent: \`${members.size}\`` })
+      interaction.editReply({ content: `Messages sent: \`${sent}/${members.size}\`` })
+      uhg.dc.client.channels.get('1027491511857840168')?.send({ content: msg, embeds: [{ title: `\`${sent}/${members.size}\` messages sent to ${role} members`, description: errors.length ? errors.join(', ') : undefined, color: errors.length ? 'RED': 'GREEN' }] })
+
 
     } catch (e) {
       if (uhg.dc.cache.embeds) interaction.editReply({ embeds: [uhg.dc.cache.embeds.error(e, 'DM Slash Command')] })
