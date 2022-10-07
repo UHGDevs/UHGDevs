@@ -1,6 +1,6 @@
 module.exports = {
   name: "Simulators",
-  aliases: ["sim", "sims", "simulators", "simulator", "easter", "scuba", "halloween", "grinch", "eastersimulator", "scubasimulator", "halloweensimulator", "grinchsimulator"],
+  aliases: ["sim", "sims", "simulators", "simulator", "scuba", "grinch", "eastersimulator", "scubasimulator", "halloweensimulator", "grinchsimulator"],
   run: async (uhg, pmsg) => {
     try{
       let api = await uhg.api.call(pmsg.nickname)

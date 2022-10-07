@@ -42,12 +42,21 @@ module.exports = async (hypixel = {} , uuid, client) => {
     } : {},
     seasonal: hypixel.seasonal ? {
       summer: hypixel.seasonal.summer ? {
-        experience: hypixel.seasonal.summer["2022"].levelling.experience || 0,
-        level: (hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000,
-        xpleft: 25000-((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000-Math.floor((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000))*25000
-      } : {},
+        "2022": {
+          experience: hypixel.seasonal.summer["2022"].levelling.experience || 0,
+          level: 1+(hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000,
+          xpleft: 25000-((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000-Math.floor((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000))*25000
+        }
+      } : {"2022": {}},
+      halloween: hypixel.seasonal.halloween ? {
+        "2022": {
+          experience: hypixel.seasonal.halloween["2022"].levelling.experience || 0,
+          level: 1+(hypixel.seasonal.halloween["2022"].levelling.experience || 0)/10000,
+          xpleft: 10000-((hypixel.seasonal.halloween["2022"].levelling.experience || 0)/10000-Math.floor((hypixel.seasonal.halloween["2022"].levelling.experience || 0)/10000))*10000
+        }
+      } : {"2022": {}},
       silver: hypixel.seasonal.silver || 0,
-    } : {summer: {}},
+    } : {summer: {"2022": {}}, halloween: {"2022": {}}},
     totalDailyRewards: hypixel.totalDailyRewards || 0,
     dailyRewards: hypixel.rewardHighScore || 0,
     updated: Number(new Date())
