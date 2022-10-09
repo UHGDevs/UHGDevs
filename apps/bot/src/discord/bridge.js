@@ -1,4 +1,5 @@
 const banned = ["vape", "liquidbounce", "wurst", "sigma", "huzuni", "kys", " ip ", "fuck", "fag", "fa g", "f ag", "fu ck", "f uck", "fuc k", "fack", "shit", "0.0.0.0", "255.255.255.255", "i-p", "i.p", "retard", "retarded", "penis", "dick", "porn", "gay", "gej", "lgbt", "die", "kill yourself", "kill urself", "nigga", "nigger", "niger", "niga", "negr"];
+const { ImgurClient } = require('imgur');
 module.exports = async (uhg, message) => {
 
   let chat;
@@ -7,6 +8,18 @@ module.exports = async (uhg, message) => {
   if (!chat) return;
 
   if (uhg.mc.client?.socket?._host !== 'mc.hypixel.net') return uhg.settings.offline ? message.reply({ content: "Bot není na hypixelu.", failIfNotExists: false }) : false
+
+  // IMGUR => convert attachment to an imgur link
+  if (message.attachments.first()?.proxyURL) {
+    const imgur = new ImgurClient({ clientId: process.env.imgurClientId, clientSecret: process.env.imgurClientSecret })
+
+    const response = await imgur.upload({
+      image: message.attachments.first()?.proxyURL,
+      type: 'url'
+    })
+
+    message.content = `${message.content} ${response.data.link}`
+  }
 
   let user = uhg.data.verify?.length ? uhg.data.verify.find(n=>n._id==message.author.id) : {nickname: message.guild.members.cache.get(message.author.id).nickname || message.author.username}
   if (!user) return message.reply({ content: `Nejsi verifikovaný, zpráva nebyla odeslána.\nVerifikuj se pomocí ${uhg.settings.prefix}verify *\`nick\`*`, failIfNotExists: false })
