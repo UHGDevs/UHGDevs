@@ -1,6 +1,6 @@
 module.exports = {
     name: "SummerEvent",
-    aliases: ["summer", "summerevent", "event"],
+    aliases: ["summer", "summerevent"],
     run: async (uhg, pmsg) => {
       try{
         let api = await uhg.api.call(pmsg.nickname)
