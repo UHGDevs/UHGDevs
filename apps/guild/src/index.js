@@ -7,6 +7,7 @@ dotenv.config();
 
 require('./utils/Logger');
 
+require('./web/public')
 const uhg = require('./UHGDevs')
 global.uhg = uhg
 

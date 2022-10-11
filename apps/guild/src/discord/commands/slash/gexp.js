@@ -64,7 +64,8 @@ module.exports = {
 
       let period = interaction.options.getString('period')
       let guild = interaction.options.getString('guild') || 'uhg'
-      let tm = interaction.options.getString('datum')?.replace(/\D/g, " ").split(" ").filter(n => n).forEach((o, i)=>{ tm[i] = String((Number(o) < 10 ? "0" : "") + o)}) || []
+      let tm = interaction.options.getString('datum')
+      tm = tm?.replace(/\D/g, " ").split(" ").filter(n => n).forEach((o, i)=>{ tm[i] = String((Number(o) < 10 ? "0" : "") + o)}) || []
 
       let time = new Date().toISOString().slice(0, 10).split("-")
       let ft;

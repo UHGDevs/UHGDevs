@@ -1,5 +1,6 @@
 
 const mongodb = require('mongodb');
+const redisdb = require('redis');
 const Config = require('./Config');
 
 class Mongo extends Config {
@@ -10,6 +11,27 @@ class Mongo extends Config {
     async createMongo() {
         let options = {}
         let mongo = await mongodb.MongoClient.connect(process.env.db, options)
+
+        try {
+        this.redis = redisdb.createClient({
+          socket: {
+              //host: process.env.redis,
+              //port: 14305
+              host: "127.0.0.1",
+              //host: "redis",
+              port: 6379
+          },
+          password: 'UHGDevs'
+      });
+
+      await this.redis.connect()
+      
+
+      this.redis.on('error', err => {
+        console.log('Error ' + err);
+    });
+  } catch(e) {console.error('e')}
+      
 
         this.mongo = mongo
 

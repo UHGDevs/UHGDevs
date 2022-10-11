@@ -1,0 +1,38 @@
+{
+    "bronze": {
+        "common": {
+            "coins": {
+                "value_min": 2000,
+                "value_max": 6000,
+                "chance": 50,
+                "default": true,
+                "nejak vyresit - change: O | defaut | neco jineho": "Mozna jeste pridat vseobecne groups a tady jen dopresnit co a jak?",
+                "desc": "GEXP",
+                "rarity": "common",
+                "emoji": null
+            },
+            "sbcoins": {
+                "value": 5000,
+                "chance": 50000,
+                "desc": "SB Coins",
+                "rarity": "common",
+                "emoji": null
+            }
+        },
+        "rare": {
+
+        },
+        "epic": {
+
+        },
+        "legendary": {
+
+        }
+    },
+    "gold": {
+
+    },
+    "diamond": {
+
+    }
+}

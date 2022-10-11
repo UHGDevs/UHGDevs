@@ -1,0 +1,32 @@
+{
+    "boxes": {
+        "bronze": {
+            "name": "Bronze box",
+            "price": 10000,
+            "image": "https://media.discordapp.net/attachments/630779313813454890/999759632375484488/wooden_box_0.png",
+            "id": "bronze-box"
+        },
+        "gold": {
+            "name": "Golden box",
+            "price": 100000
+        },
+        "diamond": {
+            "name": "Diamond box",
+            "price": 1000000
+        }
+    },
+    "chances": {
+        "rare": 25,
+        "epic": 15,
+        "legendary": 5
+    },
+    "emoji": {
+        "coin": {
+            "name": "gexp",
+            "id": "999760130629456013",
+            "guild_id": "455751845319802880",
+            "raw": "<:gexp:999760130629456013>",
+            "aliases": ["coin"]
+        }
+    }
+}
