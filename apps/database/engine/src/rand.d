@@ -1,1 +1,0 @@
-rand.o: rand.c

@@ -1,1 +1,0 @@
-endianconv.o: endianconv.c

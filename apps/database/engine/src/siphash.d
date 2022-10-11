@@ -1,1 +1,0 @@
-siphash.o: siphash.c

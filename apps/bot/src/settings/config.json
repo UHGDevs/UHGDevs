@@ -3,7 +3,7 @@
     "minecraft": true,
     "test": false,
     "deleteverify": true,
-    "offline": true,
+    "offline": false,
     "time": {
         "database": true,
         "finder": true,
