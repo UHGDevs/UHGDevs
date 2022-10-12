@@ -11,13 +11,14 @@ module.exports = {
         let keys = await uhg.redis.keys('*')
 
         console.log(keys)
-        // console.timer('a')
+         console.timer('a')
         
-        // let stat = await Promise.all(keys.map(async (key) => await uhg.redis.json.get(key, { path: '.stats.username'})))
+        //let stat = await Promise.all(keys.map(async (key) => await uhg.redis.call('JSON-GET', key, '$' )))
+        let stat = await Promise.all(keys.map(async (key) => await uhg.redis.json.get(key, { path: '.stats.username'})))
 
-
-        // console.timeEnd('a')
-        //   return 'DONE'
+console.log(stat[0])
+         console.timeEnd('a')
+           return 'DONE'
 
         let stats = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
         console.log('stats loaded')

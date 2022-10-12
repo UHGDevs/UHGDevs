@@ -34,6 +34,16 @@ global.ggl = (exp) => {
   return 1000;
 }
 
+global.waitEvent = (item, event) => {
+  return new Promise((resolve) => {
+    const listener = (...a) => {
+      item.removeEventListener(event, listener);
+      resolve(a);
+    }
+    item.addEventListener(event, listener);
+  })
+}
+
 if (!console.timer) console.timer = console.time
 
 console.discord = (message, args = {}) => {
