@@ -7,3 +7,6 @@ apps/bot/src/settings/minecraft
 farmanstest.js
 yarn.lock
 apps/bot/src/mc
+apps/database/engine
+apps/database/modules
+*.log
