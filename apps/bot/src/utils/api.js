@@ -1383,7 +1383,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         }
        api.skyblock.skills[profilname] = {
          overallxp: overallxp,
-         skillavg: (taming+mining+foraging+enchanting+farming+combat+fishing+alchemy)/8,
+         skillavg: (taming+mining+foraging+enchanting+farming+combat+fishing+alchemy+carpentry)/9,
          taming: taming,
          mining: mining,
          foraging: foraging,
