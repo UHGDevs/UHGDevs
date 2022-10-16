@@ -10,7 +10,7 @@ module.exports = async (uhg, message) => {
   if (uhg.mc.client?.socket?._host !== 'mc.hypixel.net') return uhg.settings.offline ? message.reply({ content: "Bot není na hypixelu.", failIfNotExists: false }) : false
 
   // IMGUR => convert attachment to an imgur link
-  if (message.attachments.first()?.proxyURL && message.attachments.first()?.contentType == 'image/png') {
+  if (message.attachments.first()?.proxyURL && (message.attachments.first()?.contentType == 'image/png' || message.attachments.first()?.contentType == 'image/jpeg')) {
     const imgur = new ImgurClient({ clientId: process.env.imgurClientId, clientSecret: process.env.imgurClientSecret })
 
     const response = await imgur.upload({
