@@ -18,12 +18,12 @@ module.exports = {
 
 console.log(stat[0])
          console.timeEnd('a')
-           return 'DONE'
+         //  return 'DONE'
 
         let stats = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
         console.log('stats loaded')
 
-        //stats = stats.filter(n => !keys.includes(n))
+        stats = stats.filter(n => !keys.includes(n))
         
         for (let stat of stats) {
             await uhg.redis.json.set(stat.uuid, '.', { stats: stat })
