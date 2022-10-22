@@ -94,7 +94,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     if (!hypixel.player) return "Hráč nikdy nebyl na hypixelu"
     if (!hypixel.player.stats || false) return "Hráč nehrál žádnou minihru"
 
-    var currenttourney = null //  ! CURRENT TOURNAMENT !
+    var currenttourney = "gingerbread_solo_1" //  ! CURRENT TOURNAMENT !
 
     hypixel = hypixel.player
     var achievements = hypixel.achievements || {}
@@ -886,7 +886,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
 
     api.hypixel.stats.tourney = {
       games: ctourney.games_played || 0,
-      maxgames: 50, //   ! UPDATOVAT !
+      maxgames: 72, //   ! UPDATOVAT !
       playtime: ctourney.playtime || 0,
       tributes: ctourney.tributes_earned || 0,
       totaltributes: tourney.total_tributes || 0,
@@ -923,6 +923,16 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         arrowshit: arcade.arrows_hit_tourney_mini_walls_0 || 0,
         arrowhitratio: f(arcade.arrows_hit_tourney_mini_walls_0/arcade.arrows_shot_tourney_mini_walls_0),
         finals: arcade.final_kills_tourney_mini_walls_0 || 0,
+      },
+      gingerbread_solo_1: {
+        games: ctourney.games_played || 0,
+        trophies: tkr.tourney_gingerbread_solo_1_wins || 0,
+        losses: (ctourney.games_played || 0)-(tkr.tourney_gingerbread_solo_1_wins || 0),
+        trophyratio: (tkr.tourney_gingerbread_solo_1_wins || 0)/((ctourney.games_played || 0)-(tkr.tourney_gingerbread_solo_1_wins || 0)) || 0,
+        bronze: tkr.tourney_gingerbread_solo_1_bronze_trophy || 0,
+        silver: tkr.tourney_gingerbread_solo_1_silver_trophy || 0,
+        gold: tkr.tourney_gingerbread_solo_1_gold_trophy || 0,
+        wlr: (tkr.tourney_gingerbread_solo_1_gold_trophy || 0)/((ctourney.games_played || 0)-(tkr.tourney_gingerbread_solo_1_gold_trophy || 0)) || 0,
       }
     }
 
