@@ -23,7 +23,7 @@ console.log(stat[0])
         let stats = uhg.stats
         console.log('stats loaded')
 
-        stats = stats.filter(n => !keys.includes(n))
+        stats = stats.filter(n => !keys.includes(n)).slice(0, 99)
         
         for (let stat of stats) {
             await uhg.redis.json.set(stat.uuid, '.', { stats: stat })
