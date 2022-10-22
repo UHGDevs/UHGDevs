@@ -19,8 +19,8 @@ module.exports = {
 console.log(stat[0])
          console.timeEnd('a')
          //  return 'DONE'
-
-        let stats = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
+        if (!uhg.stats) uhg.stats = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
+        let stats = uhg.stats
         console.log('stats loaded')
 
         stats = stats.filter(n => !keys.includes(n))
