@@ -9,8 +9,8 @@ module.exports = {
   name: eventName,
   description: "Automatičští elite members",
   emoji: '👨‍🦼',
-  time: '0 0 17 * * 0', //'*/10 * * * * *'
-  ignore: '* * 0,23 * * *', //'sec min hour den(mesic) mesic den(tyden)'
+  time: '0 0 0 * * 1', //'*/10 * * * * *'
+  ignore: '* * * * * *', //'sec min hour den(mesic) mesic den(tyden)'
   onstart: false,
   run: async (uhg) => {
     let now = Number(new Date())
