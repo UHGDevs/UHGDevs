@@ -8,27 +8,32 @@ module.exports = {
     type: "message",
     run: async (uhg, message, content) => {
         message.delete()
+        if (!uhg.redis) return 'Není zaplá redis databáze!'
         let keys = await uhg.redis.keys('*')
 
-        console.log(keys)
-         console.timer('a')
-        
-        //let stat = await Promise.all(keys.map(async (key) => await uhg.redis.call('JSON-GET', key, '$' )))
-        let stat = await Promise.all(keys.map(async (key) => await uhg.redis.json.get(key, { path: '.stats.username'})))
+        console.timer('a')
+        let stats = await Promise.all(keys.map(async (key) => await uhg.redis.json.get(key, { path: '.'}).catch(e => {})))
+        console.log(stats.length)
+        console.timeEnd('a')
 
-console.log(stat[0])
-         console.timeEnd('a')
-         //  return 'DONE'
-        if (!uhg.stats) uhg.stats = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
-        let stats = uhg.stats
-        console.log('stats loaded')
+        // if (!uhg.stats) {
+        //     let staty = await uhg.get('stats', 'stats', { /*username: 'DavidCzPdy'*/})
+        //     uhg.stats = staty
+        // }
+        // console.log('stats loaded')
 
-        stats = stats.filter(n => !keys.includes(n)).slice(0, 99)
-        
-        for (let stat of stats) {
-            await uhg.redis.json.set(stat.uuid, '.', { stats: stat })
-        }
-        
+        // //stats = stats.filter(n => !keys.includes(n)).slice(0, 99)
+
+        // for (let stats of uhg.stats.filter(n => (n => !keys.includes(n.uuid)))/*.slice(0, 50)*/) {
+        //     let uuid = stats.uuid
+
+        //     const verify = await uhg.get("general", "verify", {uuid: uuid})
+
+
+        //     let user = {id: verify[0]?._id || undefined, uuid: uuid, username: verify[0]?.nickname || stats.nickname, skin: verify[0]?.textures || undefined, stats: stats, notifiers: {}, guild: {}, lootboxes: {}, events: {}}
+            
+        //     await uhg.redis.json.set(user.uuid, '.', user)
+        // }
         console.warn('not done yet!')
     }
 }

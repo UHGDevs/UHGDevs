@@ -8,7 +8,7 @@ app.get('/', function(req, res) {
        res.send(ipAddress);
 });
 
-app.listen(50, function() {
+app.listen(7854, function() {
     console.log('Web application is listening on port 7854');
 });
 
