@@ -48,6 +48,10 @@ module.exports = {
           value: 'duels'
         },
         {
+          name: 'Mega Walls',
+          value: 'megawalls'
+        },
+        {
           name: 'Murder Mystery',
           value: 'murder'
         },
@@ -64,8 +68,16 @@ module.exports = {
           value: 'skywars'
         },
         {
+          name: 'Smash Heroes',
+          value: 'smash'
+        },
+        {
+          name: 'The Pit',
+          value: 'pit'
+        },
+        {
           name: 'The Walls',
-          value: 'walls'
+          value: 'thewalls'
         },
         {
           name: 'Turbo Kart Racers',
@@ -74,6 +86,10 @@ module.exports = {
         {
           name: 'VampireZ',
           value: 'vampirez'
+        },
+        {
+          name: 'Warlords',
+          value: 'warlords'
         },
         {
           name: 'Wool Wars',
@@ -105,11 +121,14 @@ module.exports = {
       let stat = interaction.options.getString('stat') || 'level'
       let gamemode = interaction.options.getString('gamemode') || 'overall'
 
+      let customstat;
+
       let data = uhg.data.stats.length ? uhg.data.stats : await uhg.mongo.run.get("stats", "stats")
 
-      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'walls' || game == 'vampirez') && stat == 'level') stat = 'wins'
+      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'thewalls' || game == 'vampirez' || game == 'warlords' || game == 'megawalls') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
       else if ((game == "paintball" || game == 'cac' || game == 'blitz') && stat == 'level') stat = "kills"
+      else if (game == 'pit' && stat == 'level') stat = 'xp'
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
@@ -117,19 +136,27 @@ module.exports = {
         let gamemode_api;
         if (game !== 'general') gamemode_api = player.stats[game][gamemode] || player.stats[game]
         else gamemode_api = player
+        
         let stats = gamemode_api[stat]
+        customstat = stat; //  example: 'prestige' or 'wins'
+        let customstats; // example: '[XIV-101]' or '1,454'
+        if (game == 'pit' && (stat == 'xp' || stat == 'playtime')) { // CUSTOM PIT
+          if (stat == 'xp') {customstats = `[${gamemode_api.prestigeroman}-${gamemode_api.level}]`; customstat = 'prestige'}
+          else if (stat == 'playtimeraw') {customstats = `${gamemode_api.playtime}h`; customstat = 'playtime'}
+        }
+        else customstats = uhg.f(stats)
         if (game == 'general' && stat == 'wins') stats = player.stats.wins.total
 
         if (!stats && stats !== 0 && game !== 'general') stats = player.stats[game][stat]
         if (!stats && stats !== 0) return
 
-        lb.players.push({ username: player.username, stat: stats })
+        lb.players.push({ username: player.username, stat: stats, customstats: customstats })
       });
 
-      lb.players.sort((a, b) => b.stat - a.stat).forEach((a, i) => { lb.send.push(`\`#${i+1}\` **${a.username}:** \`${uhg.f(a.stat)}\``) });
+      lb.players.sort((a, b) => b.stat - a.stat).forEach((a, i) => { lb.send.push(`\`#${i+1}\` **${a.username}:** \`${a.customstats}\``) });
       lb.send = lb.send.chunk(20)
 
-      let title = `CZSK ${uhg.renameHypixelGames(game)} ${gamemode} ${stat} leaderboard`
+      let title = `CZSK ${uhg.renameHypixelGames(game)} ${gamemode} ${customstat} leaderboard`
 
       let embeds = []
       lb.send.forEach((a, i)=>{

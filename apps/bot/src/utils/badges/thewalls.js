@@ -3,7 +3,7 @@
 exports.setup = (uhg, guild) => {
     let info = {
         name: 'The Walls',
-        path: 'hypixel/stats/walls/',
+        path: 'hypixel/stats/thewalls/',
         stats: ['wins', 'kills'],
         statsNames: ['Výhry', 'Zabití'],
         req: [[50, 150, 500], [250, 750, 2500]]

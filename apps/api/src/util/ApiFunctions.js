@@ -294,7 +294,7 @@ class ApiFunctions {
       .replace("walls3", "Mega Walls")
       .replace("arena", "Arena Brawl")
       .replace("vampirez", "VampireZ")
-      .replace("walls", "The Walls")
+      .replace("thewalls", "The Walls")
       .replace("battleground", "Warlords")
       .replace("build_battle", "Build Battle")
       .replace("bb", "Build Battle")

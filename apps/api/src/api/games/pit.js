@@ -33,6 +33,7 @@ module.exports = (hypixel) => {
       deaths: pit_stats_ptl.deaths || 0,
       kills: pit_stats_ptl.kills || 0,
       kdr: func.ratio(pit_stats_ptl.kills, pit_stats_ptl.deaths) || 0,
+      playtimeraw: pit_stats_ptl.playtime_minutes || 0,
       playtime: func.f(func.toTime(pit_stats_ptl.playtime_minutes).m, 0)+"h" || "0h",
       contracts: pit_stats_ptl.contracts_completed || 0,
     })

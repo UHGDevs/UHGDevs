@@ -5,7 +5,7 @@ module.exports = {
     try{
       let api = await uhg.api.call(pmsg.nickname)
       if (!api.success) return api.reason
-      let walls = api.hypixel.stats.walls
+      let walls = api.hypixel.stats.thewalls
       let message = `**TheWalls**: [${walls.wins}] **${api.username}** - ${walls.kills}Kills ${walls.kdr}KDR ${walls.wlr}WLR`
       return message
     } catch (e) {

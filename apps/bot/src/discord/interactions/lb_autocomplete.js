@@ -113,8 +113,8 @@ module.exports = async (uhg, interaction) => {
         { name: 'Zabití', value: 'kills' },
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
-        { name: 'WinStreak', value: 'winstreak' },
-        { name: 'Best WinStreak', value: 'bestwinstreak' },
+        { name: 'Winstreak', value: 'winstreak' },
+        { name: 'Best Winstreak', value: 'bestwinstreak' },
         { name: 'Loot Bedny', value: 'lootchests' }
       ])
     } else if (game == 'quake') {
@@ -161,7 +161,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Killstreaks', value: 'killstreaks' },
         { name: 'Střel vystřeleno', value: 'shots' }
       ])
-    } else if (game == "walls") {
+    } else if (game == "thewalls") {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -211,6 +211,60 @@ module.exports = async (uhg, interaction) => {
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
         { name: 'Poškození', value: 'damage' },
+      ])
+    } else if (game == 'warlords') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Zabití+Asistence', value: 'killassists' },
+        { name: 'Navrácené vlajky', value: 'flagreturns' },
+        { name: 'Získané vlajky', value: 'flagcaptures' },
+      ])
+    } else if (game == 'smash') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Level', value: 'level' },
+        { name: 'Hry', value: 'games' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Winstreak', value: 'winstreak' },
+      ])
+    } else if (game == 'megawalls') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Level', value: 'level' },
+        { name: 'Hry', value: 'games' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Finální zabití+asistence', value: 'fka' },
+        { name: 'Poškození na witherovi', value: 'witherdmg' },
+      ])
+    } else if (game == 'pit') {
+      return interaction.respond([
+        { name: 'Zlato', value: 'gold' },
+        { name: 'Renown', value: 'renown' },
+        { name: 'Celkové renown', value: 'totalrenown' },
+        { name: 'Prestige', value: 'xp' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Kontrakty', value: 'contracts' },
+        { name: 'Odehraný čas', value: 'playtimeraw' },
       ])
     }
   } else if (focused.name == 'gamemode') {
@@ -276,11 +330,19 @@ module.exports = async (uhg, interaction) => {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "paintball") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "walls") {
+    } else if (game == "thewalls") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "vampirez") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     } else if (game == "blitz") {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == 'warlords') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == 'smash') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == 'megawalls') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game == 'pit') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }
