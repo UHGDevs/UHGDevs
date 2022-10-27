@@ -19,6 +19,7 @@
         "prefix": "!"
     },
     "time": {
-        "guilddb": true
+        "guilddb": true,
+        "db": true
     }
 }
