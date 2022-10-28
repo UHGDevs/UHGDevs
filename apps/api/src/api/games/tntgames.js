@@ -31,6 +31,7 @@ module.exports = (hypixel) => {
         wins: tnt.wins_tntrun || 0,
         deaths: tnt.deaths_tntrun || 0,
         wlr: ratio(tnt.wins_tntrun || 0, tnt.deaths_tntrun || 0),
+        rawrecord: tnt.record_tntrun || 0,
         record: func.toTime(tnt.record_tntrun || 0).miniformatted
       },
       pvprun: {
