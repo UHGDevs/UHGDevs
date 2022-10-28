@@ -72,6 +72,10 @@ module.exports = {
           value: 'smash'
         },
         {
+          name: 'SpeedUHC',
+          value: 'speeduhc'
+        },
+        {
           name: 'The Pit',
           value: 'pit'
         },
@@ -80,8 +84,16 @@ module.exports = {
           value: 'thewalls'
         },
         {
+          name: 'TNT Games',
+          value: 'tntgames'
+        },
+        {
           name: 'Turbo Kart Racers',
           value: 'tkr'
+        },
+        {
+          name: 'UHC',
+          value: 'uhc'
         },
         {
           name: 'VampireZ',
@@ -125,10 +137,11 @@ module.exports = {
 
       let data = uhg.data.stats.length ? uhg.data.stats : await uhg.mongo.run.get("stats", "stats")
 
-      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'thewalls' || game == 'vampirez' || game == 'warlords' || game == 'megawalls') && stat == 'level') stat = 'wins'
+      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'thewalls' || game == 'vampirez' || game == 'warlords' || game == 'megawalls' || game == 'tntgames') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
       else if ((game == "paintball" || game == 'cac' || game == 'blitz') && stat == 'level') stat = "kills"
       else if (game == 'pit' && stat == 'level') stat = 'xp'
+      else if (game == 'uhc' && stat == 'level') stat = 'score' 
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
@@ -147,6 +160,14 @@ module.exports = {
         else if (game == 'skywars' && (stat == 'rawplaytime')) {                // CUSTOM SKYWARS
           customstats = `${Math.floor(gamemode_api.playtime)}h`
           customstat = 'playtime'
+        }
+        else if (game == 'uhc' && stat == 'score') {                            // CUSTOM UHC AND SPEEDUHC
+          customstats = gamemode_api.level
+          customstat = 'level'
+        }
+        else if (game == 'tntgames' && (stat == 'rawplaytime' || stat == 'rawrecord')) {
+          if (stat == 'rawplaytime') {customstats = `${Math.floor(gamemode_api.playtime)}h`; customstat = 'playtime'}
+          else if (stat == 'rawrecord') {customstats = Math.floor(gamemode_api.record); customstat = 'record'}
         }
         else customstats = uhg.f(stats)
         if (game == 'general' && stat == 'wins') stats = player.stats.wins.total

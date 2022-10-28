@@ -10,7 +10,8 @@ module.exports = (hypixel) => {
       coins: tnt.coins || 0,
       winstreak: tnt.winstreak || 0,
       blocksran: achievements.tntgames_block_runner || 0,
-      playtime: achievements.tntgames_tnt_triathlon || 0,
+      rawplaytime: achievements.tntgames_tnt_triathlon || 0,
+      playtime: func.toTime(achievements.tntgames_tnt_triathlon || 0).m,
       overall: {
         wins: tnt.wins || 0,
         kills: (tnt.kills_tntag || 0)+(tnt.kills_capture || 0)+(tnt.kills_pvprun || 0),
@@ -30,7 +31,7 @@ module.exports = (hypixel) => {
         wins: tnt.wins_tntrun || 0,
         deaths: tnt.deaths_tntrun || 0,
         wlr: ratio(tnt.wins_tntrun || 0, tnt.deaths_tntrun || 0),
-        record: tnt.record_tntrun || 0,
+        record: func.toTime(tnt.record_tntrun || 0).miniformatted
       },
       pvprun: {
         wins: tnt.wins_pvprun || 0,
@@ -38,7 +39,8 @@ module.exports = (hypixel) => {
         kills: tnt.kills_pvprun || 0,
         deaths: tnt.deaths_pvprun || 0,
         kdr: ratio(tnt.kills_pvprun || 0, tnt.deaths_pvprun || 0),
-        record: tnt.record_pvprun || 0,
+        rawrecord: tnt.record_pvprun || 0,
+        record: func.toTime(tnt.record_pvprun || 0).miniformatted
       },
       tnttag: {
         wins: tnt.wins_tntag || 0,

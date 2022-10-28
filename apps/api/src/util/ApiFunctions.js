@@ -30,7 +30,10 @@ class ApiFunctions {
     let days = sec / 60 / 60 / 24
     let hours = sec / 60 / 60 % 24
     let formatted = `${Math.floor(Number(days))}d ${Math.floor(Number(hours))}h`
-    let final = {formatted:formatted, h:sec/60/60, d: sec/60/60/24, m: sec/60, s: sec}
+    let minutes = sec / 60
+    let seconds = sec % 60
+    let miniformatted = `${Math.floor(Number(minutes))}min ${Math.floor(Number(seconds))}s`
+    let final = {formatted:formatted, miniformatted:miniformatted, h:sec/60/60, d: sec/60/60/24, m: sec/60, s: sec}
     return final
   }
 

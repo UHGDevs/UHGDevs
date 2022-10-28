@@ -9,7 +9,7 @@ module.exports = async (uhg, interaction) => {
   let focused = interaction.options._hoistedOptions.filter(n => n.focused)[0]
 
   if (focused.name == 'stat') {
-    if (game == 'bedwars') {
+    if (game === 'bedwars') {
       return interaction.respond([
         { name: 'Level', value: 'level' },
         { name: 'Finální Zabití', value: 'finalKills' },
@@ -33,7 +33,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Sebrané Diamanty', value: 'diamond' },
         { name: 'Sebrané Emeraldy', value: 'emerald' },
       ]);
-    } else if (game == 'skywars') {
+    } else if (game === 'skywars') {
       return interaction.respond([
         { name: 'Level', value: 'level' },
         { name: 'Výhry', value: 'wins' },
@@ -51,7 +51,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Asistence', value: 'assists' },
         { name: 'Odehraný čas', value: 'rawplaytime' }
       ])
-    } else if (game == 'general') {
+    } else if (game === 'general') {
       return interaction.respond([
         { name: 'Level', value: 'level' },
         { name: 'Karma', value: 'karma' },
@@ -64,7 +64,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Challenges', value: 'challenges' },
         { name: 'Classic Tokeny', value: 'legacyTokens' }
       ])
-    } else if (game == 'arena') {
+    } else if (game === 'arena') {
       return interaction.respond([
         { name: 'Výhry', value: 'wins' },
         { name: 'Prohry', value: 'losses' },
@@ -76,7 +76,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Klíče', value: 'keys' },
         { name: 'WinStreak', value: 'winstreak' }
       ])
-    } else if (game == 'murder') {
+    } else if (game === 'murder') {
       return interaction.respond([
         { name: 'Výhry', value: 'wins' },
         { name: 'Prohry', value: 'losses' },
@@ -93,7 +93,7 @@ module.exports = async (uhg, interaction) => {
       //  { name: 'Zabití za Survivora', value: 'survivorkills' },
       //  { name: 'Zabití za Zombie', value: 'zombiekills' }
       ])
-    } else if (game == 'tkr') {
+    } else if (game === 'tkr') {
       return interaction.respond([
         { name: 'Trofeje', value: 'trophies' },
         { name: 'Zlata', value: 'gold' },
@@ -104,7 +104,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Sebrané Mince', value: 'collectedcoins' },
         { name: 'Kola', value: 'laps' }
       ])
-    } else if (game == 'duels') {
+    } else if (game === 'duels') {
       return interaction.respond([
         { name: 'Výhry', value: 'wins' },
         { name: 'Prohry', value: 'losses' },
@@ -118,7 +118,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Best Winstreak', value: 'bestwinstreak' },
         { name: 'Loot Bedny', value: 'lootchests' }
       ])
-    } else if (game == 'quake') {
+    } else if (game === 'quake') {
       return interaction.respond([
         { name: 'Výhry', value: 'wins' },
         { name: 'Hry', value: 'games' },
@@ -129,7 +129,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'HeadShots', value: 'headshots' },
         { name: 'Best KillStreak', value: 'bestkillstreak' }
       ])
-    } else if (game == 'ww') {
+    } else if (game === 'ww') {
       return interaction.respond([
         { name: 'Level', value: 'level' },
         { name: 'Výhry', value: 'wins' },
@@ -146,13 +146,13 @@ module.exports = async (uhg, interaction) => {
         { name: 'Vln položeno', value: 'blocks_placed' },
         { name: 'Powerupů sebráno', value: 'powerups'},
       ])
-    } else if (game == 'bb') {
+    } else if (game === 'bb') {
       return interaction.respond([
         { name: 'Skóre', value: 'score' },
         { name: 'Výhry', value: 'wins' },
         { name: 'Mince', value: 'coins' }
       ])
-    } else if (game == "paintball") {
+    } else if (game === "paintball") {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -162,7 +162,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Killstreaks', value: 'killstreaks' },
         { name: 'Střel vystřeleno', value: 'shots' }
       ])
-    } else if (game == "thewalls") {
+    } else if (game === "thewalls") {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -173,7 +173,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'KDR', value: 'kdr' },
         { name: 'Asistence', value: 'assists' }
       ])
-    } else if (game == "vampirez") {
+    } else if (game === "vampirez") {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -189,7 +189,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'KDR', value: 'kdr' },
         { name: 'Zlata nakoupeno', value: 'goldbought' }
       ])
-    } else if (game == "cac") {
+    } else if (game === "cac") {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -204,7 +204,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Položené bomby', value: 'bombsplanted' },
         { name: 'Zneškodněné bomby', value: 'bombsdefused' },
       ])
-    } else if (game == 'blitz') {
+    } else if (game === 'blitz') {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -213,7 +213,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'KDR', value: 'kdr' },
         { name: 'Poškození', value: 'damage' },
       ])
-    } else if (game == 'warlords') {
+    } else if (game === 'warlords') {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Výhry', value: 'wins' },
@@ -227,7 +227,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Navrácené vlajky', value: 'flagreturns' },
         { name: 'Získané vlajky', value: 'flagcaptures' },
       ])
-    } else if (game == 'smash') {
+    } else if (game === 'smash') {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Level', value: 'level' },
@@ -241,7 +241,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Asistence', value: 'assists' },
         { name: 'Winstreak', value: 'winstreak' },
       ])
-    } else if (game == 'megawalls') {
+    } else if (game === 'megawalls') {
       return interaction.respond([
         { name: 'Mince', value: 'coins' },
         { name: 'Level', value: 'level' },
@@ -255,7 +255,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Finální zabití+asistence', value: 'fka' },
         { name: 'Poškození na witherovi', value: 'witherdmg' },
       ])
-    } else if (game == 'pit') {
+    } else if (game === 'pit') {
       return interaction.respond([
         { name: 'Zlato', value: 'gold' },
         { name: 'Renown', value: 'renown' },
@@ -267,10 +267,54 @@ module.exports = async (uhg, interaction) => {
         { name: 'Kontrakty', value: 'contracts' },
         { name: 'Odehraný čas', value: 'rawplaytime' },
       ])
+    } else if (game === 'uhc') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Level', value: 'score' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Vyrobené ultimates', value: 'ultimates' },
+        { name: 'Vyrobené extra ultimates', value: 'extraultimates' },
+      ])
+    } else if (game === 'speeduhc') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Level', value: 'score' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'Prohry', value: 'losses' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Winstreak', value: 'winstreak' },
+        { name: 'Nejvyšší winstreak', value: 'highestwinstreak' },
+        { name: 'Killstreak', value: 'killstreak' },
+        { name: 'Nejvyšší killstreak', value: 'highestkillstreak' },
+      ])
+    } else if (game === 'tntgames') {
+      return interaction.respond([
+        { name: 'Mince', value: 'coins' },
+        { name: 'Výhry', value: 'wins' },
+        { name: 'WLR', value: 'wlr' },
+        { name: 'Zabití', value: 'kills' },
+        { name: 'Smrti', value: 'deaths' },
+        { name: 'KDR', value: 'kdr' },
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Winstreak', value: 'winstreak' },
+        { name: 'Uběhnuté bloky', value: 'blocksran' },
+        { name: 'Odehraný čas', value: 'rawplaytime' },
+        { name: 'Získané body ve Wizards', value: 'points' },
+        { name: 'Rekordní čas', value: 'rawrecord' },
+        { name: 'Počet označení v TNT Tag', value: 'tagged' },
+        { name: 'Počet střel v Bow Spleef', value: 'shots' },
+      ])
     }
   } else if (focused.name == 'gamemode') {
     if (!stat) return
-    if (game == 'bedwars') {
+    if (game === 'bedwars') {
       if (stat == 'coins' || stat == 'exp' || stat == 'level') return interaction.respond([{ name: 'Celkové', value: 'overall' }])
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },
@@ -280,7 +324,7 @@ module.exports = async (uhg, interaction) => {
         { name: '4v4v4v4', value: 'fours' },
         { name: '4v4', value: '4v4' }
       ]);
-    } else if (game == 'skywars') {
+    } else if (game === 'skywars') {
       if (stat == 'coins' || stat == 'heads' || stat == 'level' || stat == 'opals' || stat == 'shards' || stat == 'tokens') return interaction.respond([{ name: 'Celkové', value: 'overall' }])
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },
@@ -290,7 +334,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Doubles Insane', value: 'doubles_insane' },
         { name: 'Rankedy', value: 'ranked' }
       ]);
-    } else if (game == 'arena') {
+    } else if (game === 'arena') {
       if (stat == 'keys' || stat == 'coins') return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },
@@ -298,7 +342,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Doubles', value: 'doubles' },
         { name: 'Fours', value: 'fours' }
       ])
-    } else if (game == 'murder') {
+    } else if (game === 'murder') {
       if (stat == 'herowins' || stat == 'coins' || stat == 'detectivewins' || stat == 'murdererwins') return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
       if (stat == 'survivorwins') return interaction.respond([ { name: 'Infection', value: 'infection' } ]);
       return interaction.respond([
@@ -308,42 +352,75 @@ module.exports = async (uhg, interaction) => {
         { name: 'Assassins', value: 'assassins' },
         { name: 'Infection', value: 'infection' }
       ])
-    } else if (game == 'cac') {
-      if (stat == 'coins' || stat == 'shots' || stat == 'grenadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([{name: 'Celkové', value: 'overall'}]);
-      if (stat == 'bombsdefused' || stat == 'bombsplanted') return interaction.respond([{name: 'Defusal', value: 'defusal'}]);
+    } else if (game === 'cac') {
+      if (stat == 'coins' || stat == 'shots' || stat == 'grenadekills' || stat == 'headshotkills' || stat == 'roundwins') return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+      if (stat == 'bombsdefused' || stat == 'bombsplanted') return interaction.respond([ { name: 'Defusal', value: 'defusal' } ]);
       return interaction.respond([
         { name: 'Celkové', value: 'overall' },
         { name: 'Defusal', value: 'defusal' },
         { name: 'Team Deathmatch', value: 'deathmatch' },
         { name: 'Gun Game', value: 'gungame' }
       ])
-    } else if (game == 'general') {
+    } else if (game === 'tntgames') {
+      if (stat == 'kills' || stat == 'kdr') return interaction.respond([ 
+        { name: 'Celkové', value: 'overall' },
+        { name: 'PVP Run', value: 'pvprun' },
+        { name: 'TNT Tag', value: 'tnttag' },
+        { name: 'Wizards', value: 'wizards' }
+      ])
+      else if (stat == 'blocksran' || stat == 'rawplaytime' || stat == 'winstreak' || stat == 'coins') return interaction.respond([ { name: 'Celkové', value: 'overall' } ])
+      else if (stat == 'points' || stat == 'assists') return interaction.respond([ { name: 'Wizards', value: 'wizards' } ])
+      else if (stat == 'tagged') return interaction.respond([ { name: 'TNT Tag', value: 'tnttag' } ])
+      else if (stat == 'shots') return interaction.respond([ { name: 'Bow Spleef', value: 'bowspleef' } ])
+      else if (stat == 'rawrecord') return interaction.respond([ 
+        { name: 'TNT Run', value: 'tntrun' },
+        { name: 'PVP Run', value: 'pvprun' }
+      ])
+      else if (stat == 'wlr') return interaction.respond([
+        { name: 'TNT Run', value: 'tntrun' },
+        { name: 'PVP Run', value: 'pvprun' },
+        { name: 'TNT Tag', value: 'tnttag' },
+        { name: 'Bow Spleef', value: 'bowspleef' }
+      ])
+      return interaction.respond([
+        { name: 'Celkové', value: 'overall' },
+        { name: 'TNT Run', value: 'tntrun' },
+        { name: 'PVP Run', value: 'pvprun' },
+        { name: 'TNT Tag', value: 'tnttag' },
+        { name: 'Wizards', value: 'wizards' },
+        { name: 'Bow Spleef', value: 'bowspleef' }
+      ])
+    } else if (game === 'general') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'tkr') {
+    } else if (game === 'tkr') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'duels') {
+    } else if (game === 'duels') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'quake') {
+    } else if (game === 'quake') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "ww") {
+    } else if (game === "ww") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "bb") {
+    } else if (game === "bb") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "paintball") {
+    } else if (game === "paintball") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "thewalls") {
+    } else if (game === "thewalls") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "vampirez") {
+    } else if (game === "vampirez") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == "blitz") {
+    } else if (game === "blitz") {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'warlords') {
+    } else if (game === 'warlords') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'smash') {
+    } else if (game === 'smash') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'megawalls') {
+    } else if (game === 'megawalls') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
-    } else if (game == 'pit') {
+    } else if (game === 'pit') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game === 'uhc') {
+      return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
+    } else if (game === 'speeduhc') {
       return interaction.respond([ { name: 'Celkové', value: 'overall' } ]);
     }
   }
