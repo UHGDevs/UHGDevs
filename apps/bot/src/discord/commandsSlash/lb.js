@@ -147,27 +147,27 @@ module.exports = {
       data.forEach(player => {
         if (game !== 'general' && !player.stats[game]) return //console.log(player)
         let gamemode_api;
-        if (game !== 'general') gamemode_api = player.stats[game][gamemode] || player.stats[game]
+        if (game !== 'general') gamemode_api = player.stats[game][gamemode][stat] ? player.stats[game][gamemode] : player.stats[game]
         else gamemode_api = player
         
         let stats = gamemode_api[stat]
         customstat = stat; //  example: 'prestige' or 'wins'
         let customstats; // example: '[XIV-101]' or '1,454'
-        if (game == 'pit' && (stat == 'xp' || stat == 'rawplaytime')) {         // CUSTOM PIT
+        if (game == 'pit' && (stat == 'xp' || stat == 'rawplaytime')) {                  // CUSTOM PIT
           if (stat == 'xp') {customstats = `[${gamemode_api.prestigeroman}-${gamemode_api.level}]`; customstat = 'prestige'}
           else if (stat == 'rawplaytime') {customstats = `${Math.floor(gamemode_api.playtime)}h`; customstat = 'playtime'}
         }
-        else if (game == 'skywars' && (stat == 'rawplaytime')) {                // CUSTOM SKYWARS
+        else if (game == 'skywars' && (stat == 'rawplaytime')) {                         // CUSTOM SKYWARS
           customstats = `${Math.floor(gamemode_api.playtime)}h`
           customstat = 'playtime'
         }
-        else if (game == 'uhc' && stat == 'score') {                            // CUSTOM UHC AND SPEEDUHC
+        else if (game == 'uhc' && stat == 'score') {                                     // CUSTOM UHC AND SPEEDUHC
           customstats = gamemode_api.level
           customstat = 'level'
         }
-        else if (game == 'tntgames' && (stat == 'rawplaytime' || stat == 'rawrecord')) {
+        else if (game == 'tntgames' && (stat == 'rawplaytime' || stat == 'rawrecord')) { // CUSTOM TNT GAMES
           if (stat == 'rawplaytime') {customstats = `${Math.floor(gamemode_api.playtime)}h`; customstat = 'playtime'}
-          else if (stat == 'rawrecord') {customstats = Math.floor(gamemode_api.record); customstat = 'record'}
+          else if (stat == 'rawrecord') {customstats = gamemode_api.record; customstat = 'record'}
         }
         else customstats = uhg.f(stats)
         if (game == 'general' && stat == 'wins') stats = player.stats.wins.total
