@@ -39,6 +39,7 @@ module.exports = (hypixel) => {
       tokens: skywars.cosmetic_tokens || 0,
       opals: skywars.opals || 0,
       expmilestone: func.getSwExpLeft(skywars.skywars_experience || 0),
+      rawplaytime: skywars.time_played || 0,
       playtime: func.toTime(skywars.time_played || 0).h,
       main_mode: func.getGamemode(sw_main_mode),
       overall: {
@@ -49,7 +50,7 @@ module.exports = (hypixel) => {
         kills: skywars.kills || 0,
         deaths: skywars.deaths || 0,
         kdr: func.ratio(skywars.kills, skywars.deaths),
-        playtime: func.toTime(skywars.time_played || 0).formatted,
+        playtime: func.toTime(skywars.time_played || 0).h,
         rawplaytime: skywars.time_played || 0,
         assists: skywars.assists || 0
       },
@@ -61,7 +62,7 @@ module.exports = (hypixel) => {
         deaths: skywars.deaths_solo_normal || 0,
         kdr: func.ratio(skywars.kills_solo_normal, skywars.deaths_solo_normal),
         games: skywars.games_solo || 0,
-        playtime: func.toTime(skywars.time_played_solo || 0).formatted,
+        playtime: func.toTime(skywars.time_played_solo || 0).h,
         rawplaytime: skywars.time_played_solo || 0,
         assists: skywars.assists_solo || 0
       },
@@ -73,7 +74,7 @@ module.exports = (hypixel) => {
         deaths: skywars.deaths_solo_insane || 0,
         kdr: func.ratio(skywars.kills_solo_insane, skywars.deaths_solo_insane),
         games: skywars.games_solo || 0,
-        playtime: func.toTime(skywars.time_played_solo || 0).formatted,
+        playtime: func.toTime(skywars.time_played_solo || 0).h,
         rawplaytime: skywars.time_played_solo || 0,
         assists: skywars.assists_solo || 0
       },
@@ -85,7 +86,7 @@ module.exports = (hypixel) => {
         deaths: skywars.deaths_team_normal || 0,
         kdr: func.ratio(skywars.kills_team_normal, skywars.deaths_team_normal),
         games: skywars.games_team || 0,
-        playtime: func.toTime(skywars.time_played_team || 0).formatted,
+        playtime: func.toTime(skywars.time_played_team || 0).h,
         rawplaytime: skywars.time_played_team || 0,
         assists: skywars.assists_team || 0
       },
@@ -97,7 +98,7 @@ module.exports = (hypixel) => {
         deaths: skywars.deaths_team_insane || 0,
         kdr: func.ratio(skywars.kills_team_insane, skywars.deaths_team_insane),
         games: skywars.games_team || 0,
-        playtime: func.toTime(skywars.time_played_team || 0).formatted,
+        playtime: func.toTime(skywars.time_played_team || 0).h,
         rawplaytime: skywars.time_played_team || 0,
         assists: skywars.assists_team || 0
       },
@@ -109,7 +110,7 @@ module.exports = (hypixel) => {
         deaths: skywars.deaths_ranked || 0,
         kdr: func.ratio(skywars.kills_ranked, skywars.deaths_ranked),
         games: skywars.games_ranked || 0,
-        playtime: func.toTime(skywars.time_played_ranked || 0).formatted,
+        playtime: func.toTime(skywars.time_played_ranked || 0).h,
         rawplaytime: skywars.time_played_ranked || 0,
         assists: skywars.assists_ranked || 0,
         rating: swrating || 0,

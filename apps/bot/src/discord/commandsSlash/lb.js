@@ -140,9 +140,13 @@ module.exports = {
         let stats = gamemode_api[stat]
         customstat = stat; //  example: 'prestige' or 'wins'
         let customstats; // example: '[XIV-101]' or '1,454'
-        if (game == 'pit' && (stat == 'xp' || stat == 'playtimeraw')) { // CUSTOM PIT
+        if (game == 'pit' && (stat == 'xp' || stat == 'rawplaytime')) {         // CUSTOM PIT
           if (stat == 'xp') {customstats = `[${gamemode_api.prestigeroman}-${gamemode_api.level}]`; customstat = 'prestige'}
-          else if (stat == 'playtimeraw') {customstats = `${gamemode_api.playtime}h`; customstat = 'playtime'}
+          else if (stat == 'rawplaytime') {customstats = `${Math.floor(gamemode_api.playtime)}h`; customstat = 'playtime'}
+        }
+        else if (game == 'skywars' && (stat == 'rawplaytime')) {                // CUSTOM SKYWARS
+          customstats = `${Math.floor(gamemode_api.playtime)}h`
+          customstat = 'playtime'
         }
         else customstats = uhg.f(stats)
         if (game == 'general' && stat == 'wins') stats = player.stats.wins.total

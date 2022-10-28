@@ -48,7 +48,8 @@ module.exports = async (uhg, interaction) => {
         { name: 'Opály', value: 'opals' },
         { name: 'Duše', value: 'souls' },
         { name: 'Tokeny', value: 'tokens' },
-        { name: 'Asistence', value: 'assists' }
+        { name: 'Asistence', value: 'assists' },
+        { name: 'Odehraný čas', value: 'rawplaytime' }
       ])
     } else if (game == 'general') {
       return interaction.respond([
@@ -264,7 +265,7 @@ module.exports = async (uhg, interaction) => {
         { name: 'Smrti', value: 'deaths' },
         { name: 'KDR', value: 'kdr' },
         { name: 'Kontrakty', value: 'contracts' },
-        { name: 'Odehraný čas', value: 'playtimeraw' },
+        { name: 'Odehraný čas', value: 'rawplaytime' },
       ])
     }
   } else if (focused.name == 'gamemode') {
