@@ -47,7 +47,7 @@ module.exports = {
       let api = await uhg.api.call(user, ["hypixel", 'guild', 'friends', 'online'], { verify: uhg.data.verify?.find(n => n._id == interaction.user.id) || {}})
       if (!api.success) return interaction.editReply({ embeds: [new MessageEmbed().setTitle(`**Error v api**`).setColor('RED').setDescription(api.reason)] })
 
-      let style = interaction.options.getString('style')
+      let style = interaction.options.getString('style') || 'picture'
       if (style == 'picture') {
         let data = await uhg.mongo.run.get('general', 'commands', { _id: 'general' }).then(n=> n[0] || null)
         if (!data) return interaction.editReply({ content: '\`general\` příkaz nebyl nalezen, kontaktuj prosím developera' })
