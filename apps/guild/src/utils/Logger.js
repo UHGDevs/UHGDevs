@@ -34,6 +34,23 @@ global.ggl = (exp) => {
   return 1000;
 }
 
+global.gl = (exp) => {
+  const EXP_NEEDED = [ 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000, 2500000, 2500000, 3000000];
+  let level = 0;
+  for (let i = 0; i <= 1000; i += 1) {
+    let need = 0;
+    if (i >= EXP_NEEDED.length) {
+      need = EXP_NEEDED[EXP_NEEDED.length - 1];
+    } else { need = EXP_NEEDED[i]; }
+    if ((exp - need) < 0) {
+      return level + (exp / need);
+    }
+    level += 1;
+    exp -= need;
+  }
+  return 1000;
+}
+
 global.waitEvent = (item, event) => {
   return new Promise((resolve) => {
     const listener = (...a) => {
@@ -42,6 +59,20 @@ global.waitEvent = (item, event) => {
     }
     item.addEventListener(event, listener);
   })
+}
+
+global.letniCas = (date = new Date()) => {
+    const january = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
+    const july = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+  
+    return Math.max(january, july) !== date.getTimezoneOffset();
+}
+
+global.previousDay = (date = new Date()) => new Date(new Date(date.getTime()).setDate(date.getDate() - 1))
+
+global.isInteraction = (i) => {
+  if (i.id || i.customId) return true
+  else return false
 }
 
 if (!console.timer) console.timer = console.time
