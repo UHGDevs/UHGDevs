@@ -117,7 +117,7 @@ module.exports = {
       let rozdil1 = Math.abs(tkjklvl_1 - uhglvl_1)
 
       let sent = true
-      let send = date.getHours() == 5 && date.getMinutes() == 58
+      let send = date.getHours() == 4 && date.getMinutes() == 58
 
       if (send) {
         let channel = uhg.dc.client.channels.cache.get("933036082541498408");
