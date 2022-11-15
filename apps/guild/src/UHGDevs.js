@@ -13,7 +13,7 @@ class UHGDevs extends Mongo {
   }
   async appStart() {
 
-      this.api = new uhgApi({ key: [process.env.api_key, process.env.api_key_2], db: process.env.db })
+      this.api = new uhgApi({ key: [process.env.api_key, process.env.api_key_2], db: process.env.db, antisniper: process.env.antisniper })
       this.discord = new DiscordHandler(this)
       this.time = new TimeHandler(this)
       // this.minecraft = new MinecraftHandler(this)

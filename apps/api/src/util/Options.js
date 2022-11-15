@@ -10,7 +10,8 @@ class Options {
       limit: 0,
       guildBot: false,
       currentTourney: null,
-      db: null
+      db: null,
+      antisniper: null
     };
   }
 
