@@ -19,7 +19,7 @@ module.exports = {
 
     let request = await uhg.redis_get('f50e5d5cca524c2ebc9d040acefa7c5a', '.')
 
-    let update = request.data.filter(n => n.stats.updated).sort((a, b) => a.stats.updated - b.stats.updated).slice(0, updateMembers)
+    let update = request.data.filter(n => n && n.stats && n.stats.updated).sort((a, b) => a.stats.updated - b.stats.updated).slice(0, updateMembers)
     for (let data of update) {
         let uuid = data.uuid
 
@@ -28,15 +28,14 @@ module.exports = {
             console.log(api)
             continue;
         }
-        console.log(api)
 
-        if (api.textures?.skin.data !== data.skin.skin.data) await uhg.redis_post(uuid, api.textures, path = '.skin')
-        if (api.names?.length !== data.names?.length) await uhg.redis_post(uuid, api.names, path = '.names')
-        if (data.username !== api.username) await uhg.redis_post(uuid, api.username, path = '.username')
+        if (api.textures?.skin.data !== data.skin.skin.data) await uhg.redis_post(uuid, api.textures, '.skin')
+        if (api.names?.length !== data.names?.length) await uhg.redis_post(uuid, api.names, '.names')
+        if (data.username !== api.username) await uhg.redis_post(uuid, api.username,'.username')
 
         let hypixel = api.hypixel;
         ['_id'].forEach(e => delete hypixel[e]);
-        await uhg.redis_post(uuid, hypixel, path = '.stats')
+        await uhg.redis_post(uuid, hypixel, '.stats')
 
     }
 

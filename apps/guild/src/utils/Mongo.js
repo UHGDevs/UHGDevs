@@ -12,23 +12,9 @@ class Mongo extends Config {
         let options = {}
         let mongo = await mongodb.MongoClient.connect(process.env.db, options)
 
-        try {
-          this.redis = redisdb.createClient({
-            socket: {
-                //host: process.env.redis,
-                //port: 14305
-                host: "127.0.0.1",
-                port: 6379
-            },
-            password: 'UHGDevs'
-          });
-
-          await this.redis.connect()
-          this.redis.on('error', err => console.log('Error ' + err));
-        } catch(e) {
-          this.redis = undefined
-          console.error('REDIS db není zaplá')
-        }
+        let connected = await this.connectRedis()
+        if (!connected) console.error('Redis db není zaplá!')
+        setInterval(this.connectRedis.bind(this), 60000);
       
 
         this.mongo = mongo
@@ -85,6 +71,26 @@ class Mongo extends Config {
       if (!this.redis) return false
       let keys = await uhg.redis.keys('*')
       return keys
+    }
+
+    async connectRedis() {
+      if (this.redis) return
+      try {
+        this.redis = redisdb.createClient({
+          socket: {
+              host: "127.0.0.1",
+              port: 6379
+          },
+          password: 'UHGDevs'
+        });
+
+        await this.redis.connect()
+        this.redis.once('error', () => {
+          console.error('Redis DB error')
+          this.redis = undefined
+        });
+        return true
+      } catch(e) {this.redis = undefined}
     }
 
   }
