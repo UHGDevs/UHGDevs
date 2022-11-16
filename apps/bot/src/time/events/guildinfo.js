@@ -30,7 +30,7 @@ module.exports = {
       let tkjk_weekly_channel = uhg.dc.client.channels.cache.get("990234306746138684");
 
       let mCount = Number(gmembers_channel.name.replace('Members: ', '').split('/')[0])
-      if (mCount !== 125 && puhg.data.members.length === 125) {
+      if (mCount !== 125 && puhg?.data.members.length === 125) {
         let kick_channel = uhg.dc.client.channels.cache.get("530496801782890527");
 
         let updated = await guildrefresh(uhg, 'UltimateHypixelGuild')
@@ -83,13 +83,13 @@ module.exports = {
       let uhg_weekly_gexp = 0
       let tkjk_weekly_gexp = 0
 
-      let week = Object.keys(puhg.data.members[0].exp.daily).slice(0, date.getDay() || 7)
+      let week = Object.keys(puhg?.data.members[0].exp.daily).slice(0, date.getDay() || 7)
       for (let day of week) {
-        uhg_weekly_gexp += puhg.data.dailyxp[day]
-        tkjk_weekly_gexp += tkjk.data.dailyxp[day]
+        uhg_weekly_gexp += puhg?.data.dailyxp[day]
+        tkjk_weekly_gexp += tkjk?.data.dailyxp[day]
       }
 
-      let gmembers_message = `Members: ${puhg.data.members.length}/125`;
+      let gmembers_message = `Members: ${puhg?.data.members.length}/125`;
       let uhglevel_message = `Guild Level: ${Math.round(uhglvl*100)/100}`;
       let tkjklevel_message = `TKJK: ${Math.round(tkjklvl*100)/100}`;
       let rozdil_message = `Rozdíl: ${Math.round(rozdil*10000)/10000}`;
@@ -108,11 +108,11 @@ module.exports = {
         console.log('Chyba v time/events/guildinfo.js:38 - nenalezen kanál')
       }
 
-      let today = Object.keys(puhg.api.members[0].expHistory)[0]
-      let yesterday = Object.keys(puhg.api.members[0].expHistory)[1]
+      let today = Object.keys(puhg?.api.members[0].expHistory)[0]
+      let yesterday = Object.keys(puhg?.api.members[0].expHistory)[1]
 
-      let uhglvl_1 = uhg.getGuildLevel(puhg.data.tdailyxp[yesterday] || 0)
-      let tkjklvl_1 = uhg.getGuildLevel(tkjk.data.tdailyxp[yesterday] || 0)
+      let uhglvl_1 = uhg.getGuildLevel(puhg?.data.tdailyxp[yesterday] || 0)
+      let tkjklvl_1 = uhg.getGuildLevel(tkjk?.data.tdailyxp[yesterday] || 0)
 
       let rozdil1 = Math.abs(tkjklvl_1 - uhglvl_1)
 
