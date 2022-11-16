@@ -12,7 +12,7 @@ class MessageHandler {
   async onMessage(message) {
     if (message.author.id == global.config.discord.clientID) return
     if (!message.author.bot && (message.channel.id == global.config.discord.officerChannel || message.channel.id == global.config.discord.guildChatChannel) && message.content && message.content.length > 0) this.bridge(message);
-    if (message.channel.type === 1) dc_client.channels.get('1027491511857840168')?.send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
+    if (message.channel.type === 1) dc_client.channels.cache.get('1027491511857840168')?.send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
 
     let reply;
 

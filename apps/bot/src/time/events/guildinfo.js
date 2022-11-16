@@ -200,7 +200,7 @@ if (date.getMinutes() !== 50) return
                   member.username = username
               }
   
-              member.gexp = Object.assign({}, member.expHistory, member.gexp, member.expHistory);
+              member.gexp = Object.assign({}, api.expHistory, member.gexp, api.expHistory);
   
               await uhg.mongo.run.post(db, 'members', member)
           }

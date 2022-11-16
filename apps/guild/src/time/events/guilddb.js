@@ -71,8 +71,7 @@ module.exports = {
                 member.username = username
             }
 
-            member.gexp = Object.assign({}, member.expHistory, member.gexp, member.expHistory);
-
+            member.gexp = Object.assign({}, api.expHistory, member.gexp, api.expHistory);
             await uhg.post(db, 'members', member)
         }
 
