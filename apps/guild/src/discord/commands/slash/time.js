@@ -12,7 +12,7 @@ const DATA = {
     type: 'slash',
     platform: 'discord',
     run: async (uhg, interaction) => {
-      if (!interaction.customId) await interaction.deferReply({ ephemeral: true }).catch(() => {})
+      if (!interaction.customId) await interaction.deferReply({ ephemeral: false }).catch(() => {})
 
       let auth = ['378928808989949964', '312861502073995265', '379640544143343618', '427198829935460353']
       if (!auth.includes(interaction.user.id)) return interaction.followUp({ embeds: [{title: `**TIME EVENT UNVERIFIED**`, color: 15548997, description: `Nejsi na whitelistu :/`}], ephemeral: true })
@@ -47,11 +47,11 @@ const DATA = {
       
       let embed = { title: `${event.emoji} **__${type} Time Event__** ${event.emoji}`, color: 5592575, description: event.description, fields: [], footer: { text: `ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ\n *ㅤㅤ*ㅤㅤ*ㅤㅤ*ㅤㅤ*ㅤㅤ*\nsec min hour date month day`}}
       embed.fields.push({ name: `ㅤ`, value: `**__Basic Info__**`, inline: false})
-      embed.fields.push({ name: 'Toggle', value: (toggle ? '✅' : '🟥') + (event.onstart ? ' | 🕐' : ''), inline: true})
+      embed.fields.push({ name: 'Toggle', value: (!toggle ? '✅' : '🟥') + (event.onstart ? ' | 🕐' : ''), inline: true})
 
       let execution = event.executedAt ? `<t:${Math.round(Number(new Date(event.executedAt))/1000)}:R>` : `🟥 `
 
-      if (!uhg.time.running[type]) execution = '👟' + ` | <t:${Math.round(Number(new Date(event.executedAt || new Date()))/1000)}:R>`
+      if (uhg.time.running[type]) execution = '👟' + ` | <t:${Math.round(Number(new Date(event.executedAt || new Date()))/1000)}:R>`
       embed.fields.push({ name: 'Last Execution', value: execution, inline: true})
       embed.fields.push(...[
         { name: 'Next execution', value: `<t:${Math.round(new Date(event.start.nextDates()).getTime()/1000)}:R>`, inline: true },
@@ -78,7 +78,7 @@ const DATA = {
       let options = uhg.time.events.map(ev => { return {label: ev.emoji + ' ' + ev.name + (config.time[ev.name] ? ' ✅':''), description: ev.description, value: ev.name}})
       const menu = new ActionRowBuilder().addComponents(new SelectMenuBuilder().setCustomId('time_cmd_gui').setPlaceholder(`${type} Time Event GUI`).addOptions(...options));
       const buttons = new ActionRowBuilder()
-        .addComponents(new ButtonBuilder().setCustomId(`time_cmd_toggle_${type}`).setStyle(toggle ? 4:3).setLabel(toggle ? 'DISABLE':'ENABLE'))
+        .addComponents(new ButtonBuilder().setCustomId(`time_cmd_toggle_${type}`).setStyle(!toggle ? 4:3).setLabel(!toggle ? 'DISABLE':'ENABLE'))
         .addComponents(new ButtonBuilder().setCustomId(`time_cmd_action_${type}`).setStyle(3).setLabel('RUN'))
         .addComponents(new ButtonBuilder().setCustomId(`time_cmd_refresh_${type}`).setStyle(2).setLabel('REFRESH'))
 

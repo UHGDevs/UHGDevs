@@ -16,12 +16,12 @@ class Mojang {
     finally {
       if (!call) return {success: false, reason: 'Error ve volání MOJANGU', type: 'mojang', input: input} 
       if (!call.data || call.data.error) {
-        if (1==1) {
+        if (options.premium) {
             //let oldname = client.data_verify.find(n => { if (n.names && n.names.find(a => a.toLowerCase() == input.toLowerCase())) return true; return n.uuid.toLowerCase() == input.toLowerCase()})
             //if (oldname) return { success: true, username: oldname.nickname, uuid: oldname.uuid, names: oldname.names, type: 'mojang', textures: oldname.textures, created_at: oldname.date };
             if (client.options.antisniper) {
-              let antisniper = await axios.get(`https://api.antisniper.net/denick?key=${client.options.antisniper}&nick=${input}`)
-              if (antisniper.success) return callAgain(options, antisniper.player.ign, antisniper.queried_nick)
+              let antisniper = await axios.get(`https://api.antisniper.net/denick?key=${client.options.antisniper}&nick=${input}`).then(n => n.data)
+              if (antisniper.success) return this.callAgain(options, antisniper.player.ign, antisniper.queried_nick)
             }
         }
         return {success: false, reason: call.data?.reason|| (input.length > 16 ? 'Neplatné UUID' : 'Neplatné jméno'), type: 'mojang', input: input} 
