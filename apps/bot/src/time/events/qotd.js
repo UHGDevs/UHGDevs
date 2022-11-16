@@ -30,7 +30,7 @@ module.exports = {
       let embed = new MessageEmbed().setTitle(`Question of the Day ${day}`).setDescription(desc)
 
       let msg = await channel.send({ content: '<@&1015349927318139022>', embeds: [embed] })
-      let thread = await msg.startThread({name: `QOTD ${day} - ${question}` })
+      let thread = await msg.startThread({name: `QOTD ${day} - ${question}`.slice(0, 100) })
 
       await uhg.mongo.run.update('general', 'qotd', {_id: day}, {completed: true, message: msg.id, thread: thread.id})
 

@@ -66,7 +66,7 @@ module.exports = {
           {name: "TKJK", value: `Level: ${Math.round(level('tkjk', 'total_daily')*10000)/10000}\nDen: ${Math.round(level('tkjk')*10000)/10000}\nExp: ${f(exp('tkjk')/1000)}k`, inline: true },
           {name: "Rozdíl:", value: `Celkový: ${Math.abs(Math.round((level('uhg', 'total_daily') - level('tkjk', 'total_daily'))*10000)/10000)}\nDen: ${Math.round((level() - level('tkjk'))*100000)/100000}\nExp: ${f((exp() - exp('tkjk'))/1000)}k${exp() - exp('tkjk') < 0 ? '' : `\nPočet dní: ${Math.ceil((exp('tkjk', 'total_daily') - exp('uhg', 'total_daily'))/(exp() - exp('tkjk')))} dní`}`, inline: false}
       ]
-      let embed = { title: 'UHG vs TKJK ' + date, color: exp() - exp('tkjk') > 0 ? '2067276' : '15548997', fields: fields }
+      let embed = { title: 'UHG vs TKJK ' + date, color: exp() - exp('tkjk') > 0 ? 2067276 : 15548997, fields: fields }
 
       dc || await interaction.editReply({ embeds: [embed] })
       return { embed: embed, mc: 'Celkový rozdíl: ' + Math.abs(Math.round((level('uhg', 'total_daily') - level('tkjk', 'total_daily'))*10000)/10000)}

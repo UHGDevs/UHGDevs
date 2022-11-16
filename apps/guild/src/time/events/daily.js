@@ -4,7 +4,7 @@ const eventName = module.filename.includes('/') ? module.filename.split('/').fil
 module.exports = {
     name: eventName,
     description: "Denní guild statistiky",
-    emoji: '🛞',
+    emoji: '🌅',
     time: '0 0 7 * * *', //'*/10 * * * * *'
     ignore: '* * * * * *', //'sec min hour den(mesic) mesic den(tyden)'
     onstart: false,

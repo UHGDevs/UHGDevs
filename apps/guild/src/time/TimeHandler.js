@@ -80,14 +80,17 @@ class TimeHandler {
     } else return false
   }
 
-  eventStart(event) {
-    this.ready[event.name] = false
+  eventStart(ev) {
+    this.ready[ev.name] = false
+
+    let event = this.events.get(ev.name)
 
     event.count = (event.count || 0) + 1
     event.executedAt = new Date()
   }
 
-  eventEnd(event) {
+  eventEnd(ev) {
+    let event = this.events.get(ev.name)
     this.ready[event.name] = true
     this.running[event.name] = undefined
 

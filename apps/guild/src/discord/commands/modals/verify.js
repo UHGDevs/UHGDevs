@@ -49,7 +49,7 @@ module.exports = {
         ]
 
         if (auth.includes(interaction.user.id)) components.push({components: [{ custom_id: 'verfiy_custom', label: 'Custom Verify:', max_length: 19, min_length: 17, placeholder: null, required: false, style: 1, type: 4, value: null }], type: 1 })
-        const modal = new ModalBuilder().setCustomId('modal_recieve_verify').setTitle('UHG Verifikace');
+        const modal = new ModalBuilder().setCustomId('verify_cmd_recieve').setTitle('UHG Verifikace');
         modal.addComponents(components)
     
         await interaction.showModal(modal);
@@ -93,12 +93,12 @@ module.exports = {
         if (!in_db && !guilds?.uhg?.members.cache.get(user.id)?.roles.cache.find(r => r.id == "985095284893814814")) {
             let buttons = new ActionRowBuilder()
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`modal_db_verify_${api.hypixel.username}-${api.uuid}-accept-${user.id}`)
+                    .setCustomId(`verify_cmd_db_${api.hypixel.username}-${api.uuid}-accept-${user.id}`)
                     .setStyle(3)
                     .setLabel("Přidat do databáze")
                 )
                 .addComponents(new ButtonBuilder()
-                    .setCustomId(`modal_db_verify_${api.hypixel.username}-${api.uuid}-reject-${user.id}`)
+                    .setCustomId(`verify_cmd_db_${api.hypixel.username}-${api.uuid}-reject-${user.id}`)
                     .setStyle(4)
                     .setLabel("Nepřidávat do databáze")
                 );
