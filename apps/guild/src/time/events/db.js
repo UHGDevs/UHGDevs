@@ -12,7 +12,7 @@ module.exports = {
   onstart: true,
   run: async (uhg, options) => {
 
-    if (!uhg.redis) throw 'Není připojená redis DB'
+    if (!uhg.redis) return 'Není připojená redis DB'
 
 
     let keys = await uhg.getRedisKeys()
