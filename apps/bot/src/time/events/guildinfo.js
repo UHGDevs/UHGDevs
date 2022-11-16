@@ -76,8 +76,8 @@ module.exports = {
         kick_channel.send({ embeds: [embed] })
       }
 
-      let uhglvl = uhg.getGuildLevel(puhg.data.totalxp)
-      let tkjklvl = uhg.getGuildLevel(tkjk.data.totalxp)
+      let uhglvl = uhg.getGuildLevel(puhg?.data.totalxp)
+      let tkjklvl = uhg.getGuildLevel(tkjk?.data.totalxp)
       let rozdil = Math.abs(tkjklvl-uhglvl)
       
       let uhg_weekly_gexp = 0
