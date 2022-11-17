@@ -121,6 +121,7 @@ const DATA = {
         embed.color = 15548997
         embed.fields.push(...[{ name: '**__Result__**', value: `**REJECTED**`}, {name: '**__Reason__**', value: `${event.name} is already RUNNING`, inline: false}])
       }
+      interaction.followUp({ embeds: [embed], ephemeral: true })
     },
     refresh: refresh
 }

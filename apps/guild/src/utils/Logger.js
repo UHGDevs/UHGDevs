@@ -75,6 +75,12 @@ global.isInteraction = (i) => {
   else return false
 }
 
+global.getId = (interaction, i) => {
+  let splits = interaction?.customId?.split('_')
+  if (splits.lenth < i) return undefined
+  else return splits[i]
+}
+
 if (!console.timer) console.timer = console.time
 
 console.discord = (message, args = {}) => {

@@ -21,7 +21,7 @@ class Mojang {
             //if (oldname) return { success: true, username: oldname.nickname, uuid: oldname.uuid, names: oldname.names, type: 'mojang', textures: oldname.textures, created_at: oldname.date };
             if (client.options.antisniper) {
               let antisniper = await axios.get(`https://api.antisniper.net/denick?key=${client.options.antisniper}&nick=${input}`).then(n => n.data)
-              if (antisniper.success) return this.callAgain(options, antisniper.player.ign, antisniper.queried_nick)
+              if (antisniper.success && antisniper.player?.ign) return this.callAgain(options, antisniper.player.ign, antisniper.queried_nick)
             }
         }
         return {success: false, reason: call.data?.reason|| (input.length > 16 ? 'Neplatné UUID' : 'Neplatné jméno'), type: 'mojang', input: input} 

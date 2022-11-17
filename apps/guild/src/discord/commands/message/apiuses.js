@@ -1,6 +1,6 @@
 
 module.exports = {
-    name: "database",
+    name: "apiuses",
     aliases: ['api', 'uses'],
     permissions: [{ id: '312861502073995265', type: 'USER', permission: true }, { id: '378928808989949964', type: 'USER', permission: true }, { id: '419183469911080960', type: 'USER', permission: true }],
     platform: "dc",

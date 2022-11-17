@@ -29,24 +29,20 @@ module.exports = {
         }
 
         const getChannel = (id) => dc_client.channels.cache.get(id)
-        const renameChannel = async (id, name) => (getChannel(id)?.name == name) ? null : await getChannel(id)?.setName(name)
+        const renameChannel = async (id, name) => (getChannel(id)?.name == name) ? null : await (getChannel(id)?.setName(name))
 
         // MEMBERS
-        if (getChannel(811865691908603904)?.name !== 'Members: 125/125' && data.uhg.members === 125  ) {}
+        if (getChannel('811865691908603904')?.name !== 'Members: 125/125' && data.uhg?.members === 125  ) {}
 
 
         /* UHG INFO */
-        await renameChannel(811865691908603904, `Members: ${data.uhg.members}/125`)
-        await renameChannel(825659339028955196, `Guild Level: ${f(data.uhg.level)}`)
+        if (data.uhg.members) await renameChannel('811865691908603904', `Members: ${data.uhg.members}/125`)
+        if (data.uhg.level) await renameChannel('825659339028955196', `Guild Level: ${f(data.uhg.level)}`)
 
-        await renameChannel(928671490436648980, `Rozdíl: ${f(data.tkjk.level - data.uhg.level, 5)}`)
+        if (data.uhg.level && data.tkjk.level) await renameChannel('928671490436648980', `Rozdíl: ${f(data.tkjk.level - data.uhg.level, 5)}`)
 
         /* TKJK INFO */
-        await renameChannel(928569528676392980, `TKJK GL: ${f(data.tkjk.level)}`)
-
-        
-  
-
+        if (data.tkjk.level) await renameChannel('928569528676392980', `TKJK: ${f(data.tkjk.level)}`)
 
     }
 }
