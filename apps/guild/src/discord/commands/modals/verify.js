@@ -79,7 +79,7 @@ module.exports = {
         if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
 
         in_db = true
-        let request = await uhg.redis_get(uuid, '.').then(n => n.data)
+        let request = await uhg.redis_get(uuid, '.').then(n => n.data.map(a => a[1]))
         if (!request.length || request[0] == null) {await uhg.redis_post(uuid, {}, '.'); in_db = false}
 
         await uhg.redis_post(uuid, uuid, '.uuid')

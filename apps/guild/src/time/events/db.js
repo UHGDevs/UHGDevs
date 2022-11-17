@@ -17,9 +17,9 @@ module.exports = {
 
     let keys = await uhg.getRedisKeys()
 
-    let request = await uhg.redis_get('f50e5d5cca524c2ebc9d040acefa7c5a', '.')
+    let request = await uhg.redis_get('f50e5d5cca524c2ebc9d040acefa7c5a', '.').then(a => a.data.map(n => n[1]))
 
-    let update = request.data.filter(n => n && n.stats && n.stats.updated).sort((a, b) => a.stats.updated - b.stats.updated).slice(0, updateMembers)
+    let update = request.filter(n => n && n.stats && n.stats.updated).sort((a, b) => a.stats.updated - b.stats.updated).slice(0, updateMembers)
     for (let data of update) {
         let uuid = data.uuid
 

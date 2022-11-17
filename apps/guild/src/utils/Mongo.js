@@ -56,7 +56,7 @@ class Mongo extends Config {
       if (!this.redis) return false
       let errors = []
       if (typeof keys === 'string') keys = [keys]
-      let stats = await Promise.all(keys.map(async (key) => await this.redis.json.get(key, { path: path}).catch(e => { errors.push(key)})))
+      let stats = await Promise.all(keys.map(async (key) => [key, await this.redis.json.get(key, { path: path}).catch(e => { errors.push(key)}) ]))//.catch(e => { errors.push(key)})
 
       return { data: stats.filter(n => n !== undefined), errors: errors}
     }
