@@ -7,7 +7,7 @@ const eventName = module.filename.includes('/') ? module.filename.split('/').fil
 
 module.exports = {
   name: eventName,
-  description: "Automatičští elite members",
+  description: "Automatičtí elite members",
   emoji: '👨‍🦼',
   time: '0 0 0 * * 1', //'*/10 * * * * *'
   ignore: '* * * * * *', //'sec min hour den(mesic) mesic den(tyden)'
