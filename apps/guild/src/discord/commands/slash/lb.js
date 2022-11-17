@@ -88,11 +88,11 @@ module.exports = {
       let find = interaction.options.getString('find')?.toLowerCase()
       let embed = ((find && find !== 'null') ? embeds.find(n => String(n.fields[0].value).toLowerCase().includes(`**${find}:`)) : embeds[0]) ?? embeds[0]
 
-      /* */
 
-      let cache = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../cache/lb.txt'), 'utf8'));
+      let cache = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../cache/lb.json'), 'utf8'));
       cache[title] = embeds
-      await fs.writeFile(path.join(__dirname, '../../../../cache/lb.txt'), JSON.stringify(cache, null, 4), 'utf8', data =>{})
+      await fs.writeFile(path.join(__dirname, '../../../../cache/lb.json'), JSON.stringify(cache, null, 4), 'utf8', data =>{})
+
 
       await interaction.editReply({ embeds: [embed], components: [buttons] })
     },
@@ -147,6 +147,25 @@ module.exports = {
       return interaction.respond(options || [{name: 'Není k dispozici zádný výběr!', value: 'err'}]) 
     },
     recieve: async (uhg, interaction) => {
-      interaction.update({ type: 6 })
+      await interaction.update({ type: 6 })
+
+      const znovu = { title: 'ERROR', description: 'Nepodařilo se načíst cache!\nPoužij prosím příkaz znovu', color: 15158332, footer: {text: 'UHGDevs' }}
+      let embeds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../cache/lb.json'), 'utf8'));
+      let pages = embeds[interaction.message.embeds[0].title]
+
+      if (!pages) return interaction.editReply({ embeds: [znovu], components: [] })
+
+      let pageid = interaction.customId.toLowerCase()
+      let v = interaction.message.embeds[0].footer.text.split("/")[0]
+
+      if (pageid.includes('first')) {
+        await interaction.editReply({ embeds: [pages[0]] })
+      } else if (pageid.includes('back') && v>1) {
+          await interaction.editReply({ embeds: [pages[v-2]] })
+      } else if (pageid.includes('next') && v < pages.length) {
+          await interaction.editReply({ embeds: [pages[v]] })
+      } else if (pageid.includes('last')) await interaction.editReply({ embeds: [pages[pages.length-1]] })
+
+
     }
 }
