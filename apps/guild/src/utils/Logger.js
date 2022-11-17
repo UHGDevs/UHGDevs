@@ -150,4 +150,43 @@ console.time = (message, options) => {
   }
 }
 
+
 module.exports = { getCurrentTime }
+
+
+
+global.renameHypixelGames = (game) =>{
+  if (game === null || game === undefined) return
+  else {
+    return game.toLowerCase()
+      .replace("skywars", "SkyWars")
+      .replace("bedwars", "BedWars")
+      .replace("gingerbread", "TKR")
+      .replace("mcgo", "Cops & Crims")
+      .replace("super_smash", "Smash Heroes")
+      .replace("skyblock", "SkyBlock")
+      .replace("murder_mystery", "Murder Mystery")
+      .replace("legacy", "Classic Games")
+      .replace("survival_games", "Blitz SG")
+      .replace("uhc", "UHC")
+      .replace("speed_uhc", "Speed UHC")
+      .replace("tntgames", "TNT Games")
+      .replace("pit", "The Pit")
+      .replace("arcade", "Arcade Games")
+      .replace("walls3", "Mega Walls")
+      .replace("arena", "Arena Brawl")
+      .replace("vampirez", "VampireZ")
+      .replace("thewalls", "The Walls")
+      .replace("battleground", "Warlords")
+      .replace("build_battle", "Build Battle")
+      .replace("bb", "Build Battle")
+      .replace("tkr", "TKR")
+      .replace("bw", "BedWars")
+      .replace("sw", "SkyWars")
+      .replace("ww", "Wool Wars")
+      .replace("woolgame", "Wool Wars")
+      .replace("wool_game", "Wool Wars")
+      .replace("wool_games", "Wool Wars")
+
+  }
+}

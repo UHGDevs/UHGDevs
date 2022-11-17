@@ -2,7 +2,14 @@
 
 const fs = require('fs');
 const path = require('node:path');
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SelectMenuBuilder } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder } = require('discord.js')
+
+const buttons = new ActionRowBuilder()
+  .addComponents(new ButtonBuilder().setCustomId('lb_cmd_recieve_first').setStyle(1).setEmoji('⏮'))
+  .addComponents(new ButtonBuilder().setCustomId('lb_cmd_recieve_back').setStyle(1).setEmoji('◀'))
+  .addComponents(new ButtonBuilder().setCustomId('lb_cmd_recieve_next').setStyle(1).setEmoji('▶'))
+  .addComponents(new ButtonBuilder().setCustomId('lb_cmd_recieve_last').setStyle(1).setEmoji('⏭'));
+
 
 module.exports = {
     name: 'lb',
@@ -29,6 +36,13 @@ module.exports = {
         type: 3,
         required: false,
         autocomplete: true
+      },
+      {
+        name: 'find',
+        description: 'Chceš najít nějakého hráče??',
+        type: 3,
+        required: false,
+        autocomplete: true
       }
     ],
     type: 'slash',
@@ -51,26 +65,52 @@ module.exports = {
 
       /* where the magic happens */
       
-      let path = ('.' + game.path.replaceAll('/', '.') ?? '').replaceAll('..', '.') 
+      let apipath = ('.' + game.path.replaceAll('/', '.') ?? '').replaceAll('..', '.') 
       let keys = await uhg.getRedisKeys()
       let names = await uhg.redis_get(keys, '.username').then(n => n.data)
-      console.log(names)
-      let stats = await uhg.redis_get(keys, path).then(n => n.data.filter(f => f))
+      let stats = await uhg.redis_get(keys, apipath).then(n => n.data.filter(f => f))
 
       stats = stats.map(n => {
         if (!n[1]) return
         return [names.find(a => a[0] == n[0])[1], (n[1][stat] ? n[1][stat] : n[1][gamemode][stat]) ?? -0]
       }).filter(n => n).sort((a, b) => b[1] - a[1])
 
+      let title = `CZSK ${renameHypixelGames(game.game)} ${gamemode} ${stat} leaderboard`
+      let description = `ㅤ`
 
-      await interaction.editReply({ content: stats.map(n => n[0] + ' ' + n[1]).slice(0, 10).join('\n') /*embeds: []*/ })
+      let format = chunk(stats.map((n, i) => `\`#${i+1}\` ${n.length > 2 ? n[3] + ' ': ''}**${n[0]}:** \`${n[1]}\``), 20)
+      
+      let embeds = format.map((a, i) => { return { title: title, description: description, color: 5592575, footer: { text: `${i+1}/${format.length}`}, fields: [{ name: 'ㅤ', value: a.join("\n"), inline: false}]} })
+      if (!embeds.length) embeds = [{ title: title, description: description, color: 5592575, footer: { text: `${0}/${0}`}, fields: [{ name: 'ㅤ', value: '**V databázi nejsou uloženi žádní hráči**', inline: false}]}]
+      
+
+
+      let find = interaction.options.getString('find')?.toLowerCase()
+      let embed = ((find && find !== 'null') ? embeds.find(n => String(n.fields[0].value).toLowerCase().includes(`**${find}:`)) : embeds[0]) ?? embeds[0]
+
+      /* */
+
+      let cache = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../cache/lb.txt'), 'utf8'));
+      cache[title] = embeds
+      await fs.writeFile(path.join(__dirname, '../../../../cache/lb.txt'), JSON.stringify(cache, null, 4), 'utf8', data =>{})
+
+      await interaction.editReply({ embeds: [embed], components: [buttons] })
     },
-    autocomplete: (uhg, interaction) => {
+    autocomplete: async (uhg, interaction) => {
 
       if (!uhg.redis) return interaction.respond([ {name: 'Není zaplá DB!', value: 'err'} ])
 
       let current = interaction.options._hoistedOptions.filter(n => n.focused)[0].name
       let focused = interaction.options.getFocused()
+
+      if (current == 'find') {
+        let keys = await uhg.getRedisKeys()
+        let names = await uhg.redis_get(keys, '.stats.username').then(n => n.data.filter(a => a && a[1]))
+
+        names = names.sort((a, b) => a[1].localeCompare(b[1]))
+
+        return interaction.respond(names?.map(n => { return {value: n[1], name: n[1]} }).filter(n => n.name.toLowerCase().includes(focused.toLowerCase())).slice(0, 25) || [{ value: 'null', name: 'Nebyl nalezen žádný hráč'}])
+      }
 
       let game = interaction.options.getString('game')
       if (current == 'game') return interaction.respond(uhg.lb?.data?.map(n => { return {value: n.game, name: n.game} }).filter(n => n.name.toLowerCase().includes(focused.toLowerCase())) || []) 
@@ -105,5 +145,8 @@ module.exports = {
       }
       
       return interaction.respond(options || [{name: 'Není k dispozici zádný výběr!', value: 'err'}]) 
+    },
+    recieve: async (uhg, interaction) => {
+      interaction.update({ type: 6 })
     }
 }
