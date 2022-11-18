@@ -8,6 +8,7 @@ const DiscordHandler = require('./discord/DiscordHandler');
 //const MinecraftHandler = require('./minecraft/MinecraftHandler');
 const TimeHandler = require('./time/TimeHandler');
 const Mongo = require('./utils/Mongo');
+const Web = require('./web/Web');
 
 
 class UHGDevs extends Mongo {
@@ -20,6 +21,7 @@ class UHGDevs extends Mongo {
       this.api = new uhgApi({ key: [process.env.api_key, process.env.api_key_2], db: process.env.db, antisniper: process.env.antisniper })
       this.discord = new DiscordHandler(this)
       this.time = new TimeHandler(this)
+      this.web = new Web(this)
       // this.minecraft = new MinecraftHandler(this)
   
       // this.discord.setBridge(this.minecraft)
