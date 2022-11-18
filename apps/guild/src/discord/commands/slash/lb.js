@@ -101,7 +101,6 @@ module.exports = {
     autocomplete: async (uhg, interaction) => {
 
       if (!uhg.redis) return interaction.respond([ {name: 'Není zaplá DB!', value: 'err'} ])
-      interaction.update({ type: 6 })
 
       let current = interaction.options._hoistedOptions.filter(n => n.focused)[0].name
       let focused = interaction.options.getFocused()
