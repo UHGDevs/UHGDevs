@@ -134,11 +134,11 @@ console.date = getCurrentTime
 
 console.mongo = (message, options) => {
   console.log(chalk.bgBlue.black(`[${getCurrentTime()}] Mongo >`) + ' ' + chalk.blue(message))
-  if (global.config?.discord.log_channel === true) {
-    global.logging_channel?.send({
-      content: message
-    })
-  }
+  // if (global.config?.discord.log_channel === true) {
+  //   global.logging_channel?.send({
+  //     content: message
+  //   })
+  // }
 }
 
 console.time = (message, options) => {

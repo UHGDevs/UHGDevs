@@ -50,6 +50,8 @@ module.exports = {
     run: async (uhg, interaction) => {
       await interaction.deferReply({ ephemeral: false }).catch(() => {})
 
+      if (!uhg.redis) return interaction.editReply({ embeds: [{ title: 'ERROR', description: `Není zaplá db!`, footer: { text: 'Ffs'}, color: 15548997 }] })
+
       if (interaction.options._hoistedOptions.find(n => n.value == 'err')) return interaction.editReply({ embeds: [{ title: 'ERROR', description: `... dont try ...`, footer: { text: 'Also, JOIN UHG'}, color: 15548997 }] })
 
       let game = uhg.lb.get(interaction.options.getString('game'))
@@ -99,6 +101,7 @@ module.exports = {
     autocomplete: async (uhg, interaction) => {
 
       if (!uhg.redis) return interaction.respond([ {name: 'Není zaplá DB!', value: 'err'} ])
+      interaction.update({ type: 6 })
 
       let current = interaction.options._hoistedOptions.filter(n => n.focused)[0].name
       let focused = interaction.options.getFocused()
