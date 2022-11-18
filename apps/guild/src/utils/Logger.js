@@ -190,3 +190,25 @@ global.renameHypixelGames = (game) =>{
 
   }
 }
+
+global.defaultConfig = () => {
+  return {
+    dev: true,
+    discord: {
+      prefix: '.',
+      prefix_DEV: ',',
+      enabled: true,
+      bot_messages: false,
+      log_channel: false,
+      clientID: '892275591682883604',
+      clientID_DEV: '892275591682883604',
+      serverID: '758650512827613195',
+      serverID_DEV: '758650512827613195',
+      guildChatChannel: '957005113149521930',
+      guildChatChannel_DEV: '957005113149521930',
+      loggingChannel: '1017334503066320906'
+    },
+    minecraft: { enabled: 'test', prefix: '!' },
+    time: {}
+  }
+}

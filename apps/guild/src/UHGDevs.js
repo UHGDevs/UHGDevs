@@ -38,7 +38,7 @@ class UHGDevs extends Mongo {
   filesCheck() {
     let names = ['gexp', 'lb']
     let files = fs.readdirSync(path.join(__dirname, '../cache'))
-    names.filter(n => !files.includes(n + '.json')).forEach(n => fs.writeFile(path.join(__dirname, '../cache/'+ n + '.json'), '{}', data => {}))
+    names.filter(n => !files.includes(n + '.json')).forEach(n => fs.writeFile(path.join(__dirname, '../cache/'+ n + '.json'), '{}', 'utf-8', data => {}))
   }
 }
 

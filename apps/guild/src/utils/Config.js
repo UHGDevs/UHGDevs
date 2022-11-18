@@ -4,12 +4,12 @@ const path = require('path');
 
 class Config {
   constructor() {
+
     this.readConfig()
-    this.initConfig()
-  }
-  initConfig() {
     fs.watchFile(path.resolve(__dirname, '../../config.json'), () => this.readConfig());
+
   }
+
   readConfig() {
     let config = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../config.json'), 'utf8'))
     if (config.dev === true) {
@@ -40,6 +40,7 @@ class Config {
       }
     }
     await fs.writeFile(path.resolve(__dirname, '../../config.json'), JSON.stringify(config, null, 4), 'utf8', data =>{})
+    await delay(100)
   }
 
   handlePerms(perms, api) {

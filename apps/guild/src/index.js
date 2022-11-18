@@ -7,11 +7,25 @@ dotenv.config();
 
 require('./utils/Logger');
 
-require('./web/public')
-const uhg = require('./UHGDevs')
-global.uhg = uhg
 
-uhg.appStart().then( uhg.appConnect() ).catch(console.error)
+const fs = require('fs');
+const path = require('path');
+
+let config = fs.readdirSync(path.join(__dirname, '../')).filter(n => n == 'config.json').length
+if (!config) fs.writeFile(path.join(__dirname, '../config.json'),  JSON.stringify(defaultConfig(), null, 4), 'utf-8', data => {})
+
+delay(config ? 0 : 100).then(async () => {
+
+    require('./web/public')
+    const uhg = require('./UHGDevs')
+    global.uhg = uhg
+
+    await uhg.appStart()
+
+    await uhg.appConnect()
+
+})
+
 
 
 process.on('SIGINT', async () => {
