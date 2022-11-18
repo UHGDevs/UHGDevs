@@ -28,7 +28,7 @@ module.exports = {
 
         const modal = new ModalBuilder().setCustomId('editlb_cmd_game_'+game).setTitle(`Nová ${game} LB`)
           .addComponents(textBox({ id: 'gamemode', text: 'Jaké chceš mít gamemody?', example: 'overall, threes, fours', value: lb?.gamemode?.join(', ')}))
-          .addComponents(textBox({ id: 'stats', text: 'Jaké chceš mít statistiky?', example: 'level, kills, deaths', value: lb?.stats?.join(', ')}))
+          .addComponents(textBox({ id: 'stats', text: 'Jaké chceš mít statistiky?', example: 'level, kills, deaths', value: lb?.stats?.join(', '), style: 2}))
           .addComponents(textBox({ id: 'default', text: 'Jaká je defaultní statistika?', example: 'level', value: lb?.default}))
           .addComponents(textBox({ id: 'ignore', text: 'Chceš nějaké statistiky ignorovat?', example: '!overall/level, threes/wins', required: false, value: lb?.ignore?.join(', ')}))
           .addComponents(textBox({ id: 'action', text: 'Chceš provést nějakou akci?', example: 'delete|path:' + (lb?.path || 'hypixel/stats/bedwars'), required: false}))
