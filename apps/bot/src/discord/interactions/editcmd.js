@@ -1,6 +1,6 @@
 const { MessageEmbed, MessageButton, MessageActionRow, MessageSelectMenu, Modal, TextInputComponent } = require("discord.js");
 const { stat } = require("fs");
-const canva = require('uhg-canvas')
+const canva = require('../../../../canvas')
 const auth = ['378928808989949964', '312861502073995265', '379640544143343618']
 
 module.exports = async (uhg, interaction) => {

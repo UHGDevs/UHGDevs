@@ -1,4 +1,4 @@
-const canva = require('uhg-canvas')
+const canva = require('../../../../canvas')
 
 const { MessageSelectMenu, MessageButton, MessageActionRow } = require("discord.js");
 const { stat } = require('fs');

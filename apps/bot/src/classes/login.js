@@ -1,7 +1,7 @@
 const { Collection } = require('discord.js');
 const fs = require('fs');
 const { MongoClient } = require("mongodb");
-const { Client } = require('uhg-api')
+const { Client } = require('../../../api')
 
 const Functions = require('./functions.js')
 class Login extends Functions {

@@ -1,7 +1,7 @@
 const { CommandInteraction, MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 
 const fs = require('fs');
-const canva = require('uhg-canvas')
+const canva = require('../../../../canvas')
 
 module.exports = {
   name: "profile",
