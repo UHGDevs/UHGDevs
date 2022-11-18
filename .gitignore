@@ -10,3 +10,6 @@ apps/bot/src/mc
 apps/database/engine
 apps/database/modules
 *.log
+apps/guild/cache/*.json
+apps/guild/config.json
+*.pid
