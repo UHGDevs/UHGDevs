@@ -1,4 +1,7 @@
 
+const path = require('node:path');
+const fs = require('fs');
+
 const uhgApi = require('../../api/src/index').Client;
 
 const DiscordHandler = require('./discord/DiscordHandler');
@@ -10,6 +13,7 @@ const Mongo = require('./utils/Mongo');
 class UHGDevs extends Mongo {
   constructor() {
     super()
+    this.filesCheck()
   }
   async appStart() {
 
@@ -29,6 +33,12 @@ class UHGDevs extends Mongo {
 
     this.time?.init()
    // this.minecraft?.init()
+  }
+
+  filesCheck() {
+    let names = ['gexp', 'lb']
+    let files = fs.readdirSync(path.join(__dirname, '../cache'))
+    names.filter(n => !files.includes(n + '.json')).forEach(n => fs.writeFile(path.join(__dirname, '../cache/'+ n + '.json'), '{}', data => {}))
   }
 }
 
