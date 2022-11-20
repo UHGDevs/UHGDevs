@@ -7,11 +7,10 @@ const uhgApi = require('../../api/src/index').Client;
 const DiscordHandler = require('./discord/DiscordHandler');
 //const MinecraftHandler = require('./minecraft/MinecraftHandler');
 const TimeHandler = require('./time/TimeHandler');
-const Mongo = require('./utils/Mongo');
 const Web = require('./web/Web');
+const CommandsHandler = require('./commands/CommandsHandler');
 
-
-class UHGDevs extends Mongo {
+class UHGDevs extends CommandsHandler {
   constructor() {
     super()
     this.filesCheck()

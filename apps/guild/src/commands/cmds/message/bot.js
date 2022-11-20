@@ -30,7 +30,7 @@ module.exports = {
                 });
                 uhg.stopBot('Restarting bot')
             } else if (args[1] == 'commands') {
-                return uhg.discord.createCommands()
+                return uhg.createCommands()
             }
         } else return 'more category soon'
     }
