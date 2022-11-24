@@ -9,7 +9,7 @@ module.exports = {
   name: eventName,
   description: "Automatičtí elite members",
   emoji: '👨‍🦼',
-  time: '0 0 6 * * 1', //'*/10 * * * * *'
+  time: '0 55 4 * * 1', //'*/10 * * * * *'
   ignore: '* * * * * *', //'sec min hour den(mesic) mesic den(tyden)'
   onstart: false,
   run: async (uhg) => {
