@@ -16,6 +16,8 @@
         "bwroles": true,
         "achievements": true,
         "qotd": true
+        "qotd": true,
+        "forums": true
     },
     "dev_mode": false
 }
