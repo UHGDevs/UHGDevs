@@ -137,9 +137,9 @@ module.exports = {
 
       let data = uhg.data.stats.length ? uhg.data.stats : await uhg.mongo.run.get("stats", "stats")
 
-      if ((game == 'duels' || game == 'arena' || game == 'quake' || game == 'murder' || game == 'bb' || game == 'thewalls' || game == 'vampirez' || game == 'warlords' || game == 'megawalls' || game == 'tntgames') && stat == 'level') stat = 'wins'
+      if ((game == 'duels' || game == 'arena' || game == 'murder' || game == 'bb' || game == 'thewalls' || game == 'vampirez' || game == 'warlords' || game == 'megawalls' || game == 'tntgames') && stat == 'level') stat = 'wins'
       else if (game == 'tkr' && stat == 'level') stat = 'gold'
-      else if ((game == "paintball" || game == 'cac' || game == 'blitz') && stat == 'level') stat = "kills"
+      else if ((game == "paintball" || game == 'cac' || game == 'blitz' || game == 'quake') && stat == 'level') stat = "kills"
       else if (game == 'pit' && stat == 'level') stat = 'xp'
       else if (game == 'uhc' && stat == 'level') stat = 'score' 
 
