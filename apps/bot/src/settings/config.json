@@ -15,7 +15,6 @@
         "gameplayers": true,
         "bwroles": true,
         "achievements": true,
-        "qotd": true
         "qotd": true,
         "forums": true
     },
