@@ -7,7 +7,7 @@ module.exports = async (uhg, interaction) => {
   else if (interaction.isCommand()) require('../interactions/slashcommands')(uhg, interaction)
   else if ((interaction.isButton() || interaction.isSelectMenu() || interaction.isModalSubmit()) && interaction.customId.startsWith('ECMD_'))  require('../interactions/editcmd')(uhg, interaction);
   else if (interaction.customId && interaction.customId.startsWith('ECMD_')) await interaction.update({ type:6 });
-  else if (interaction.customId.startsWith('FORUMS')) require(`../interactions/forums`)(uhg, interaction)
+  else if (interaction.customId && interaction.customId.startsWith('FORUMS')) require(`../interactions/forums`)(uhg, interaction)
   else if (interaction.isButton() && (interaction.customId.startsWith('/g ') || interaction.customId == 'guild_denine')) require('../interactions/guild_command')(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('GEXP')) require('../interactions/gexp')(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('LB')) require('../interactions/lb')(uhg, interaction)
