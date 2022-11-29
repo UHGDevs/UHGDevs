@@ -11,27 +11,41 @@ class MessageHandler {
 
   async onMessage(message) {
     if (message.author.id == global.config.discord.clientID) return
-    if (!message.author.bot && (message.channel.id == global.config.discord.officerChannel || message.channel.id == global.config.discord.guildChatChannel) && message.content && message.content.length > 0) this.bridge(message);
+    if (!message.author.bot && (message.channel.id == global.config.discord.officerChannel || message.channel.id == global.config.discord.guildChatChannel) && message.content && message.content.length > 0) this.bridge(message); // add function for this (also with tkjk)
     if (message.channel.type === 1) dc_client.channels.cache.get('1027491511857840168')?.send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
 
+
+    if (message.content.startsWith(this.config.prefix)) this.runCommand(message) // pridat mc channels with mc prefix
+  }
+
+  async runCommand(message) {
+    let commands = this.uhg.commands.filter(n => n.type?.includes('message'))
+
+    let args = message.content.replace(this.config.prefix, '').split(' ').filter(n => n).map(n => n.trim())
+    let cmd = commands.get(args[0].toLowerCase()) || commands.get(this.uhg.aliases.get(args[0].toLowerCase()))
+    if (!cmd) return
+
+    let data = {} // verify & premium data
     let reply;
 
-    if (message.content.startsWith(this.config.prefix)) {
-      let commands = this.uhg.commands.filter(n => n.type?.includes('message'))
+    let perms = this.uhg.handlePerms(cmd.permissions, message) // ADD user stats (for premium), maybe add reason? (who has access)
 
-      let args = message.content.replace(this.config.prefix, '').split(' ').map(n => n.trim())
-      let cmd = commands.get(args[0].toLowerCase()) || commands.get(this.uhg.aliases.get(args[0].toLowerCase()))
-      if (cmd) {
-        let perms = this.uhg.handlePerms(cmd.permissions, message)
-        if (perms) reply = await cmd?.run(this.uhg, message, message.content.replace(this.config.prefix, '').replace(args[0], '').trim()).catch(async (e) => message.reply({ embeds: [await console.error(e)], failIfNotExists: false }))
-        else reply = `${message.member.nickname || message.author.username} nemá oprávnění na \`${cmd.name}\` příkaz!`
-      }
-    }
+    if (!perms) reply = `${message.member.nickname || message.author.username} nemá oprávnění na \`${cmd.name}\` příkaz!`
+    else if (cmd.platform === 'dc') reply = await cmd?.run(this.uhg, message, message.content.replace(this.config.prefix, '').replace(args[0], '').trim()).catch(async (e) => message.reply({ embeds: [await console.error(e)], failIfNotExists: false }));
+    else if (cmd.platform === 'mc') reply = await cmd?.run(this.uhg, {username: args[0], nickname: args[0], msg: message.content.replace(this.config.prefix, '').replace(args[0], '').trim(), user: data}).catch(async (e) => message.reply({ embeds: [await console.error(e)], failIfNotExists: false }));
 
-    if (reply && typeof reply === 'string') {
-      console.discord(reply)
-      message.reply({ content: reply, failIfNotExists: false })
-    }
+    if (!reply) return
+
+
+    console.discord(typeof reply === 'string' ? reply : reply.msg)
+    let dcreply = { failIfNotExists: false }
+    if (typeof reply === 'string') dcreply.content = reply
+    else if (reply.embed) dcreply.embeds = [reply.embed]
+    else if (reply.msg) dcreply.content = reply.msg
+
+    message.reply(dcreply)
+    
+
   }
 
   async bridge(message) {
