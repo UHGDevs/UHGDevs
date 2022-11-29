@@ -17,6 +17,7 @@
     "flying-squid": "^1.5.0",
     "mineflayer": "^4.5.1",
     "mongodb": "^4.12.0",
-    "redis": "^4.5.0"
+    "redis": "^4.5.0",
+    "rss-parser": "^3.12.0"
   }
 }
