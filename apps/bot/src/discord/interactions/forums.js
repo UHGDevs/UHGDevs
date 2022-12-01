@@ -95,9 +95,9 @@ module.exports = async (uhg, interaction) => {
         let msg = `\n${interaction.message?.embeds[0].url}`
         if (interaction.message?.embeds[0].fields[5] && interaction.message?.embeds[0].fields[5].value !== '*Žádný*') msg = `${interaction.message?.embeds[0].fields[5].value} ${msg}`
         if (interaction.message?.embeds[0].fields[3].value !== '*Žádná*') msg = `[${interaction.message?.embeds[0].fields[3].value}] ${msg}`
-        channel.send({ content: msg, allowedMentions: { parse: ["everyone", "roles"] } })
+        let sent = await channel.send({ content: msg, allowedMentions: { parse: ["everyone", "roles"] } })
         await interaction.editReply( { components: [] } )
-        await uhg.mongo.run.update("general", "forums", {link: interaction.message?.embeds[0].url}, {announced: true})
+        await uhg.mongo.run.update("general", "forums", {link: interaction.message?.embeds[0].url}, {announced: true, messageId: sent?.id})
     } else if (customId[1] === "customtext") {
         let component = new MessageActionRow().addComponents(new TextInputComponent().setCustomId(`FORUMS_customtextComp`).setLabel("Vlastní text:").setStyle('PARAGRAPH').setPlaceholder("[@ping] TEXT... https://url.cz \n\n! ! ! NAPIŠ POUZE TEN TEXT, NIC JINÉHO, NE ODKAZ ANI ZMÍNKU ! ! !").setMaxLength(1500).setRequired(false));
         let modal = new Modal().setCustomId(`FORUMS_customtextModal`).setTitle(`Vlastní text do Oznámení [FORUMS]`).addComponents(component)

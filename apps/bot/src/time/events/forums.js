@@ -21,15 +21,15 @@ module.exports = {
         let data = await uhg.mongo.run.get('general', 'forums')
         let dataMain = data.filter(n => n.category == "main")
         let dataSb = data.filter(n => n.category == "sb")
-        let maxValueMain = Math.max(...dataMain.map(o => o.guid))
-        let maxValueSb = Math.max(...dataSb.map(o => o.guid))
-
+        let maxValueMain = 5133475//Math.max(...dataMain.map(o => o.guid))
+        let maxValueSb = 5133475//Math.max(...dataSb.map(o => o.guid))
+        
         let feed = {main: feedMain.items, sb: feedSb.items}
 
         for (let i in { ...feed.main, ...feed.sb }) {
           let category;
-          if (feed.main[i].guid > maxValueMain) category = 'main'
-          else if (feed.sb[i].guid > maxValueSb) category = 'sb'
+          if (feed.main[i].guid > maxValueMain && !data.filter(n => n.guid == feed.main[i].guid).length) category = 'main'
+          else if (feed.sb[i].guid > maxValueSb && !data.filter(n => n.guid == feed.sb[i].guid).length) category = 'sb'
           if (category) {// provede se pokud guid článku je větší než nejvyšší guid v databázi pod tou kategorií konkrétní
             await uhg.mongo.run.post("general", "forums", {_id:Number(data.length), title: feed[category][i].title, pubDate: feed[category][i].pubDate, creator: feed[category][i].creator, link: feed[category][i].link, guid: feed[category][i].guid, category: category})
             let channel = await uhg.dc.client.channels.cache.get('530496801782890527') // ADMIN CHAT
