@@ -43,23 +43,23 @@ module.exports = async (hypixel = {} , uuid, client) => {
     seasonal: {
       summer: {
         "2022": {
-          experience: hypixel.seasonal?.summer?.["2022"]?.levelling.experience || 0,
-          level: 1+(hypixel.seasonal?.summer?.["2022"]?.levelling.experience || 0)/25000,
-          xpleft: 25000-((hypixel.seasonal?.summer?.["2022"]?.levelling.experience || 0)/25000-Math.floor((hypixel.seasonal?.summer?.["2022"]?.levelling.experience || 0)/25000))*25000
+          experience: hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0,
+          level: 1+(hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000,
+          xpleft: 25000-((hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000-Math.floor((hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000))*25000
         }
       },
       halloween: {
         "2022": {
-          experience: hypixel.seasonal?.halloween?.["2022"]?.levelling.experience || 0,
-          level: 1+(hypixel.seasonal?.halloween?.["2022"]?.levelling.experience || 0)/10000,
-          xpleft: 10000-((hypixel.seasonal?.halloween?.["2022"]?.levelling.experience || 0)/10000-Math.floor((hypixel.seasonal?.halloween?.["2022"]?.levelling.experience || 0)/10000))*10000
+          experience: hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0,
+          level: 1+(hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000,
+          xpleft: 10000-((hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000))*10000
         }
       },
       christmas: {
         "2022": {
-          experience: hypixel.seasonal?.christmas?.["2022"]?.levelling.experience || 0,
-          level: 1+(hypixel.seasonal?.christmas?.["2022"]?.levelling.experience || 0)/10000,
-          xpleft: 10000-((hypixel.seasonal?.christmas?.["2022"]?.levelling.experience || 0)/10000-Math.floor((hypixel.seasonal?.christmas?.["2022"]?.levelling.experience || 0)/10000))*10000
+          experience: hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0,
+          level: 1+(hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000,
+          xpleft: 10000-((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000))*10000
         }
       },
       silver: hypixel.seasonal?.silver || 0,
