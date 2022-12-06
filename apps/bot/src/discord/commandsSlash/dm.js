@@ -2,7 +2,7 @@
 module.exports = {
   name: 'dm',
   description: 'Message group of users!',
-  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}, { id: '312861502073995265', type: 'USER', permission: true},  { id: '379640544143343618', type: 'USER', permission: true}],
+  permissions: [{ id: '378928808989949964', type: 'USER', permission: true}, { id: '312861502073995265', type: 'USER', permission: true},  { id: '379640544143343618', type: 'USER', permission: true}, { id: '427198829935460353', type: 'USER', permission: true}],
   options: [
     {
       name: 'role',
