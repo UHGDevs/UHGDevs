@@ -3,7 +3,7 @@ const { MessageEmbed } = require("discord.js")
 module.exports = {
   name: 'qotd',
   description: 'Command for UHG QOTD',
-  permissions: [ {id: '378928808989949964', type: 'USER', permission: true }, { id: '660441379310272513', type: 'USER', permission: true}],
+  permissions: [ {id: '378928808989949964', type: 'USER', permission: true }, { id: '660441379310272513', type: 'USER', permission: true}, { id: '456149035481563147', type: 'ROLE', permission: true }, { id: '572651929625296916', type: 'ROLE', permission: true }, { id: '478610913386168360', type: 'ROLE', permission: true }],
   options: [
     {
       name: 'question',
