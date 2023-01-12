@@ -47,9 +47,9 @@ module.exports = (hypixel) => {
         },
 
         overall: {
-            wins: arena.wins || 0,
+            wins: arena.wins || (arena.wins_1v1 || 0)+(arena.wins_2v2 || 0)+(arena.wins_4v4 || 0) || 0,
             losses: overall_arena_losses,
-            wlr: func.ratio(arena.wins, overall_arena_losses) || 0,
+            wlr: func.ratio(arena.wins || (arena.wins_1v1 || 0)+(arena.wins_2v2 || 0)+(arena.wins_4v4 || 0), overall_arena_losses) || 0,
             kills: overall_arena_kills,
             deaths: overall_arena_deaths,
             kdr: func.ratio(overall_arena_kills, overall_arena_deaths) || 0,
