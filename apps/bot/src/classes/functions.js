@@ -16,7 +16,8 @@ module.exports = class Functions extends EventEmitter {
           if (n < info.req[i][0]) return -1
           else if (n < info.req[i][1]) return 0
           else if (n < info.req[i][2]) return 1
-          else return 2
+          else if (n < info.req[i][3]) return 2
+          else return -1
       })
       let role_i = Math.min(...stats)
       let stat_role = role_i >= 0 ? info.roles[role_i] : null
