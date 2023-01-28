@@ -71,8 +71,6 @@ class Client extends Nw {
 
     this.calls.set('skyblock', 'skyblock')
     this.calls.set('sb', 'skyblock')
-
-    this.calls.set('friends', 'friends')
     
   }
 

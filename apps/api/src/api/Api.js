@@ -39,7 +39,7 @@ class Api extends CreateUser {
     for (let call of calls) {
       /* require api from database (aliases) */
       let fetcher = this.client.calls.get(call.toLowerCase())
-      if (!fetcher) return resolve ({ success: false, reason: `${call} is invalide name of api`})
+      if (!fetcher) return resolve ({ success: false, reason: `${call} is invalid name of api`})
 
       promises.push( require(`./${fetcher}`).call(options) );
     }

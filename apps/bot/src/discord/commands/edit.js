@@ -17,7 +17,7 @@ module.exports = {
       let data = await uhg.mongo.run.get('general', 'commands', { _id: cmd }).then(n=> n[0]|| null)
       if (!data) return 'Command nebyl nalezen'
 
-      let api = await uhg.api.call(args[1] || 'DavidCzPdy', ['hypixel', 'guild', 'friends', 'online'], { premium: true} )
+      let api = await uhg.api.call(args[1] || 'DavidCzPdy', ['hypixel', 'guild', 'online'], { premium: true} )
       if (!api.success) return api.reason
       
       let img = await canva.run(data, api)
