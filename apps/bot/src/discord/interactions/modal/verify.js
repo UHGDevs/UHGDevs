@@ -106,7 +106,8 @@ exports.get = async (uhg, interaction) => {
     if (guildfiltered.length) {
         await uhg.mongo.run.delete("general", "uhg", {_id:guildfiltered[0]._id})
         let rank;
-        rank = api.guild.all.members.filter(n => n.uuid == api.uuid)[0].rank
+        //rank = api.guild.all.members.filter(n => n.uuid == api.uuid)[0].rank
+        rank = api.guild.member.rank
         await uhg.mongo.run.post("general", "uhg", {_id: user.id, username: username, uuid: api.uuid, guildrank: rank})
     }
 
@@ -117,23 +118,23 @@ exports.get = async (uhg, interaction) => {
     else await interaction.editReply({ content: `Změnil sis jméno z \`${verified[0].nickname}\` na \`${username}\`!` });
 
     if (!uhg.data.stats.filter(n => n.uuid == api.uuid).length && !interaction.member.roles.cache.some(r => r.id == "985095284893814814")) {
-    let buttons = new MessageActionRow()
-        .addComponents(new MessageButton()
-            .setCustomId(`VERLANG-${api.hypixel.username}-${api.uuid}-accept`)
-            .setStyle("SUCCESS")
-            .setLabel("Přidat do databáze")
-        )
-        .addComponents(new MessageButton()
-            .setCustomId(`VERLANG-${api.hypixel.username}-${api.uuid}-reject`)
-            .setStyle("DANGER")
-            .setLabel("Nepřidávat do databáze")
-        );
-    let embed = new MessageEmbed()
-        .setTitle(`**${uhg.dontFormat(api.hypixel.username)}**`)
-        .setDescription(`Jazyk: **${language.toUpperCase()}**`)
-        .setColor(5592575);
-    let channel = await uhg.dc.client.channels.cache.get('530496801782890527')
-    channel.send({ embeds: [embed], components: [buttons] })
+        let buttons = new MessageActionRow()
+            .addComponents(new MessageButton()
+                .setCustomId(`VERLANG-${api.hypixel.username}-${api.uuid}-accept-${user.id}`)
+                .setStyle("SUCCESS")
+                .setLabel("Přidat do databáze")
+            )
+            .addComponents(new MessageButton()
+                .setCustomId(`VERLANG-${api.hypixel.username}-${api.uuid}-reject-${user.id}`)
+                .setStyle("DANGER")
+                .setLabel("Nepřidávat do databáze")
+            );
+        let embed = new MessageEmbed()
+            .setTitle(`**${uhg.dontFormat(api.hypixel.username)}**`)
+            .setDescription(`Jazyk: **${language.toUpperCase()}**`)
+            .setColor(5592575);
+        let channel = await uhg.dc.client.channels.cache.get('530496801782890527')
+        channel.send({ embeds: [embed], components: [buttons] })
    }
 
    uhg.dc.client.channels.cache.get('548772550386253824').send({ content: `${custom?'Custom ':''}Verify: ${user || username} - ${language} (temp msg)`, allowedMentions: { parse: [] } })

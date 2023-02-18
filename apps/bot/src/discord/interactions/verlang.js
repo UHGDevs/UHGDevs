@@ -17,7 +17,8 @@ module.exports = async (uhg, interaction) => {
     await interaction.editReply({ components: [accept] })
   }
   else if (customId[3] == "reject") {
-    interaction.member.roles.add(interaction.member.guild.roles.cache.find(role => role.id == "985095284893814814"))
+    let members = await interaction.member.guild.members.fetch()
+    members.get(customId[4]).roles.add(interaction.member.guild.roles.cache.find(role => role.id == "985095284893814814"))
     embed = new MessageEmbed().setTitle(`${customId[1]} nebyl přidán do databáze`).setColor("RED")
     await interaction.editReply({ components: [reject] })
   }
