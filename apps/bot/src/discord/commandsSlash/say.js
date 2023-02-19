@@ -32,7 +32,7 @@ module.exports = {
     try {
       require("../../minecraft/send.js").send(uhg, {send: msg})
         
-      let embed = new MessageEmbed().setTitle(msg).setAuthor({name:`${interaction.user.username}#${interaction.user.discriminator}`})
+      let embed = new MessageEmbed().setTitle(msg).setAuthor({name:`${interaction.user.username}#${interaction.user.discriminator}`, iconURL: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`})
       interaction.editReply({ embeds: [embed] })
 
     } catch (e) {
