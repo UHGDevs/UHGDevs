@@ -6,7 +6,7 @@ const guildrefresh = require('../../utils/guildrefresh');
 module.exports = {
   name: 'unelites',
   description: 'Show most unactive members',
-  permissions: [],
+  permissions: [{ id: '530504567528620063', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '530504766225383425', type: 'ROLE', permission: true}],
   options: [
     {
       name: 'guild',
@@ -106,9 +106,9 @@ module.exports = {
       interaction.editReply({ embeds: [embed] })
 
     } catch (e) {
-      if (uhg.dc.cache.embeds) interaction.editReply({ embeds: [uhg.dc.cache.embeds.error(e, 'TIME Slash Command')] })
+      if (uhg.dc.cache.embeds) interaction.editReply({ embeds: [uhg.dc.cache.embeds.error(e, 'unelites Slash Command')] })
       else console.log(String(e).bgRed + ' neni loaded')
-      return "Chyba v TIME slash commandu!"
+      return "Chyba v unelites slash commandu!"
     }
   }
 }
