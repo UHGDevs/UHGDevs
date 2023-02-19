@@ -58,18 +58,22 @@ module.exports = async (uhg, message) => {
 
   if (uhg.test.server){
     if (content == "gfind") await uhg.test.server.broadcast(`§2Guild > §b[MVP§8+§b] Honzu §e[Gnrl]§f: někdo bedwars? je to nejlepší hra`)
-    if (content == "gcmd") await uhg.test.server.broadcast(`§2Guild > §b[MVP§8+§b] Farmans §e[Gnrl]§f: !level Honzu`)
-    if (content == "gchat") await uhg.test.server.broadcast(`§2Guild > §a[VIP§6+§a] The_AntiFrost_SK§f [Elite]: necham drakov`);
-    if (content == "mvp") await uhg.test.server.broadcast(`§2Guild > §b[MVP] Zayoo§f: necham drakov`)
-    if (content == "pchat") await uhg.test.server.broadcast(`§2Party > §a[VIP§6+§a] AntreX95§f: necham drakov`);
-    if (content == "non") await uhg.test.server.broadcast(`§2Guild > §7Drunter6§f [Elite]: necham drakov`)
-    if (content == "msg") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: !online Honzu`)
-    if (content == "join") await uhg.test.server.broadcast(`§2Guild >  Farmans joined.`)
-    if (content == "gjoin") await uhg.test.server.broadcast(`§b[MVP§8+§b] JkGalaktus§f has requested to join the Guild!`)
-    if (content == "promote") await uhg.test.server.broadcast(`§a[VIP] UHGuild was promoted from Member to Manager`)
-    if (content == "demote") await uhg.test.server.broadcast(`§a[VIP] UHGuild was demoted from Manager to Member`)
-    if (content == "fevent") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: 0 0 0 0`)
-    if (content == "event") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: -77 86 65 0`)
-    if (content.split(" ")[0] == "c") await uhg.test.server.broadcast(`§2Guild > §b[MVP§8+§b] Farmans §e[Gnrl]§f: !${content.split(" ")[1]} Honzu`)
+    else if (content == "gcmd") await uhg.test.server.broadcast(`§2Guild > §b[MVP§8+§b] Farmans §e[Gnrl]§f: !level Honzu`)
+    else if (content == "gchat") await uhg.test.server.broadcast(`§2Guild > §a[VIP§6+§a] The_AntiFrost_SK§f [Elite]: necham drakov`);
+    else if (content == "mvp") await uhg.test.server.broadcast(`§2Guild > §b[MVP] Zayoo§f: necham drakov`)
+    else if (content == "pchat") await uhg.test.server.broadcast(`§2Party > §a[VIP§6+§a] AntreX95§f: necham drakov`);
+    else if (content == "non") await uhg.test.server.broadcast(`§2Guild > §7Drunter6§f [Elite]: necham drakov`)
+    else if (content == "msg") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: !online Honzu`)
+    else if (content == "join") await uhg.test.server.broadcast(`§2Guild >  Farmans joined.`)
+    else if (content == "gjoin") await uhg.test.server.broadcast(`§b[MVP§8+§b] JkGalaktus§f has requested to join the Guild!`)
+    else if (content == "promote") await uhg.test.server.broadcast(`§a[VIP] UHGuild was promoted from Member to Manager`)
+    else if (content == "demote") await uhg.test.server.broadcast(`§a[VIP] UHGuild was demoted from Manager to Member`)
+    else if (content == "fevent") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: 0 0 0 0`)
+    else if (content == "event") await uhg.test.server.broadcast(`From §6[MVP§9+§6] Farmans: -77 86 65 0`)
+    else if (content.split(" ")[0] == "c") await uhg.test.server.broadcast(`§2Guild > §b[MVP§8+§b] Farmans §e[Gnrl]§f: !${content.split(" ")[1]} Honzu`)
+    else if (content == "glvl") await uhg.test.server.broadcast(`The Guild has reached Level 180!`)
+    else if (content == "gtier") await uhg.test.server.broadcast(`The guild has completed Tier 1 of this week's Guild Quest! +50000 Guild Experience`)
+    else if (content == "gleft") await uhg.test.server.broadcast(`[MVP+] pepek_namorniik left the guild!`)
+    else if (content == "left") await uhg.test.server.broadcast(`Guild >  Nelio left.`)
   }
 }
