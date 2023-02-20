@@ -1,9 +1,5 @@
 const { MessageEmbed, MessageButton, MessageActionRow } = require("discord.js");
 
-let denined =  new MessageActionRow().addComponents(new MessageButton().setCustomId('guild_denined').setLabel('ODMÍTNUTO').setStyle('DANGER').setDisabled(true))
-let accepted =  new MessageActionRow().addComponents(new MessageButton().setCustomId('guild_accepted').setLabel('PŘIJATO').setStyle('SUCCESS').setDisabled(true))
-let invited =  new MessageActionRow().addComponents(new MessageButton().setCustomId('guild_invited').setLabel('POZVÁNO').setStyle('PRIMARY').setDisabled(true))
-
 module.exports = async (uhg, interaction) => {
   let type = interaction.customId.split('_')[2]
   try { await interaction.update({ type: 6 }) } catch (e) {}
