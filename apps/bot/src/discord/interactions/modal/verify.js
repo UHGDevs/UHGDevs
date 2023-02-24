@@ -90,6 +90,8 @@ exports.get = async (uhg, interaction) => {
 
     let bwMember = gBw.members.cache.get(user.id)
     if (bwMember) { // BW Discord server
+        let bedwars = api.hypixel.stats.bedwars
+        gBw.channels.cache.get("877432655954706473").send({ content: `${bwMember.user} se právě verifikoval!\n**BedWars**: ${bedwars.levelformatted} **${api.username}** - ${uhg.f(bedwars.overall.finalKills)}Finals ${uhg.f(bedwars.overall.wins)}Wins ${uhg.f(bedwars.overall.fkdr)}FKDR ${uhg.f(bedwars.overall.wlr)}WLR\nPlancke: https://plancke.io/hypixel/player/stats/${api.username}`, allowedMentions: { parse: [] }})
         refresh.bw_refresh(uhg, bwMember, api.hypixel)
     }
 
