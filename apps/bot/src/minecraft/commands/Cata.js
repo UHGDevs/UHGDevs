@@ -21,8 +21,8 @@ module.exports = {
       let catalevel = profil.level || 0
       let secrets = profil.secrets || 0
       let secretsratio = profil.secretsratio || 0
-      let clas = profil.class || "nic"
-      let message = `Cata: [${catalevel}] **${api.username}** - ${uhg.f(secrets)} secrets - ${uhg.f(secretsratio)} secrets/run (${clas})`
+      let clas = profil.class || "Class None"
+      let message = `Cata: [${catalevel}] **${api.username}** - ${uhg.f(secrets)} Secrets | ${uhg.f(secretsratio)} Secrets/Run | ${uhg.f(profil.bloodmobkills || 0)} Blood Kills | ${uhg.capitalize(clas)}`
       return message
     } catch (e) {
         console.log(String(e.stack).bgRed)

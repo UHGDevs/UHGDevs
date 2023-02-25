@@ -1307,7 +1307,8 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         let berserk = getLevelByXp(classes.berserk.experience, "dungeons")
         let archer = getLevelByXp(classes.archer.experience, "dungeons")
         let tank = getLevelByXp(classes.tank.experience, "dungeons")
-       let catalvl = await getCataLvl(catacombs.experience||0)
+        let catalvl = await getCataLvl(catacombs.experience||0)
+        let bloodmobkills = (profiles[i].members[uuid]?.stats?.kills_watcher_summon_undead || 0) + (profiles[i].members[uuid]?.stats?.kills_master_watcher_summon_undead || 0)
 
        api.skyblock.dungeons[profilname] = {
          level: catalvl,
@@ -1322,6 +1323,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
          berserklvl: berserk,
          archerlvl: archer,
          tanklvl: tank,
+         bloodmobkills: bloodmobkills
        }
       }
     }
