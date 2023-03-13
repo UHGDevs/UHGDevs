@@ -13,11 +13,10 @@ module.exports = class Functions extends EventEmitter {
       if (!info) return {}
       let stats = info.stats.map(n => this.path(info.path+n, api))
       stats = stats.map((n, i) => {
-          if (n < info.req[i][0]) return -1
+          if (n < info.req[i][0] || !n) return -1
           else if (n < info.req[i][1]) return 0
           else if (n < info.req[i][2]) return 1
-          else if (n < info.req[i][3]) return 2
-          else return -1
+          else return 2
       })
       let role_i = Math.min(...stats)
       let stat_role = role_i >= 0 ? info.roles[role_i] : null
