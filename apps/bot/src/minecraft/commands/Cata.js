@@ -1,6 +1,6 @@
 module.exports = {
   name: "Cata",
-  aliases: ["cata", "catacombs"],
+  aliases: ["cata", "catacombs", "dungs", "dung", "dungeons", "dungeon", "catacomb"],
   type: 'skyblock',
   run: async (uhg, pmsg) => {
     try {
