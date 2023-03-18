@@ -884,9 +884,10 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       goldbought: vampirez.gold_bought || 0
     }
 
+    most_used_blitz_kit = Object.keys(blitz).filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal").reduce((a, b) => blitz[a] > blitz[b] ? a : b, "None")
     api.hypixel.stats.tourney = {
       games: ctourney.games_played || 0,
-      maxgames: 72, //   ! UPDATOVAT !
+      maxgames: 70, //   ! UPDATOVAT !
       playtime: ctourney.playtime || 0,
       tributes: ctourney.tributes_earned || 0,
       totaltributes: tourney.total_tributes || 0,
@@ -934,7 +935,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         gold: tkr.tourney_gingerbread_solo_1_gold_trophy || 0,
         wlr: (tkr.tourney_gingerbread_solo_1_gold_trophy || 0)/((ctourney.games_played || 0)-(tkr.tourney_gingerbread_solo_1_gold_trophy || 0)) || 0,
       },
-      quake_solo2_1: {
+      quake_solo2_2: {
         games: ctourney.games_played || 0,
         wins: blitz.tourney_blitz_duo_2_wins_teams || 0,
         losses: (ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0),
@@ -943,7 +944,8 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         deaths: blitz.tourney_blitz_duo_2_deaths || 0,
         kdr: ratio(blitz.tourney_blitz_duo_2_kills || 0, blitz.tourney_blitz_duo_2_deaths || 0) || 1,
         playtime: blitz.tourney_blitz_duo_2_time_played || 0,
-        mostusedkit: Object.keys(blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")).reduce((a, b) => blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")[a] > blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")[b] ? a : b)
+        mostusedkit: most_used_blitz_kit.split("_")[most_used_blitz_kit.split("_").length-1]
+
       }
     }
 
