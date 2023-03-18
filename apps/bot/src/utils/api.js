@@ -94,7 +94,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     if (!hypixel.player) return "Hráč nikdy nebyl na hypixelu"
     if (!hypixel.player.stats || false) return "Hráč nehrál žádnou minihru"
 
-    var currenttourney = "gingerbread_solo_1" //  ! CURRENT TOURNAMENT !
+    var currenttourney = "quake_solo2_2" //  ! CURRENT TOURNAMENT !
 
     hypixel = hypixel.player
     var achievements = hypixel.achievements || {}
@@ -933,6 +933,17 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         silver: tkr.tourney_gingerbread_solo_1_silver_trophy || 0,
         gold: tkr.tourney_gingerbread_solo_1_gold_trophy || 0,
         wlr: (tkr.tourney_gingerbread_solo_1_gold_trophy || 0)/((ctourney.games_played || 0)-(tkr.tourney_gingerbread_solo_1_gold_trophy || 0)) || 0,
+      },
+      quake_solo2_1: {
+        games: ctourney.games_played || 0,
+        wins: blitz.tourney_blitz_duo_2_wins_teams || 0,
+        losses: (ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0),
+        wlr: ratio(blitz.tourney_blitz_duo_2_wins_teams || 0, ((ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0))) || 1,
+        kills: blitz.tourney_blitz_duo_2_kills || 0,
+        deaths: blitz.tourney_blitz_duo_2_deaths || 0,
+        kdr: ratio(blitz.tourney_blitz_duo_2_kills || 0, blitz.tourney_blitz_duo_2_deaths || 0) || 1,
+        playtime: blitz.tourney_blitz_duo_2_time_played || 0,
+        mostusedkit: Object.keys(blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")).reduce((a, b) => blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")[a] > blitz.filter(n => n.startsWith("tourney_blitz_duo_2_wins_teams_") && n !== "tourney_blitz_duo_2_wins_teams_normal")[b] ? a : b)
       }
     }
 

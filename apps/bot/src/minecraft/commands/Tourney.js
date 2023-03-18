@@ -10,7 +10,7 @@ module.exports = {
         if (getmode) args1 = getmode.split(" ")[0]
         if (getmode) args2 = getmode.split(" ")[1]
         let mode;
-        let gamealiases = ["tkr", "turbokartracers"] //   UPDATOVAT
+        let gamealiases = ["bsg", "blitz", "sg", "blitzsg", "survivalgames", "blitzsurvivalgames"] //   UPDATOVAT
         let all = ["basic", "b", "normal", "overall", "základní", "game", "stats", "g"].concat(gamealiases)
         let game = ["game", "stats", "g"].concat(gamealiases);
         let basic = ["basic", "b", "normal", "overall", "základní"]
@@ -24,13 +24,13 @@ module.exports = {
         if (api instanceof Object == false) return api
         let tourney = api.hypixel.stats.tourney
         let currenttournament = tourney.currenttournament
-        let ctfancy = "TKR" //   UPDATOVAT
+        let ctfancy = "Blitz Duo" //   UPDATOVAT
         let ctourney = tourney[currenttournament]
         if (!currenttournament) return "Momentálně se neodehrává žádný turnaj"
   
         let message = `Použij příkaz takhle: "!tourney game" nebo "!tourney basic"`
         if (mode === "basic") message = `**${ctfancy} Tourney**: **${api.username}** - ${tourney.games}/${tourney.maxgames} Games - ${tourney.tributes}/100 Tributes (Total: ${tourney.totaltributes}) - ${tourney.playtime}min Playtime`
-        else if (mode === "game") message  = `**${ctfancy} Tourney**: **${api.username}** - ${uhg.f(ctourney.trophies)} Trophies (Gold - ${uhg.f(ctourney.gold)}, Silver - ${uhg.f(ctourney.silver)}, Bronze - ${uhg.f(ctourney.bronze)}) ${uhg.f(ctourney.wlr)}WLR ${uhg.f(ctourney.trophyratio)} Trophy Ratio`
+        else if (mode === "game") message  = `**${ctfancy} Tourney**: **${api.username}** - ${uhg.f(ctourney.wins)}Wins ${uhg.f(ctourney.wlr)}WLR ${uhg.f(ctourney.kdr)}KDR | Playtime: ${Math.floor(ctourney.playtime/60/60)}h | Most Played Kit: ${ctourney.mostusedkit}`
         return message
       } catch (e) {
           console.log(String(e.stack).bgRed)
