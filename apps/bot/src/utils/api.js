@@ -939,10 +939,10 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
         games: ctourney.games_played || 0,
         wins: blitz.tourney_blitz_duo_2_wins_teams || 0,
         losses: (ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0),
-        wlr: ratio(blitz.tourney_blitz_duo_2_wins_teams || 0, ((ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0))) || 1,
+        wlr: ratio(blitz.tourney_blitz_duo_2_wins_teams || 0, ((ctourney.games_played || 0)-(blitz.tourney_blitz_duo_2_wins_teams || 0))) || 0,
         kills: blitz.tourney_blitz_duo_2_kills || 0,
         deaths: blitz.tourney_blitz_duo_2_deaths || 0,
-        kdr: ratio(blitz.tourney_blitz_duo_2_kills || 0, blitz.tourney_blitz_duo_2_deaths || 0) || 1,
+        kdr: ratio(blitz.tourney_blitz_duo_2_kills || 0, blitz.tourney_blitz_duo_2_deaths || 0) || 0,
         playtime: blitz.tourney_blitz_duo_2_time_played || 0,
         mostusedkit: most_used_blitz_kit.split("_")[most_used_blitz_kit.split("_").length-1]
 
