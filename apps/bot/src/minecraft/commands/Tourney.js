@@ -30,7 +30,7 @@ module.exports = {
   
         let message = `Použij příkaz takhle: "!tourney game" nebo "!tourney basic"`
         if (mode === "basic") message = `**${ctfancy} Tourney**: **${api.username}** - ${tourney.games}/${tourney.maxgames} Games - ${tourney.tributes}/100 Tributes (Total: ${tourney.totaltributes}) - ${tourney.playtime}min Playtime`
-        else if (mode === "game") message  = `**${ctfancy} Tourney**: **${api.username}** - ${uhg.f(ctourney.wins)}Wins ${uhg.f(ctourney.wlr)}WLR ${uhg.f(ctourney.kills)}Kills ${uhg.f(ctourney.kdr)}KDR | Playtime: ${Math.floor(ctourney.playtime/60/60)}h | Most Played Kit: ${uhg.capitalize(ctourney.mostusedkit)}`
+        else if (mode === "game") message  = `**${ctfancy} Tourney**: **${api.username}** - ${uhg.f(ctourney.wins)}Wins ${uhg.f(ctourney.wlr)}WLR | ${uhg.f(ctourney.kills)}Kills ${uhg.f(ctourney.kdr)}KDR | Playtime: ${Math.floor(ctourney.playtime/60/60)}h | Most Played Kit: ${uhg.capitalize(ctourney.mostusedkit)}`
         return message
       } catch (e) {
           console.log(String(e.stack).bgRed)
