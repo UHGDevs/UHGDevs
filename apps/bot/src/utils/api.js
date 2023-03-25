@@ -204,7 +204,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
     if (getRank(hypixel).rank == 'YOUTUBE') {color = [getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex, getPlusColor(getRank(hypixel).rank, hypixel.rankPlusColor).hex2]}
     api.hypixel = {
       _id: uuid,
-      username: hypixel.displayname,
+      username: nickname || hypixel.displayname,
       uuid: uuid,
       rank: getRank(hypixel).rank,
       prefix: getRank(hypixel).prefix,
