@@ -1,7 +1,7 @@
 
 const func = require('../../util/ApiFunctions');
 
-module.exports = async (hypixel = {} , uuid, client) => {
+module.exports = async (hypixel = {} , uuid, client, username) => {
   const achievements = hypixel.achievements || {};
   const legacy = hypixel.stats.Legacy || {}
 
@@ -11,7 +11,7 @@ module.exports = async (hypixel = {} , uuid, client) => {
     type: 'hypixel',
     _id: uuid,
     uuid: uuid,
-    username: hypixel.displayname,
+    username: username || hypixel.displayname,
     rank: func.getRank(hypixel).rank,
     prefix: func.getRank(hypixel).prefix,
     color: func.getPlusColor(func.getRank(hypixel).rank, hypixel.rankPlusColor).hex,

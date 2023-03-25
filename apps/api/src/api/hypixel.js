@@ -26,7 +26,7 @@ class Hypixel {
 
     hypixel = hypixel.player;
 
-    const api = await require('./games/general')(hypixel, uuid, client)
+    const api = await require('./games/general')(hypixel, uuid, client, options.user.username)
 
     options.user.cache.hypixel_achievements = hypixel.achievements || {}
     
