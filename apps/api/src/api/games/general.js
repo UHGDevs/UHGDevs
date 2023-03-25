@@ -11,7 +11,7 @@ module.exports = async (hypixel = {} , uuid, client) => {
     type: 'hypixel',
     _id: uuid,
     uuid: uuid,
-    username: await uhg.api.call(uuid || hypixel.displayname, ["mojang"]) || hypixel.displayname,
+    username: hypixel.displayname,
     rank: func.getRank(hypixel).rank,
     prefix: func.getRank(hypixel).prefix,
     color: func.getPlusColor(func.getRank(hypixel).rank, hypixel.rankPlusColor).hex,
