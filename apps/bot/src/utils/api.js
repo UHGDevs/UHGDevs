@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 const { skyblock_year_0 } = require('../settings/values/skyblockconstants.js');
 /* Api Keys */
 const api_key = process.env.api_key;
-const api_key_2 = process.env.api_key_2;
+const api_key_2 = process.env.api_key;
 
 /* Function getAPI */
 module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) => {
