@@ -62,6 +62,13 @@ module.exports = async (hypixel = {} , uuid, client, username) => {
           xpleft: 10000-((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000))*10000
         }
       },
+      easter: {
+        "2023": {
+          experience: hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0,
+          level: 1+(hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000,
+          xpleft: 10000-((hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000))*10000
+        }
+      },
       silver: hypixel.seasonal?.silver || 0,
     },
     totalDailyRewards: hypixel.totalDailyRewards || 0,
