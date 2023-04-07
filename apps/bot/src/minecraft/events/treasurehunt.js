@@ -8,7 +8,6 @@ module.exports = async (uhg, pmsg) => {
     let z = Number(content[2])
     let c = Number(content[3].replace("#", ""))
     if (x === NaN || y === NaN || z === NaN || c === NaN) return
-    else return chat.send(uhg, {send: `/msg ${pmsg.username} Event již skončil`})
 
     let ignore = ["DavidCzPdy", "Honzu", "unisdynasty"]
     if (ignore.includes(pmsg.username)) return chat.send(uhg, {send: `/msg ${pmsg.username} Nemáš právo soutěžit!`})
@@ -17,14 +16,14 @@ module.exports = async (uhg, pmsg) => {
     if (!database.length) return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} nebyl nalezen!`})
     database = database[0]
 
-    if (database.winner) {
-      let time = uhg.toTime(Number(new Date()) - database.time, true)
-      if (time.d >= 1) time = Math.floor(time.d) + "d"
-      else if (time.h >= 1) time = Math.floor(time.h) + "h"
-      else if (time.m >= 1) time = Math.floor(time.m) + "min"
-      else time = Math.floor(time.s) + "s"
-      return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} už byl uhádnut hráčem ${database.winner} před ${time}!`})
-    }
+    // if (database.winner) {
+    //   let time = uhg.toTime(Number(new Date()) - database.time, true)
+    //   if (time.d >= 1) time = Math.floor(time.d) + "d"
+    //   else if (time.h >= 1) time = Math.floor(time.h) + "h"
+    //   else if (time.m >= 1) time = Math.floor(time.m) + "min"
+    //   else time = Math.floor(time.s) + "s"
+    //   return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} už byl uhádnut hráčem ${database.winner} před ${time}!`})
+    // }
     let nameStop = database.names.filter(n => n == pmsg.username)
     if (nameStop.length > 15) return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} jsi už 15x neuhádl, nejde ho dál hádat!`})
 
@@ -37,14 +36,14 @@ module.exports = async (uhg, pmsg) => {
       return
     }
 
-    let points = pmsg.verify_data.points_0 || 0
+    let points = pmsg.verify_data.points_1 || 0
     points += 1
     chat.send(uhg, {send: `/msg ${pmsg.username} Správná odpověď! Počet bodů: ${points}!`})
     chat.send(uhg, {send: `/gc ${pmsg.username} uhádl obrázek č. ${c}! Aktuální počet bodů: **${points}**`})
     bridge.info(uhg, {msg: `**${pmsg.username}** uhádl obrázek č. ${c}! Aktuální počet bodů: **${points}**`})
 
-    uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_0: points })
-    uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: pmsg.username, time: Number(new Date())})
+    uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_1: points })
+    //uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: pmsg.username, time: Number(new Date())})
 
     try {
       let message = await uhg.dc.client.channels.cache.get('962729811518820382').messages.fetch(database.msgID)
