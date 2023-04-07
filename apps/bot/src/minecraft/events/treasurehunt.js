@@ -2,7 +2,7 @@ let chat = require(`../send.js`)
 let bridge = require(`../bridge.js`)
 module.exports = async (uhg, pmsg) => {
     let content = pmsg.content.replaceAll("/", "").trim().split(" ")
-    if (!content.length || content.length !==4) return
+    if (!content.length) return
     let x = Number(content[0])
     let y = Number(content[1])
     let z = Number(content[2])
