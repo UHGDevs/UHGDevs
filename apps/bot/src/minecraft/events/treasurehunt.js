@@ -45,11 +45,11 @@ module.exports = async (uhg, pmsg) => {
     uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_1: points })
     //uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: pmsg.username, time: Number(new Date())})
 
-    try {
-      let message = await uhg.dc.client.channels.cache.get('962729811518820382').messages.fetch(database.msgID)
-      message.delete()
-    } catch (e) {
+    // try {
+    //   let message = await uhg.dc.client.channels.cache.get('962729811518820382').messages.fetch(database.msgID)
+    //   message.delete()
+    // } catch (e) {
 
-    }
+    // }
     return
 }
