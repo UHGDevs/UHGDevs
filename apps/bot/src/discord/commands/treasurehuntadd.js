@@ -37,6 +37,7 @@ module.exports = {
           coords: `${x} ${y} ${z}`,
           url: picture,
           guesses: 0,
+          winners: [],
           names: []
         }
 
