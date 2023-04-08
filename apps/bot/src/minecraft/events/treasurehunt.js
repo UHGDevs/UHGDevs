@@ -25,7 +25,8 @@ module.exports = async (uhg, pmsg) => {
     //   return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} už byl uhádnut hráčem ${database.winner} před ${time}!`})
     // }
 
-    if (pmsg.username in database.winners) {
+    if (database.winners.includes(pmsg.username)) {
+      console.log("tady")
       return chat.send(uhg, {send: `/msg ${pmsg.username} Obrázek jsi již uhodl!`})
     }
 
@@ -48,7 +49,7 @@ module.exports = async (uhg, pmsg) => {
     bridge.info(uhg, {msg: `**${pmsg.username}** uhádl obrázek č. ${c}! Aktuální počet bodů: **${points}**`})
 
     let winners = database.winners
-    winners.append(pmsg.username)
+    winners.push(pmsg.username)
     uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_1: points })
     uhg.mongo.run.update('general', 'treasure', { _id:c }, {winners: winners})
     //uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: pmsg.username, time: Number(new Date())})
