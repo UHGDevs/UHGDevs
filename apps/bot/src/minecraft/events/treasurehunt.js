@@ -26,7 +26,6 @@ module.exports = async (uhg, pmsg) => {
     // }
 
     if (database.winners.includes(pmsg.username)) {
-      console.log("tady")
       return chat.send(uhg, {send: `/msg ${pmsg.username} Obrázek jsi již uhodl!`})
     }
 
