@@ -47,7 +47,7 @@ module.exports = async (uhg, pmsg) => {
     chat.send(uhg, {send: `/gc ${pmsg.username} uhádl obrázek č. ${c}! Aktuální počet bodů: **${points}**`})
     bridge.info(uhg, {msg: `**${pmsg.username}** uhádl obrázek č. ${c}! Aktuální počet bodů: **${points}**`})
 
-    let winners = database.winner
+    let winners = database.winners
     winners.append(pmsg.username)
     uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_1: points })
     uhg.mongo.run.update('general', 'treasure', { _id:c }, {winners: winners})
