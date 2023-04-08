@@ -13,7 +13,7 @@ module.exports = async (uhg, pmsg) => {
     if (ignore.includes(pmsg.username)) return chat.send(uhg, {send: `/msg ${pmsg.username} Nemáš právo soutěžit!`})
 
     let database = await uhg.mongo.run.get('general', 'treasure', { _id: c })
-    if (!database.length) return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} nebyl nalezen!`})
+    if (!database.length) return chat.send(uhg, {send: `/msg ${pmsg.username} Obrázek číslo ${c} nebyl nalezen!`})
     database = database[0]
 
     // if (database.winner) {
@@ -24,12 +24,17 @@ module.exports = async (uhg, pmsg) => {
     //   else time = Math.floor(time.s) + "s"
     //   return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} už byl uhádnut hráčem ${database.winner} před ${time}!`})
     // }
+
+    if (pmsg.username in database.winners) {
+      return chat.send(uhg, {send: `/msg ${pmsg.username} Obrázek jsi již uhodl!`})
+    }
+
     let nameStop = database.names.filter(n => n == pmsg.username)
-    if (nameStop.length > 15) return chat.send(uhg, {send: `/msg ${pmsg.username} obrázek číslo ${c} jsi už 15x neuhádl, nejde ho dál hádat!`})
+    if (nameStop.length > 15) return chat.send(uhg, {send: `/msg ${pmsg.username} Obrázek číslo ${c} jsi už 15x neuhádl, nejde ho dál hádat!`})
 
     let coords = `${x} ${y} ${z}`
     if (coords !== database.coords)  {
-      chat.send(uhg, {send: `/msg ${pmsg.username} souřadnice ${coords} obr. č. ${c} nejsou správné!`})
+      chat.send(uhg, {send: `/msg ${pmsg.username} Souřadnice ${coords} obr. č. ${c} nejsou správné!`})
       let names = database.names
       names.push(pmsg.username)
       if (coords !== '0 0 0') uhg.mongo.run.update('general', 'treasure', { _id:c }, {guesses: database.guesses += 1, names: names})
@@ -45,7 +50,7 @@ module.exports = async (uhg, pmsg) => {
     let winners = database.winner
     winners.append(pmsg.username)
     uhg.mongo.run.update('general', 'uhg', { username: pmsg.username }, { points_1: points })
-    uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: winners})
+    uhg.mongo.run.update('general', 'treasure', { _id:c }, {winners: winners})
     //uhg.mongo.run.update('general', 'treasure', { _id:c }, {winner: pmsg.username, time: Number(new Date())})
 
     // try {
