@@ -34,6 +34,9 @@ class Skyblock {
         name: p.cute_name,
         mode: func.sbMode(p.game_mode),
 
+        selected: p.selected || false,
+        updated: p.last_save || -1,
+
         bank: p.banking ? Math.floor(p.banking.balance) : -1,
         bank_history: [ ],
         bank_interest: { },
@@ -94,7 +97,8 @@ class Skyblock {
       api.profiles.push(profile)
     }
     
-    api.profiles.sort((a, b) => b.member.updated - a.member.updated)
+    api.profiles.sort((a, b) => b.updated - a.updated)
+    api.profiles.sort((a, b) => Number(b.selected) - Number(a.selected) )
     
     return api
   }
