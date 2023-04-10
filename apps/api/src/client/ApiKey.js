@@ -45,7 +45,7 @@ class ApiKey extends EventEmitter {
     }
     if (!this.options.key.length) throw new Error('API_KEY_NOT_WORKING');
     this.options.key_count = this.options.key.length
-    this.options.limit = this.options.key_count * 120 - 2
+    this.options.limit = this.options.key_count * 60 - 2
   }
 
   getKey() {
