@@ -23,12 +23,13 @@ module.exports = {
       let guild = uhg.dc.client.guilds.cache.get('874337528621191251')
       let gmembers = guild.members.cache
       let whitelist = ['DavidCzPdy']
+      if (!verify || !verify.length) return
       for (let user of verify) {
         //if (!whitelist.includes(user.nickname)) continue;
         let gmember = gmembers.get(user._id)
         if (!gmember) continue;
         if (gmember.user.bot) continue;
-        let data = members.filter(n => n.uuid == user.uuid)
+        let data = members?.length ? members.filter(n => n.uuid == user.uuid) : []
         if (!data.length) continue;
         await refresh.bw_refresh(uhg, gmember, data[0])
       }

@@ -27,8 +27,8 @@ module.exports = {
 
 
         let gameplayers = await uhg.mongo.run.get("general", "uhg")
-        gameplayers = gameplayers.filter(n => n.gameplayers ? n.gameplayers.toggle == true : n.gameplayers)
-        if (!gameplayers) return
+        gameplayers = gameplayers?.filter(n => n.gameplayers ? n.gameplayers.toggle == true : n.gameplayers)
+        if (!gameplayers || !gameplayers.length) return
 
         let game;
         let gamemode;

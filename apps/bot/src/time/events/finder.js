@@ -13,9 +13,11 @@ module.exports = {
     let event = time.start(uhg, eventName)
     try {
       let data = await uhg.mongo.run.get("general", "guildfind")
-      data.forEach(item => {
-        if (item.updated+1000*60*60<Number(new Date())) uhg.mongo.run.delete("general", "guildfind", {_id: item._id})
-      });
+      if (data && data.length) {
+        data.forEach(item => {
+          if (item.updated+1000*60*60<Number(new Date())) uhg.mongo.run.delete("general", "guildfind", {_id: item._id})
+        });
+      }
     } catch(e) {
       if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
       else console.log(String(e.stack).bgRed + 'Time error v2');

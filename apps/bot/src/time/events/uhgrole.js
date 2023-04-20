@@ -35,15 +35,15 @@ module.exports = {
       let uhgUuids = []
       for (let member of members) {
         uhgUuids.push(member.uuid);
-        let vMember = dVerify.filter(n => n.uuid == member.uuid)
-        let uMember = dUhg.filter(n => n.uuid == member.uuid)
+        let vMember = dVerify?.filter(n => n.uuid == member.uuid)
+        let uMember = dUhg?.filter(n => n.uuid == member.uuid)
 
         if (!vMember.length) unUuid.push(member.uuid);
         else if (!uMember.length) uhg.mongo.run.post("general", "uhg", {_id:vMember[0]._id, username:vMember[0].nickname, uuid: vMember[0].uuid, guildrank: member.rank })
         else if (uMember[0].guildrank != member.rank) uhg.mongo.run.update("general", "uhg", {_id:uMember[0]._id, guildrank: member.rank })
         else if (uMember[0].username != vMember[0].nickname) uhg.mongo.run.update("general", "uhg", {_id:uMember[0]._id, username: vMember[0].nickname })
       }
-      dUhg.filter(n => !uhgUuids.includes(n.uuid)).forEach(notuhg => { uhg.mongo.run.delete("general", "uhg", {_id: notuhg._id})});
+      dUhg?.filter(n => !uhgUuids.includes(n.uuid))?.forEach(notuhg => { uhg.mongo.run.delete("general", "uhg", {_id: notuhg._id})});
 
 
       /* -- Get UNVERIFIED Guild Members -- */
@@ -83,7 +83,7 @@ module.exports = {
         }
 
         let data = await uhg.mongo.run.get('stats', 'stats', { uuid: verify.uuid })
-        if (data.length) {
+        if (data?.length) {
           data = data[0]
           if (uhgD && uhgD.username && data.username !== uhgD.username) uhg.mongo.run.update("general", "uhg", {_id:verify._id, username: data.username })
         } else {

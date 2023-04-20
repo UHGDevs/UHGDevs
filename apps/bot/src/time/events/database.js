@@ -13,12 +13,12 @@ module.exports = {
     let now = Number(new Date())
     let event = time.start(uhg, eventName)
     try {
-      let data = await uhg.mongo.run.get("stats", "stats").then(n => n.sort((a, b) => a.updated - b.updated))
+      let data = await uhg.mongo.run.get("stats", "stats").then(n => n?.length ? n.sort((a, b) => a.updated - b.updated) : [])
       uhg.data.stats = data
       let verify = await uhg.mongo.run.get('general', 'verify', {})
       uhg.data.verify = verify
-      data = data.filter(n => n.updated<=now-1000*60*60).sort((a, b) => a.updated - b.updated)//n.updated<=now-n.delay ||43000000
-      let update = data.slice(0,50)
+      data = data?.filter(n => n.updated<=now-1000*60*60).sort((a, b) => a.updated - b.updated)//n.updated<=now-n.delay ||43000000
+      let update = data?.slice(0,50)
       for (let member of update) {
         let api = await uhg.api.call(member.uuid, ["hypixel"])
         if (!api.success) return uhg.dc.client.channels.cache.get('548772550386253824').send(`${member.username} database refresh error:\n${api.reason}`)

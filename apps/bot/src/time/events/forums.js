@@ -19,8 +19,8 @@ module.exports = {
         let feedMain = await parser.parseURL('https://hypixel.net/forums/news-and-announcements.4/-/index.rss');
         let feedSb = await parser.parseURL('https://hypixel.net/forums/skyblock-patch-notes.158/-/index.rss')
         let data = await uhg.mongo.run.get('general', 'forums')
-        let dataMain = data.filter(n => n.category == "main")
-        let dataSb = data.filter(n => n.category == "sb")
+        // let dataMain = data.filter(n => n.category == "main")
+        // let dataSb = data.filter(n => n.category == "sb")
         let maxValueMain = 5133475//Math.max(...dataMain.map(o => o.guid))
         let maxValueSb = 5133475//Math.max(...dataSb.map(o => o.guid))
         
