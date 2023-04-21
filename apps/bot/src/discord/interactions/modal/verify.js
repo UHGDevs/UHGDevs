@@ -79,13 +79,17 @@ exports.get = async (uhg, interaction) => {
     username = api.username
     if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
     
-    const bannedUUIDs = ["d92fde8bd3c243298bc0a7648c38bd48"/*Seznamka*/]
+    const bannedUUIDs = []
     if (bannedUUIDs.includes(api.hypixel.uuid)) return interaction.editReply({ content: `Nepodařilo se tě verifikovat!\nJméno \`${username}\` se nachází na seznamu zabanovaných UUIDs, pokud si myslíš, že se jedná o chybu, napiš členům Admin Teamu` })
+
+    let verified = await uhg.mongo.run.get("general", "verify")
+    uhg.data.verify = verified
+    verified = verified.filter(n => n._id == user.id)
 
     let refresh = require('../../../utils/serverroles.js')
     let uhgMember = gUhg.members.cache.get(user.id)
     if (uhgMember) { // UHG Discord server
-        refresh.uhg_refresh(uhg, uhgMember, api.hypixel, api.guild)
+        refresh.uhg_refresh(uhg, uhgMember, {...api.hypixel, ...verified.emoji}, api.guild)
     }
 
     let bwMember = gBw.members.cache.get(user.id)
@@ -95,9 +99,6 @@ exports.get = async (uhg, interaction) => {
         refresh.bw_refresh(uhg, bwMember, api.hypixel)
     }
 
-    let verified = await uhg.mongo.run.get("general", "verify")
-    uhg.data.verify = verified
-    verified = verified.filter(n => n._id == user.id)
     if (verified.length && verified[0].nickname == username) {return interaction.editReply({ content: `Už ${custom ? 'je':'jsi'} verifikovaný` })}
 
     // Overwrite Verify

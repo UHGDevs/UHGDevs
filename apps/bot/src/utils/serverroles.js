@@ -104,7 +104,7 @@ exports.uhg_refresh = async (uhg, member, api, guilda) => {
   else if (guilda.member) grank = ('Guild ' + guilda.member.rank).replace('Guild Guild', 'Guild')
 
   /* -- Change username -- */
-  if (api.username && (member.nickname && member.nickname !== api.username || member.nickname === null && user.username !== api.username)) { try { await member.setNickname(api.username) } catch (e) {errors = errors + 'UHG - Change nickname\n'}}
+  if (api.username && (member.nickname && member.nickname !== api.username || member.nickname === null && user.username !== api.username)) { try { await member.setNickname(api.emoji ? `${api.username} ${api.emoji}` : api.username) } catch (e) {errors = errors + 'UHG - Change nickname\n'}}
   
   /* -- Default role -- */
   if (api.username && !member._roles.includes("478816107222925322")) await member.roles.add(guild.roles.cache.get("478816107222925322"))
