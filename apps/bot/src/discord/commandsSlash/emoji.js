@@ -1,7 +1,7 @@
 module.exports = {
   name: 'emoji',
   description: 'Vyber si Discord emotikon, který bude za tvým jménem',
-  permissions: [{ id: '312861502073995265', type: 'USER', permission: true}, {type: 'ROLE', id: '530504567528620063', guild: '684069130478813226', permission: true}],
+  permissions: [{ id: '312861502073995265', type: 'USER', permission: true}, {type: 'ROLE', id: '684069130478813226', guild: '455751845319802880', permission: true}],
   options: [
     {
       name: 'emoji',
