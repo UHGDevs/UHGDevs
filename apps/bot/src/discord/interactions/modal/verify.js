@@ -61,7 +61,7 @@ exports.get = async (uhg, interaction) => {
     if (!language.match(/cz|sk|en/i)) {return interaction.reply({ content: 'Invalid language! CZ/SK/EN', ephemeral: true })}
     
     let gUhg = uhg.dc.client.guilds.cache.get('455751845319802880')
-    let gBw = uhg.dc.client.guilds.cache.get('874337528621191251')
+    // let gBw = uhg.dc.client.guilds.cache.get('874337528621191251')
 
     let user = interaction.user;
 
@@ -92,12 +92,12 @@ exports.get = async (uhg, interaction) => {
         refresh.uhg_refresh(uhg, uhgMember, {...api.hypixel, ...verified.emoji}, api.guild)
     }
 
-    let bwMember = gBw.members.cache.get(user.id)
-    if (bwMember) { // BW Discord server
-        let bedwars = api.hypixel.stats.bedwars
-        gBw.channels.cache.get("877432655954706473").send({ content: `${bwMember.user} se právě verifikoval!\n**BedWars**: ${bedwars.levelformatted} **${api.username}** - ${uhg.f(bedwars.overall.finalKills)}Finals ${uhg.f(bedwars.overall.wins)}Wins ${uhg.f(bedwars.overall.fkdr)}FKDR ${uhg.f(bedwars.overall.wlr)}WLR\nPlancke: https://plancke.io/hypixel/player/stats/${api.username}`, allowedMentions: { parse: [] }})
-        refresh.bw_refresh(uhg, bwMember, api.hypixel)
-    }
+    // let bwMember = gBw.members.cache.get(user.id)
+    // if (bwMember) { // BW Discord server
+    //     let bedwars = api.hypixel.stats.bedwars
+    //     gBw.channels.cache.get("877432655954706473").send({ content: `${bwMember.user} se právě verifikoval!\n**BedWars**: ${bedwars.levelformatted} **${api.username}** - ${uhg.f(bedwars.overall.finalKills)}Finals ${uhg.f(bedwars.overall.wins)}Wins ${uhg.f(bedwars.overall.fkdr)}FKDR ${uhg.f(bedwars.overall.wlr)}WLR\nPlancke: https://plancke.io/hypixel/player/stats/${api.username}`, allowedMentions: { parse: [] }})
+    //     refresh.bw_refresh(uhg, bwMember, api.hypixel)
+    // }
 
     if (verified.length && verified[0].nickname == username) {return interaction.editReply({ content: `Už ${custom ? 'je':'jsi'} verifikovaný` })}
 
