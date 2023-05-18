@@ -5,7 +5,7 @@ const fs = require('fs');
 const uhgApi = require('../../api/src/index').Client;
 
 const DiscordHandler = require('./discord/DiscordHandler');
-//const MinecraftHandler = require('./minecraft/MinecraftHandler');
+const MinecraftHandler = require('./minecraft/MinecraftHandler');
 const TimeHandler = require('./time/TimeHandler');
 const Web = require('./web/Web');
 const CommandsHandler = require('./commands/CommandsHandler');
@@ -21,7 +21,7 @@ class UHGDevs extends CommandsHandler {
       this.discord = new DiscordHandler(this)
       this.time = new TimeHandler(this)
       this.web = new Web(this)
-      // this.minecraft = new MinecraftHandler(this)
+      this.minecraft = new MinecraftHandler(this)
   
       // this.discord.setBridge(this.minecraft)
       // this.minecraft.setBridge(this.discord)
@@ -33,7 +33,7 @@ class UHGDevs extends CommandsHandler {
     this.config.discord.enabled ? this.discord?.init() : null
 
     this.time?.init()
-   // this.minecraft?.init()
+    this.minecraft?.createClient()
   }
 
   filesCheck() {

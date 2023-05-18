@@ -81,6 +81,8 @@ global.getId = (interaction, i) => {
   else return splits[i]
 }
 
+global.clear = (message) => message.replace(/✫|✪|⚝/g, '?').replace(/§|¡±/g, '�').replace(/�[0-9A-FK-OR]/gi, '')
+
 if (!console.timer) console.timer = console.time
 
 console.discord = (message, args = {}) => {

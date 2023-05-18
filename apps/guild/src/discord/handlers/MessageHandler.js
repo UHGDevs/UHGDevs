@@ -14,6 +14,9 @@ class MessageHandler {
     if (!message.author.bot && (message.channel.id == global.config.discord.officerChannel || message.channel.id == global.config.discord.guildChatChannel) && message.content && message.content.length > 0) this.bridge(message); // add function for this (also with tkjk)
     if (message.channel.type === 1) dc_client.channels.cache.get('1027491511857840168')?.send({ embeds: [{ title: `${message.author.username}'s dm` , description: message.content}]})
 
+    /* add mc bridge channels */
+    await uhg.minecraft.server.broadcast(`§2Guild > §b[MVP§8+§b] Honzu §e[Gnrl]§f: někdo bedwars? je to nejlepší hra`)
+    console.log('a')
 
     if (message.content.startsWith(this.config.prefix)) this.runCommand(message) // pridat mc channels with mc prefix
   }
