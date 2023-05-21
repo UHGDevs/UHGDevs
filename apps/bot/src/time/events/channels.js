@@ -69,7 +69,7 @@ module.exports = {
         }
         let embed = new MessageEmbed().setTitle(`unELITE MEMBERS`).setDescription(`**Nejméně GEXP za 30 dní:**\n\n${msgfrag.join("\n")}`).setFooter('Jen guild membeři, kteří jsou v guildě více jak 7 dní')
         kick_channel.send({ embeds: [embed] })
-        }
+        
 
 
         /* UHG INFO */
@@ -80,7 +80,6 @@ module.exports = {
 
         /* TKJK INFO */
         if (data.tkjk.level) await renameChannel('928569528676392980', `TKJK: ${uhg.f(data.tkjk.level)}`)
-
     } catch(e) {
       if (uhg.dc.cache.embeds) uhg.dc.cache.embeds.timeError(e, eventName);
       else console.log(String(e.stack).bgRed + 'Time error v2');
