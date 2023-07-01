@@ -427,6 +427,26 @@ class ApiFunctions {
     return 0
   }
 
+  static getEvents(api) {
+    let obj = {}
+    for (let event in api) {
+      if (!["christmas", "summer", "easter", "halloween"].includes(event)) continue
+      let cap = event == "summer" ? 25000 : 10000
+      let objevent = {}
+      for (let year in api[event]) {
+        if (!api[event]?.[year]?.levelling) continue
+        objevent[year] = {
+            experience: api[event]?.[year]?.levelling?.experience || 0,
+            level: 1+(api[event]?.[year]?.levelling?.experience || 0)/cap,
+            xpleft: cap-((api[event]?.[year]?.levelling?.experience || 0)/cap-Math.floor((api[event]?.[year]?.levelling?.experience || 0)/cap))*cap
+          
+        }
+      }
+      obj[event] = objevent
+    }
+    return obj
+  }
+
   static capitalize(string) {
     if (!string) return string
     return String(string)[0].toUpperCase() + String(string).slice(1);

@@ -41,34 +41,7 @@ module.exports = async (hypixel = {} , uuid, client, username) => {
       boots: hypixel.vanityMeta.packages.includes("suit_treasure_boots"),
     } : {},
     seasonal: {
-      summer: {
-        "2022": {
-          experience: hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0,
-          level: 1+(hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000,
-          xpleft: 25000-((hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000-Math.floor((hypixel.seasonal?.summer?.["2022"]?.levelling?.experience || 0)/25000))*25000
-        }
-      },
-      halloween: {
-        "2022": {
-          experience: hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0,
-          level: 1+(hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000,
-          xpleft: 10000-((hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.halloween?.["2022"]?.levelling?.experience || 0)/10000))*10000
-        }
-      },
-      christmas: {
-        "2022": {
-          experience: hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0,
-          level: 1+(hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000,
-          xpleft: 10000-((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.christmas?.["2022"]?.levelling?.experience || 0)/10000))*10000
-        }
-      },
-      easter: {
-        "2023": {
-          experience: hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0,
-          level: 1+(hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000,
-          xpleft: 10000-((hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000-Math.floor((hypixel.seasonal?.easter?.["2023"]?.levelling?.experience || 0)/10000))*10000
-        }
-      },
+      events: func.getEvents(hypixel.seasonal),
       silver: hypixel.seasonal?.silver || 0,
     },
     totalDailyRewards: hypixel.totalDailyRewards || 0,
