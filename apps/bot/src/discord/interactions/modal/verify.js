@@ -77,7 +77,7 @@ exports.get = async (uhg, interaction) => {
     let api = await uhg.api.call(username, ["hypixel", "guild"])
     if (!api.success) return interaction.editReply({ content: api.reason })
     username = api.username
-    if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
+    if (!custom && api.hypixel.links.DISCORD !== `${user.username}#${user.discriminator}` && api.hypixel.links.DISCORD.toLowerCase() !== `${user.username}`) {return interaction.editReply({ content: "Link your Discord with Hypixel" })}
     
     const bannedUUIDs = []
     if (bannedUUIDs.includes(api.hypixel.uuid)) return interaction.editReply({ content: `Nepodařilo se tě verifikovat!\nJméno \`${username}\` se nachází na seznamu zabanovaných UUIDs, pokud si myslíš, že se jedná o chybu, napiš členům Admin Teamu` })
