@@ -31,6 +31,7 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
   const getGamemode = uhg.getGamemode
   const getWwLevel = uhg.getWwLevel
   const getCrimson = uhg.getCrimson
+  const getEvents = uhg.getEvents
 
   /* Empty dictionary */
   let api = {};
@@ -229,14 +230,10 @@ module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) 
       stats: {},
       firstLogin: hypixel.firstLogin || -1,
       lastLogin: hypixel.lastLogin || -1,
-      seasonal: hypixel.seasonal ? {
-        summer: hypixel.seasonal.summer ? {
-          experience: hypixel.seasonal.summer["2022"].levelling.experience || 0,
-          level: (hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000,
-          xpleft: 25000-((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000-Math.floor((hypixel.seasonal.summer["2022"].levelling.experience || 0)/25000))*25000
-        } : {},
-        silver: hypixel.seasonal.silver || 0,
-      } : {summer: {}},
+      seasonal: {
+        events: getEvents(hypixel.seasonal),
+        silver: hypixel.seasonal?.silver || 0,
+      },
       updated: Number(new Date()),
     }
 
