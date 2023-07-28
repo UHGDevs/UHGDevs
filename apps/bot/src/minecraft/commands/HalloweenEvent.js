@@ -16,7 +16,7 @@ module.exports = {
         let api = await uhg.api.call(nickname)
         if (!api.success) return api.reason
         if (!Object.keys(api.hypixel.seasonal.events.halloween).includes(year)) return `Hráč nehrál v roce ${year} Halloween event`
-        let message = `**HalloweenEvent**: **${api.username}** - Level ${Math.floor(api.hypixel.seasonal.events.halloween[year].level || 0)} | ${uhg.f(api.hypixel.seasonal.events.halloween[year].xpleft || 0)} XP do dalšího Levelu | ${uhg.f(api.hypixel.seasonal.silver || 0)} Silver`
+        let message = `**${year} HalloweenEvent**: **${api.username}** - Level ${Math.floor(api.hypixel.seasonal.events.halloween[year].level || 0)} | ${uhg.f(api.hypixel.seasonal.events.halloween[year].xpleft || 0)} XP do dalšího Levelu | ${uhg.f(api.hypixel.seasonal.silver || 0)} Silver`
         return message
       } catch (e) {
           console.log(String(e.stack).bgRed)
