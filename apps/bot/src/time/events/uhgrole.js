@@ -71,6 +71,8 @@ module.exports = {
         let verify = dVerify.find(n => n._id == member.id)
         let uhgD = dUhg.find(n => n._id == member.id) || {}
        // let loot = dLoot.find(n => n._id == member._id)
+
+        if (!member.roles.cache.get("684069130478813226") && verify?.emoji) uhg.mongo.run.update("general", "verify", {_id:verify._id}, {emoji: null})
         
         if (!verify) {
           if (member.roles.cache.get('478816107222925322')) dcUnVer.push(member)
