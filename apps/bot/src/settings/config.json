@@ -16,7 +16,9 @@
         "bwroles": true,
         "achievements": true,
         "qotd": true,
-        "forums": true
+        "forums": true,
+        "daily": false,
+        "channels": false
     },
     "dev_mode": false
 }
