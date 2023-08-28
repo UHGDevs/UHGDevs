@@ -29,7 +29,9 @@ class ApiKey extends EventEmitter {
 
     this.callHypixel = create({ baseURL: 'https://api.hypixel.net/', httpsAgent })
 
-    this.testKeys()
+    this.options.key_count = this.options.key.length
+    this.options.limit = 300/5
+   //this.testKeys()
     this.resetKeyTimer()
   }
 
@@ -40,9 +42,10 @@ class ApiKey extends EventEmitter {
       try {
         const response = await this.callHypixel.get('boosters', {params: { key: key }}).then( n => n.data )
         if (!response.success) throw new Error('API_KEY_INVALIDE', `(${key})`);
-        else this.options.key.push(key);
+        else if (!this.options.key.includes(key)) this.options.key.push(key);
       } catch (e) { console.info("Invalid authorization of API key (Hypixel API is having hard time)")}
     }
+    console.log(keys)
     if (!this.options.key.length) throw new Error('API_KEY_NOT_WORKING');
     this.options.key_count = this.options.key.length
     this.options.limit = this.options.key_count * 60 - 2
