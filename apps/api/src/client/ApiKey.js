@@ -38,7 +38,7 @@ class ApiKey extends EventEmitter {
     this.options.key = []
     for (let key of keys) {
       try {
-        const response = await this.callHypixel.get('key', {params: { key: key }}).then( n => n.data )
+        const response = await this.callHypixel.get('boosters', {params: { key: key }}).then( n => n.data )
         if (!response.success) throw new Error('API_KEY_INVALIDE', `(${key})`);
         else this.options.key.push(key);
       } catch (e) { console.info("Invalid authorization of API key (Hypixel API is having hard time)")}
