@@ -8,8 +8,9 @@ const { skyblock_year_0 } = require('../settings/values/skyblockconstants.js');
 const api_key = process.env.api_key;
 const api_key_2 = process.env.api_key;
 
+
 /* Function getAPI */
-module.exports = async (input, call=["mojang", "key", "hypixel"], skyblocki=[]) => {
+module.exports = async (input, call=["mojang", "hypixel"], skyblocki=[]) => {
   try {
   const uhg = await require("../index.js").uhg()
   const f = uhg.f

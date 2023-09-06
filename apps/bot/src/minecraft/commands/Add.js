@@ -11,7 +11,7 @@ module.exports = {
         args = args.split(" ").filter(n => n)
         if (!args.length) return "Nezadal jsi jméno"
 
-        let api = await uhg.getApi(args[0], ["key", "hypixel", "mojang"])
+        let api = await uhg.getApi(args[0], ["hypixel", "mojang"])
         if (api instanceof Object == false) return api
         uhg.mongo.run.post("stats", "stats", api.hypixel)
         let message = `**${api.username}** byl přidán do databáze`

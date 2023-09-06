@@ -49,7 +49,7 @@ module.exports = async (uhg, guildname, names=false, games=false) => {
       if (!update.members[imem].games) update.members[imem].games = {daily: {}, total: {}}
 
       if (games) {
-        let gapi = await uhg.api.call(uuid, ["key", "hypixel"])
+        let gapi = await uhg.api.call(uuid, ["hypixel"])
         if (gapi.key.uses > 50) await uhg.delay(1000)
         let wins = gapi.hypixel.stats.wins.total
         if (!update.members[imem].games.total[yesterday]) update.members[imem].games.total[yesterday] = wins
