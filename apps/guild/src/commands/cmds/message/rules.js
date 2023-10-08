@@ -12,7 +12,7 @@ module.exports = {
         .addComponents(new ButtonBuilder().setCustomId('embeds_pravidla')/*.setLabel('⚠️ Pravidla guildy')*/.setStyle(2).setDisabled(false).setEmoji('⚠️'))
         .addComponents(new ButtonBuilder().setCustomId('embeds_elites')/*.setLabel('Elite membeři')*/.setStyle(2).setDisabled(false).setEmoji('<:elitemember:979390144153018428>'))
         .addComponents(new ButtonBuilder().setCustomId('embeds_events')/*.setLabel('Guild eventy')*/.setStyle(2).setDisabled(false).setEmoji('🎲'))
-        .addComponents(new ButtonBuilder().setCustomId('embeds_bot')/*.setLabel('Guild bot')*/.setStyle(2).setDisabled(true).setEmoji('<:botuhg:979390792747581460>'))
+        .addComponents(new ButtonBuilder().setCustomId('embeds_bot')/*.setLabel('Guild bot')*/.setStyle(2).setDisabled(false).setEmoji('<:botuhg:979390792747581460>'))
         .addComponents(new ButtonBuilder().setCustomId('embeds_merch').setStyle(2).setDisabled(false).setEmoji('👕'))
 
       let op = ["312861502073995265", "379640544143343618", "427198829935460353", "378928808989949964"]
