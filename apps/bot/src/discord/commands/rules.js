@@ -11,7 +11,7 @@ module.exports = {
         .addComponents(new MessageButton().setCustomId('uhg_embeds_pravidla')/*.setLabel('⚠️ Pravidla guildy')*/.setStyle('SECONDARY').setDisabled(false).setEmoji('⚠️'))
         .addComponents(new MessageButton().setCustomId('uhg_embeds_elites')/*.setLabel('Elite membeři')*/.setStyle('SECONDARY').setDisabled(false).setEmoji('<:elitemember:1077323794374463590>'))
         .addComponents(new MessageButton().setCustomId('uhg_embeds_events')/*.setLabel('Guild eventy')*/.setStyle('SECONDARY').setDisabled(false).setEmoji('🎲'))
-        .addComponents(new MessageButton().setCustomId('uhg_embeds_bot')/*.setLabel('Guild bot')*/.setStyle('SECONDARY').setDisabled(true).setEmoji('<:botuhg:1077325785641259039>'))
+        .addComponents(new MessageButton().setCustomId('uhg_embeds_bot')/*.setLabel('Guild bot')*/.setStyle('SECONDARY').setDisabled(false).setEmoji('<:botuhg:1077325785641259039>'))
         .addComponents(new MessageButton().setCustomId('uhg_embeds_merch').setStyle('SECONDARY').setDisabled(false).setEmoji('👕'))
 
       let op = ["312861502073995265", "379640544143343618", "427198829935460353", "378928808989949964"]
