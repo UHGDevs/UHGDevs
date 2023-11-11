@@ -11,12 +11,12 @@
     },
     "personal": {
         "title": "Personalista funkce",
-        "description": "__Práce:__\n<:dot:1003711491196854393>Dělá různé průzkumy mezi členy guildy\n<:dot:1003711491196854393>Snaží se s členy guildy bavit o tom, co od guildy očekávají\n<:dot:1003711491196854393>Řeší aktivitu v guildě (kickování neaktivních, řešení omluvenek)\n__Zásady:__\n<:dot:1003711491196854393>Umět mluvit s lidmi\n<:dot:1003711491196854393>Být schopen pravidelně kontrolovat aktivitu\n<:dot:1003711491196854393>Spravovat omluvenky\n__ Ve funkci:__\n_Nikdo_",
+        "description": "__Práce:__\n<:dot:1003711491196854393>Dělá různé průzkumy mezi členy guildy\n<:dot:1003711491196854393>Snaží se s členy guildy bavit o tom, co od guildy očekávají\n<:dot:1003711491196854393>Řeší aktivitu v guildě (kickování neaktivních, řešení omluvenek)\n__Zásady:__\n<:dot:1003711491196854393>Umět mluvit s lidmi\n<:dot:1003711491196854393>Být schopen pravidelně kontrolovat aktivitu\n<:dot:1003711491196854393>Spravovat omluvenky\n__ Ve funkci:__\n_Honzu, unisdynasty_",
         "color": 5793266
     },
     "eventer": {
         "title": "Eventer funkce",
-        "description": "__Práce:__\n<:dot:1003711491196854393>Realizuje guild eventy min. 1x měsíčně větší a min. 1x týdně menší\n<:dot:1003711491196854393>Pokud se jedná o eventy s výhrou, tak musí sehnat sponzora\n__Zásady:__\n<:dot:1003711491196854393>Mít čas na dělání pravidelných eventů\n<:dot:1003711491196854393>Psát do MOTD, jaký bude další velký event nebo někoho o to požádat\n<:dot:1003711491196854393>Mít nápady\n__ Ve funkci:__\n_Nikdo_",
+        "description": "__Práce:__\n<:dot:1003711491196854393>Realizuje guild eventy min. 1x měsíčně větší a min. 1x týdně menší\n<:dot:1003711491196854393>Pokud se jedná o eventy s výhrou, tak musí sehnat sponzora\n__Zásady:__\n<:dot:1003711491196854393>Mít čas na dělání pravidelných eventů\n<:dot:1003711491196854393>Psát do MOTD, jaký bude další velký event nebo někoho o to požádat\n<:dot:1003711491196854393>Mít nápady\n__ Ve funkci:__\n_Honzu, unisdynasty_",
         "color": 5763719
     },
     "gvg_eventer": {
@@ -26,17 +26,17 @@
     },
     "social": {
         "title": "Sociální Manažer funkce",
-        "description": "__Práce:__\n<:dot:1003711491196854393>Stará se o soc. sítě guildy (Twitter, TikTok, Instargam, ...)\n<:dot:1003711491196854393>Propaguje guildu\n__Zásady:__\n<:dot:1003711491196854393>Být aktivní min. na 3 soc. sítích a vyznat se v nich\n<:dot:1003711491196854393>Aktivně postovat příspěvky/videa o guildě/Hypixelu všeho druhu\n<:dot:1003711491196854393>Doporučené soc. sítě jsou Instagram, Twitter nebo TikTok\n__ Ve funkci:__\n_Smolda_",
+        "description": "__Práce:__\n<:dot:1003711491196854393>Stará se o soc. sítě guildy (Twitter, TikTok, Instargam, ...)\n<:dot:1003711491196854393>Propaguje guildu\n__Zásady:__\n<:dot:1003711491196854393>Být aktivní min. na 3 soc. sítích a vyznat se v nich\n<:dot:1003711491196854393>Aktivně postovat příspěvky/videa o guildě/Hypixelu všeho druhu\n<:dot:1003711491196854393>Doporučené soc. sítě jsou Instagram, Twitter nebo TikTok\n__ Ve funkci:__\n_Smolda, Jerry_Bro_",
         "color": 10181046
     },
     "chat": {
         "title": "Chat Moderátor funkce",
-        "description": "__Práce:__\n<:dot:1003711491196854393>Dohlíží na chat v guildě\n<:dot:1003711491196854393>Rozdává muty pokud se někdo chová proti pravidlům\n<:dot:1003711491196854393>V případě, že by měl být člen kicknut, nastaví mute a řekne vyššímu staffu\n__Zásady:__\n<:dot:1003711491196854393>Být mentálně vyspělý\n<:dot:1003711491196854393>Aktivně sledovat a psát do chatu\n<:dot:1003711491196854393>Být v chatu nápomocen členům guildy\n__ Ve funkci:__\n_zmikisek, MrDodo9Riderr, macek2005, 0hBlood, Smolda, itsseyne_",
+        "description": "__Práce:__\n<:dot:1003711491196854393>Dohlíží na chat v guildě\n<:dot:1003711491196854393>Rozdává muty pokud se někdo chová proti pravidlům\n<:dot:1003711491196854393>V případě, že by měl být člen kicknut, nastaví mute a řekne vyššímu staffu\n__Zásady:__\n<:dot:1003711491196854393>Být mentálně vyspělý\n<:dot:1003711491196854393>Aktivně sledovat a psát do chatu\n<:dot:1003711491196854393>Být v chatu nápomocen členům guildy\n__ Ve funkci:__\n_macek2005, 0hBlood, Smolda, knacam, Jerry_Bro, Corruptedoslav a Zoey_Atx_",
         "color": 3447003
     },
     "function": {
         "title": "Správce Discord funkce",
-        "description": "__Práce:__\n<:dot:1003711491196854393>QOTD Správce, který musí denně psát nové otázky do <#1015355454882316288>\n<:dot:1003711491196854393>Movie night Správce, který pouští filmy a sestavuje Movie list\n<:dot:1003711491196854393>Hypixel Annoucement Správce, který posílá novinky a zprávy o Hypixelu\n __Zásady:__\n<:dot:1003711491196854393>Mít představivost při psaní QOTD\n<:dot:1003711491196854393>Vyznat se v filmech a snažit se je aktivně pouštět ve voice room\n<:dot:1003711491196854393>Mít rychlý přehled o Hypixel novinkách/různých oznámeních z komunity\n__ Ve funkci:__\n_0hBlood, Pavel67522_",
+        "description": "__Práce:__\n<:dot:1003711491196854393>QOTD Správce, který musí denně psát nové otázky do <#1015355454882316288>\n<:dot:1003711491196854393>Movie night Správce, který pouští filmy a sestavuje Movie list\n<:dot:1003711491196854393>Hypixel Annoucement Správce, který posílá novinky a zprávy o Hypixelu\n __Zásady:__\n<:dot:1003711491196854393>Mít představivost při psaní QOTD\n<:dot:1003711491196854393>Vyznat se v filmech a snažit se je aktivně pouštět ve voice room\n<:dot:1003711491196854393>Mít rychlý přehled o Hypixel novinkách/různých oznámeních z komunity\n__ Ve funkci:__\n _Nikdo_",
         "color": 3426654
     },
     "tester": {
