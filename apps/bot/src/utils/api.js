@@ -1313,11 +1313,11 @@ module.exports = async (input, call=["mojang", "hypixel"], skyblocki=[]) => {
         }
         let secretsperrun = secrets/runs || 0
         let classes = dungeons.player_classes || {}
-        let healer = getLevelByXp(classes.healer.experience, "dungeons")
-        let mage = getLevelByXp(classes.mage.experience, "dungeons")
-        let berserk = getLevelByXp(classes.berserk.experience, "dungeons")
-        let archer = getLevelByXp(classes.archer.experience, "dungeons")
-        let tank = getLevelByXp(classes.tank.experience, "dungeons")
+        let healer = getLevelByXp(classes.healer?.experience || 0, "dungeons")
+        let mage = getLevelByXp(classes.mage?.experience || 0, "dungeons")
+        let berserk = getLevelByXp(classes.berserk?.experience || 0, "dungeons")
+        let archer = getLevelByXp(classes.archer?.experience || 0, "dungeons")
+        let tank = getLevelByXp(classes.tank?.experience || 0, "dungeons")
         let catalvl = await getCataLvl(catacombs.experience||0)
         let bloodmobkills = (profiles[i].members[uuid]?.stats?.kills_watcher_summon_undead || 0) + (profiles[i].members[uuid]?.stats?.kills_master_watcher_summon_undead || 0)
 

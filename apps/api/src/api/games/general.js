@@ -46,7 +46,7 @@ module.exports = async (hypixel = {} , uuid, client, username) => {
     },
     totalDailyRewards: hypixel.totalDailyRewards || 0,
     dailyRewards: hypixel.rewardHighScore || 0,
-    updated: Number(new Date())
-
+    updated: Number(new Date()),
+    tourney: hypixel.tourney || {}
   })
 }

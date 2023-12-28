@@ -30,6 +30,10 @@ module.exports = {
         {
           name: 'daily',
           value: 'd',
+        },
+        {
+          name: 'yearly',
+          value: 'y',
         }
       ]
     },
@@ -55,7 +59,7 @@ module.exports = {
     },
     {
       name: 'datum',
-      description: 'Jaký den nebo měsíc chceš vidět?',
+      description: 'Jaký den nebo měsíc chceš vidět? (2 2023)',
       type: 'STRING',
       required: false
     }
@@ -86,10 +90,12 @@ module.exports = {
       let descinfo = `${ft.d}. ${ft.m}. ${ft.y}\n`
       if (period == 'm') descinfo = `${ft.m}. měsíc ${ft.y}\n`
       else if (period == 'w') descinfo = ``
+      else if (period == 'y') descinfo = `Rok ${ft.y}\n`
 
       let title = `DENNÍ GEXP - ${guild} - ${ft.d}. ${ft.m}. ${ft.y}`
       if (period == 'm') title = `MĚSÍČNÍ GEXP - ${guild} - ${ft.m}. ${ft.y}`
       else if (period == 'w') title = `TÝDENNÍ GEXP - ${guild}`
+      else if (period == 'y') title = `ROČNÍ GEXP - ${guild}`
 
       let cache = JSON.parse(fs.readFileSync('src/settings/cache/gexp.json', 'utf8'));
       if (cache[title] && cache[title].length) interaction.editReply({ embeds:[cache[title][0]] })
@@ -105,6 +111,11 @@ module.exports = {
         let sday = Object.keys(data.dailyxp).filter(n=>n.startsWith(time.slice(0,7)))
         for (let i = 0; i < sday.length; i++) {
           scaled += data.dailyxp[sday[i]]
+        }
+      } else if (period == 'y') {
+	      let sday = Object.keys(data.dailyxp).filter(n=>n.startsWith(time.slice(0,4)))
+        for (let i = 0; i < sday.length; i++) {
+          scaled += data.dailyxp[sday[i]] || 0
         }
       } else if (period == 'w') {
         for (let i=0; i<7;i++) {
@@ -122,6 +133,7 @@ module.exports = {
 
         if (period == 'd') days = Object.keys(member.exp.daily).filter(n => n == time)
         else if (period == "w") days = Object.keys(member.exp.daily).slice(0, 7)
+        else if (period == "y") days = Object.keys(member.exp.daily).filter(n=>n.startsWith(time.slice(0,4)))
         else days = Object.keys(member.exp.daily).filter(n=>n.startsWith(time.slice(0,7)))
 
         for (let den of days) {
@@ -138,6 +150,7 @@ module.exports = {
 
         if (period == 'd') days = Object.keys(member.exp.daily).filter(n => n == time)
         else if (period == "w") days = Object.keys(member.exp.daily).slice(0, 7)
+        else if (period == "y") days = Object.keys(member.exp.daily).filter(n=>n.startsWith(time.slice(0,4)))
         else days = Object.keys(member.exp.daily).filter(n=>n.startsWith(time.slice(0,7)))
 
         for (let den of days) {

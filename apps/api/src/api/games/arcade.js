@@ -198,7 +198,18 @@ module.exports = (hypixel) => {
       highestround: arcade.pixel_party.highest_round || 0,
       rounds: arcade.pixel_party.rounds_completed || 0,
       powerups: arcade.pixel_party.power_ups_collected || 0,
-    } : {}
+    } : {},
+    dropper: {
+      wins: arcade.dropper?.wins || 0,
+      fails: arcade.drooper?.fails || 0,
+      games_finished: arcade.dropper?.games_finished || 0,
+      maps_completed: arcade.dropper?.maps_completed || 0,
+      flawless_games: arcade.dropper?.flawless_games || 0,
+      games: arcade.dropper?.games_played || 0,
+      losses: (arcade.dropper?.games_played || 0)-(arcade.dropper?.wins || 0),
+      wlr: func.ratio(arcade.dropper?.wins || 0, (arcade.dropper?.games_played || 0)-(arcade.dropper?.wins || 0)),
+      fastest_game: arcade.dropper?.fastest_game || 0,
+    }
   }
 
   return api

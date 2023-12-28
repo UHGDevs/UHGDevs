@@ -23,4 +23,7 @@ module.exports = async (uhg, interaction) => {
   else if (interaction.isButton() && interaction.customId.startsWith('TIME_RUN_')) require(`../interactions/time_run`)(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('CROLE_')) require(`../interactions/customroles`)(uhg, interaction)
   else if (interaction.isButton() && interaction.customId.startsWith('tricka_')) require(`../interactions/tricka`)(uhg, interaction)
+  else if (interaction.isSelectMenu() && interaction.customId.startsWith("TOURNEY_MENU")) require("../interactions/tourney_menu")(uhg, interaction)
+  else if (interaction.isButton() && interaction.customId.startsWith("TOURNEY_EDIT")) require("../interactions/modal/tourneyedit.js").send(uhg, interaction)
+  else if (interaction.isButton() && interaction.customId.startsWith("TOURNEY_PLAYER")) require("../interactions/modal/tourneyplayer.js").send(uhg, interaction)
 }
