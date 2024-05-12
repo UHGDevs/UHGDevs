@@ -1543,6 +1543,6 @@ module.exports = async (input, call=["mojang", "hypixel"], skyblocki=[]) => {
 
 } catch (e) {
   console.log(String(e.stack).bgRed)
-  return "Chyba v API, kontaktujte vývojáře (<@!312861502073995265>)"
+  return "Chyba v API, kontaktujte vývojáře"
 }
 }
