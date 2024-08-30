@@ -31,7 +31,7 @@ module.exports = {
         if (gmember.user.bot) continue;
         let data = members?.length ? members.filter(n => n.uuid == user.uuid) : []
         if (!data.length) continue;
-        await refresh.bw_refresh(uhg, gmember, data[0])
+        //await refresh.bw_refresh(uhg, gmember, data[0])
       }
 
     

@@ -28,5 +28,5 @@ module.exports = async (uhg, client) => {
 
   let rServers = require('../../utils/serverroles.js')
   rServers.uhg(uhg)
-  rServers.bw(uhg)
+  //rServers.bw(uhg)
 }
