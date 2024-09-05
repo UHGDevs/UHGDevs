@@ -6,7 +6,7 @@ const guildrefresh = require('../../utils/guildrefresh');
 module.exports = {
   name: 'unelites',
   description: 'Show most unactive members',
-  permissions: [{ id: '530504567528620063', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '530504766225383425', type: 'ROLE', permission: true}],
+  permissions: [{ id: '530504567528620063', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '475585340762226698', type: 'ROLE', permission: true}, { id: '530504766225383425', type: 'ROLE', permission: true}, { id: '478610913386168360', type: 'ROLE', permission: true},],
   options: [
     {
       name: 'guild',
