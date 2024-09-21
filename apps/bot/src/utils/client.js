@@ -6,6 +6,8 @@ module.exports = (uhg) => {
     if (uhg.settings.dev_mode === true) {
       uhg.mc.client = minecraft.createClient({
         host: "mc.hypixel.net",
+        version: "1.20.1",
+        port: "25565",
         username: process.env.email,
         password: process.env.password,
         auth: 'microsoft',
@@ -15,8 +17,9 @@ module.exports = (uhg) => {
       })
     } else {
       uhg.mc.client = minecraft.createClient({
+        version: '1.20.1',
         host: "mc.hypixel.net",
-        version: "1.16.1",
+        port: "25565",
         username: process.env.email,
         auth: 'microsoft',
         onMsaCode: msaCode,
@@ -27,11 +30,11 @@ module.exports = (uhg) => {
 
     uhg.mc.client.setMaxListeners(Infinity)
 
-//     uhg.mc.client.on("success", (packet, a) => {
-// //      console.log(packet)
-// //      console.log(a)
-//       console.log("BOT LOG ON".brightGreen)
-//     })
+     uhg.mc.client.on("success", (packet, a) => {
+//       console.log(packet)
+//       console.log(a)
+       console.log("BOT LOG ON".brightGreen)
+     })
 
     async function msaCode(data) {
       console.log(data)
