@@ -1,22 +1,21 @@
 const fs = require('fs');
-module.exports = async (uhg, packet) => {
+module.exports = async (uhg, message, type) => {
+  //if (type != "chat") return;
   const pmsg = {}
-  let message = JSON.parse(packet.message);
   if (message.extra) {
     let msgs = []
-    for (let i=0; i<message.extra.length;i++) msgs.push(message.extra[i].text)
-
+    for (let i=0; i<message.extra.length;i++) msgs.push(message.extra[i].text);
     pmsg.extra = uhg.clear(msgs.join("")) || null
     pmsg.non = msgs.join("") || null
-  } else pmsg.extra = null
+  } else pmsg.extra = null;
 
   if (message.text && pmsg.extra) pmsg.msg = uhg.clear(message.text) + pmsg.extra
   else pmsg.msg = pmsg.extra||uhg.clear(message.text)||null
-  if (!pmsg.msg) return { msg: false }
+
+  if (!pmsg.msg) return { msg: false };
   if (pmsg.msg.startsWith("-")) pmsg.msg = pmsg.msg.replace(/-/g, "").trim()
   pmsg.msg = pmsg.msg.replace(/\s+/g, ' ').trim()
 
-  console.log(pmsg.msg)
   if (uhg.mc.temp) uhg.mc.temp.push(pmsg.msg)
 
   //["Guild", ">", "jmenonnona:", "zprava"]
@@ -109,8 +108,8 @@ module.exports = async (uhg, packet) => {
     pmsg.channel = "Officer"
     pmsg.event = "ginvite"
   }
+
   if (!pmsg.channel || pmsg.username==uhg.mc.client.username) return pmsg
-  //console.log(pmsg)
 
   let verify = uhg.data.verify ? uhg.data.verify.filter(n => n.nickname == pmsg.username) : await uhg.mongo.run.get("general", "verify", { nickname: pmsg.username })
   if (verify.length) {

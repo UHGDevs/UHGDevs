@@ -66,10 +66,11 @@ exports.write = async function (uhg, pmsg) {
     else if (pmsg.antispam) msg = msg + pmsg.antispam
 
     delete pmsg.error
-    uhg.mc.client.write("chat", { message: msg, position: 0 })
+    //uhg.mc.client.write("chat", { message: msg, position: 0 })
+    uhg.mc.client.chat(msg)
 
-    uhg.mc.client.on('chat', async function(packet) {
-      let message = JSON.parse(packet.message)
+    uhg.mc.client.on('message', async function(packet) {
+      let message = packet
       let text = uhg.clear(message.text)
       if (message.color == "red" && text.endsWith("!") && !text.includes("are a bannable")) pmsg.error = text
       return

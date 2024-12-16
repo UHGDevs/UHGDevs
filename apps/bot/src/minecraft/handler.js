@@ -2,12 +2,14 @@ const fs = require("fs");
 module.exports = async (uhg) => {
 
   const event = require(`./message.js`)
-  uhg.mc.client.on("chat", event.bind(null, uhg));
+  uhg.mc.client.on("message", event.bind(null, uhg));
   uhg.mc.client.on("error", error => {
     console.log("CHYBA V botovi:\n".bgRed + String(error.stack).bgRed)
     uhg.restartbot()
   })
-  uhg.mc.client.on("kick_disconnect", packet => { uhg.dc.cache.channels.get("bot").send(JSON.parse(packet.reason).extra[0].text); uhg.restartbot() })
+  //uhg.mc.client.on("kick_disconnect", packet => { uhg.dc.cache.channels.get("bot").send(JSON.parse(packet.reason).extra[0].text); uhg.restartbot() })
+  uhg.mc.client.on("kick", packet => { uhg.dc.cache.channels.get("bot").send("KICK"); uhg.restartbot() })
+  uhg.mc.client.on("end", packet => { uhg.dc.cache.channels.get("bot").send("ENDED"); uhg.restartbot() })
 
   uhg.mc.ready = true
 
