@@ -3,8 +3,9 @@ const squid = require('flying-squid');
 const mineflayer = require("mineflayer");
 
 module.exports = (uhg) => {
+  let force = false
   if (uhg.settings.minecraft === true) {
-    if (uhg.settings.dev_mode === true) {
+    if (uhg.settings.dev_mode === true && force) {
 
       /*
       uhg.mc.client = minecraft.createClient({
@@ -34,6 +35,8 @@ module.exports = (uhg) => {
         chatLengthLimit: 256,
       })
 
+      console.log("B")
+
     } else {
 
       uhg.mc.client = mineflayer.createBot({
@@ -48,6 +51,7 @@ module.exports = (uhg) => {
         viewDistance: "tiny",
         chatLengthLimit: 256,
       })
+      console.log("A")
       /*
       uhg.mc.client = minecraft.createClient({
         version: '1.20.1',
