@@ -35,14 +35,13 @@ module.exports = (uhg) => {
         chatLengthLimit: 256,
       })
 
-      console.log("B")
-
     } else {
 
       uhg.mc.client = mineflayer.createBot({
         host: "mc.hypixel.net",
         port: "25565",
         username: process.env.email,
+        password: process.env.password,
         onMsaCode: msaCode,
         checkTimeoutInterval: 30 * 1000 * 1.5,
         profilesFolder: 'src/settings/minecraft/',
@@ -51,7 +50,6 @@ module.exports = (uhg) => {
         viewDistance: "tiny",
         chatLengthLimit: 256,
       })
-      console.log("A")
       /*
       uhg.mc.client = minecraft.createClient({
         version: '1.20.1',
@@ -86,8 +84,8 @@ module.exports = (uhg) => {
 
     async function msaCode(data) {
       console.log(data)
-      const msg = `Nové přihlášení:\nLink: ${data.verification_uri}\nKód: \`${data.user_code}\``
-
+      const msg = `Nové přihlášení:\nLink: ${data?.verification_uri}\nKód: \`${data?.user_code}\``
+      console.log(msg)
       let channel = uhg.dc.cache.channels.get('bot')
       if (!channel) return
 
@@ -117,5 +115,4 @@ module.exports = (uhg) => {
 
   }
 
-  console.log(uhg.mc.client.username)
 }
