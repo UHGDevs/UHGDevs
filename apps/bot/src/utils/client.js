@@ -40,7 +40,6 @@ module.exports = (uhg) => {
         host: "mc.hypixel.net",
         port: "25565",
         username: process.env.email,
-        password: process.env.password,
         onMsaCode: msaCode,
         checkTimeoutInterval: 30 * 1000 * 1.5,
         profilesFolder: 'src/settings/minecraft/',
