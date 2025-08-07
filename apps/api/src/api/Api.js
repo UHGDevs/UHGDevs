@@ -37,6 +37,12 @@ class Api extends CreateUser {
 
     let promises = []
     for (let call of calls) {
+      
+      if (this.cache[call] && (this.cache[call].updated == undefined ||this.cache[call].updated > Number(new Date()) - 1000*60*30 )) {
+      
+        api[call] = this.cache[call]
+        continue
+      }
       /* require api from database (aliases) */
       let fetcher = this.client.calls.get(call.toLowerCase())
       if (!fetcher) return resolve ({ success: false, reason: `${call} is invalid name of api`})
