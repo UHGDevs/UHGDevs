@@ -27,7 +27,7 @@ module.exports = (hypixel) => {
     
     return ({
       level: func.getBwLevel(bedwars.Experience),
-      levelformatted: `[${Math.floor(func.getBwLevel(bedwars.Experience))}☆]`,
+      levelformatted: `[${Math.floor(func.getBwLevel(bedwars.Experience))}${func.getBwLevel(bedwars.Experience)>1100? '✪' : '✫'}]`,
       xp: bedwars.Experience || 0,
       coins: bedwars.coins || 0,
       main_mode: func.getGamemode(bw_main_mode),

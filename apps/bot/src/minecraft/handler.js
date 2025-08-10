@@ -9,7 +9,7 @@ module.exports = async (uhg) => {
   })
   //uhg.mc.client.on("kick_disconnect", packet => { uhg.dc.cache.channels.get("bot").send(JSON.parse(packet.reason).extra[0].text); uhg.restartbot() })
   uhg.mc.client.on("kick", packet => { uhg.dc.cache.channels.get("bot").send("KICK"); uhg.restartbot() })
-  uhg.mc.client.on("end", packet => { uhg.dc.cache.channels.get("bot").send("ENDED"); uhg.restartbot() })
+  uhg.mc.client.on("end", async (packet) => { uhg.dc.cache.channels.get("bot").send("ENDED " + packet.reason ); console.log(packet); await uhg.delay(20000); uhg.restartbot() })
 
   uhg.mc.ready = true
 

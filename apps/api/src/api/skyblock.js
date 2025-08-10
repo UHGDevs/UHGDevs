@@ -17,7 +17,7 @@ class Skyblock {
     if (limit <= 0) return {success: false, type: "skyblock", reason: 'Hypixel API key limit reached!'};
 
     let skyblock;
-    try { skyblock = await client.callHypixel.get('skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response ? e.response.data.cause : 'Skyblock API error'}};
+    try { skyblock = await client.callHypixel.get('v2/skyblock/profiles', {params: { key: apikey, uuid: uuid }}).then( n => n.data ) } catch (e) {return {success: false, type: "skyblock", reason: e.response ? e.response.data.cause : 'Skyblock API error'}};
     if (!skyblock.success) return  {success: false, type: "skyblock", reason: skyblock.cause};
     if (!skyblock.profiles) return  {success: false, type: "skyblock", reason: 'Hráč nemá žádný profil!'};
 
@@ -35,7 +35,7 @@ class Skyblock {
         mode: func.sbMode(p.game_mode),
 
         selected: p.selected || false,
-        updated: p.last_save || -1,
+//        updated: p.last_save || -1,
 
         bank: p.banking ? Math.floor(p.banking.balance) : -1,
         bank_history: [ ],
@@ -74,6 +74,7 @@ class Skyblock {
 
       /* -- Member -- */ 
       let member = p.members[uuid]
+
       member.banking = p.banking
       member.experience_skill_social2 = Object.values(p.members).reduce((a, b)=>a += b.experience_skill_social2 || 0, 0)
 
@@ -141,8 +142,9 @@ profiles: array             - []
 
   username: string
   uuid: string
-  updated: int                - by hypixel
+//  updated: int                - by hypixel
   joined: int                 - joined island time
+  cookie: bool                - cookie buff
 
   skills_api: bool            - true = on, false = off
   banking_api: bool

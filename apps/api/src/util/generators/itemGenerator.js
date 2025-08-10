@@ -156,10 +156,10 @@ const parseItems = async function (base64, db) {
 const getItems = async function (profile, db) {
   const output = {};
 
-  if (profile.backpack_contents) {
+  if (profile.inventory?.backpack_contents) {
     const storage = [];
 
-    for (const backpack of Object.values(profile.backpack_contents)) {
+    for (const backpack of Object.values(profile.inventory.backpack_contents)) {
       const items = await parseItems(backpack.data, db);
 
       storage.push(items);
@@ -167,11 +167,11 @@ const getItems = async function (profile, db) {
 
     output.storage = storage.flat();
   }
-
-  if (profile.sacks_counts) {
+  
+  if (profile.inventory?.sacks_counts) {
     let sacksValue = 0;
 
-    for (const [index, count] of Object.entries(profile.sacks_counts)) {
+    for (const [index, count] of Object.entries(profile.inventory.sacks_counts)) {
       const sackPrice = db[index.toLowerCase()];
 
       if (sackPrice != undefined) {
@@ -181,16 +181,16 @@ const getItems = async function (profile, db) {
 
     output.sacks = sacksValue;
   }
+  
+  output.inventory = profile.inventory?.inv_contents ? await parseItems(profile.inventory.inv_contents.data, db) : [];
+  output.enderchest = profile.inventory?.ender_chest_contents ? await parseItems(profile.inventory.ender_chest_contents.data, db) : [];
+  output.armor = profile.inventory?.inv_armor ? await parseItems(profile.inventory.inv_armor.data, db) : [];
+  output.wardrobe_inventory = profile.inventory.wardrobe_contents ? await parseItems(profile.inventory.wardrobe_contents.data, db) : [];
 
-  output.inventory = profile.inv_contents ? await parseItems(profile.inv_contents.data, db) : [];
-  output.enderchest = profile.ender_chest_contents ? await parseItems(profile.ender_chest_contents.data, db) : [];
-  output.armor = profile.inv_armor ? await parseItems(profile.inv_armor.data, db) : [];
-  output.wardrobe_inventory = profile.wardrobe_contents ? await parseItems(profile.wardrobe_contents.data, db) : [];
-
-  if (profile.pets) {
+  if (profile.pets_data?.pets) {
     const pets = [];
 
-    for (const pet of profile.pets) {
+    for (const pet of profile.pets_data.pets) {
       const petData = petGenerator.getPetPrice(pet, db);
 
       pets.push(petData);
@@ -199,7 +199,7 @@ const getItems = async function (profile, db) {
     output.pets = pets;
   }
 
-  output.talismans = profile.talisman_bag ? await parseItems(profile.talisman_bag.data, db) : [];
+  output.talismans = profile.inventory?.bag_contents?.talisman_bag ? await parseItems(profile.inventory.bag_contents.talisman_bag.data, db) : [];
 
   if (output.inventory.length == 0) {
     output.no_inventory = true;

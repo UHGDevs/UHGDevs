@@ -36,7 +36,7 @@ const getNetworth = async function (data, profile) {
   }
 
   output.bank = profile.banking?.balance ?? -1;
-  output.purse = profile.coin_purse ?? -1;
+  output.purse = profile.currencies?.coin_purse ?? -1;
   output.sacks = data.sacks ?? 0;
 
   output.networth = Object.values(output.categories).reduce((a, b) => a + b.total, 0) + output.sacks;

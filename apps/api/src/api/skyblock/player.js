@@ -9,21 +9,23 @@ module.exports = (player, profile, cache) => {
   let skills = func.getSkills(player, achievements)
 
   let mining = player.mining_core || {}
-
+console.log(player.player_data.experience)
+  console.log(Object.values(player.player_data.experience || [])?.filter(a => a>0))
   let api = {
     username: player.username,
     uuid: player.uuid,
-    updated: player.last_save,
-    joined: player.first_join,
-
-    skills_api: (!player.experience_skill_farming && !player.experience_skill_mining && !player.experience_skill_foraging) ? false : true,
+    //updated: player.last_save,
+    joined: player.profile.first_join,
+    cookie: player.profile.cookie_buff_active ?? false,
+    
+    skills_api: Object.values(player.player_data.experience || [])?.filter(a => a>0).length ? true : false,
     banking_api: profile.bank >= 0,
-    purse_api: player.coin_purse ? true: false,
+    purse_api: player.currencies?.coin_purse >= 0,
 
     bank: {
-      purse: Math.floor(player.coin_purse || 0),
-      bank: profile.bank > 0 ? profile.bank : 0,
-      total: Math.floor(player.coin_purse || 0) + (profile.bank > 0 ? profile.bank : 0)
+      purse: Math.floor(player.currencies?.coin_purse ?? 0),
+      bank: profile.bank ?? 0,
+      total: Math.floor(player.currencies.coin_purse ?? 0) + (profile.bank ?? 0)
     },
 
     fairy_souls: {
