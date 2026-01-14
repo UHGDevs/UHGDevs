@@ -1285,7 +1285,7 @@ module.exports = async (input, call=["mojang", "hypixel"], skyblocki=[]) => {
     api.skyblock.mining = {}
     api.skyblock.nether = {}
 
-    var skyblock = await fetch(`https://api.hypixel.net/skyblock/profiles?key=${api_key}&uuid=${uuid}`).then(api => api.json())
+    var skyblock = await fetch(`https://api.hypixel.net/v2/skyblock/profiles?key=${api_key}&uuid=${uuid}`).then(api => api.json())
     if (!skyblock.success) return "Chyba v skyblock api"
     let profiles = skyblock.profiles
     if (!profiles) return "Hráč nehrál SkyBlock"

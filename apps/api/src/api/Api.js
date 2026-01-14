@@ -39,7 +39,6 @@ class Api extends CreateUser {
     for (let call of calls) {
       
       if (this.cache[call] && (this.cache[call].updated == undefined ||this.cache[call].updated > Number(new Date()) - 1000*60*30 )) {
-      
         api[call] = this.cache[call]
         continue
       }

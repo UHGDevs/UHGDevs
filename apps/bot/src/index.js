@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 process.on('uncaughtException', function (error) {console.log(error)})
 
 const fs = require('fs');

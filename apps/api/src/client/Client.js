@@ -13,7 +13,7 @@ class Client extends Nw {
   constructor(options = {}) {
     super(options);
 
-    this.version = '0.1.0';
+    this.version = '0.0.0';
 
 
     this.users = new Collection()
@@ -78,7 +78,7 @@ class Client extends Nw {
     let data = await this.callHypixel.get('resources/achievements').then( n => n.data )
     let aps = {
       all: data.achievements,
-      legacy: await getLegacy(data.achievements)
+      legacy: await require('../util/achievements').getLegacy(data.achievements)
     }
     this.aps = aps
     return aps

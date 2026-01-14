@@ -14,3 +14,4 @@ apps/guild/cache/*.json
 apps/guild/config.json
 *.pid
 apps/guild/src/minecraft/data
+apps/novybot

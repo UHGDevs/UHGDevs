@@ -1,7 +1,7 @@
 const { CommandInteraction, MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 
 const fs = require('fs');
-const canva = require('../../../../canvas')
+//const canva = require('../../../../canvas')
 
 module.exports = {
   name: "profile",
@@ -48,12 +48,12 @@ module.exports = {
       if (!api.success) return interaction.editReply({ embeds: [new MessageEmbed().setTitle(`**Error v api**`).setColor('RED').setDescription(api.reason)] })
 
       let style = interaction.options.getString('style') || 'picture'
-      if (style == 'picture') {
+      if (false/*style == 'picture'*/) {
         let data = await uhg.mongo.run.get('general', 'commands', { _id: 'general' }).then(n=> n[0] || null)
         if (!data) return interaction.editReply({ content: '\`general\` příkaz nebyl nalezen, kontaktuj prosím developera' })
 
-        let img = await canva.run(data, api)
-        return interaction.editReply({ files: [img] })
+       // let img = await canva.run(data, api)
+        //return interaction.editReply({ files: [img] })
       }
 
       let stats = uhg.data.stats && uhg.data.stats.length ? uhg.data.stats.find(n => n.uuid == api.uuid) : await uhg.mongo.run.get("stats", "stats", { uuid: api.uuid }).then(n => n[0] || null)

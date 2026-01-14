@@ -145,6 +145,7 @@ module.exports = {
 
       let lb = { players: [], send: [] }
       data.forEach(player => {
+        if (game !== 'general' && !player.stats) {console.log(`ERROR - nejsou stats: `);console.log(player); return;}
         if (game !== 'general' && !player.stats[game]) return //console.log(player)
         let gamemode_api;
         if (game !== 'general') gamemode_api = player.stats[game][gamemode] && player.stats[game][gamemode][stat] ? player.stats[game][gamemode] : player.stats[game]

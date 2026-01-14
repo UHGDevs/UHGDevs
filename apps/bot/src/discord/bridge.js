@@ -7,7 +7,7 @@ module.exports = async (uhg, message) => {
   if (message.channel.id==uhg.getDiscordIds().channels.guild) chat = "/gc"
   if (!chat) return;
 
-  if (uhg.mc.client?.socket?._host !== 'mc.hypixel.net') return uhg.settings.offline ? message.reply({ content: "Bot není na hypixelu.", failIfNotExists: false }) : false
+  //if (uhg.mc.client?.socket?._host !== 'mc.hypixel.net') return uhg.settings.offline ? message.reply({ content: "Bot není na hypixelu.", failIfNotExists: false }) : false
 
   // IMGUR => convert attachment to an imgur link
   if (message.attachments.first()?.proxyURL && (message.attachments.first()?.contentType == 'image/png' || message.attachments.first()?.contentType == 'image/jpeg')) {

@@ -1,4 +1,4 @@
-const canva = require('../../../../canvas')
+//const canva = require('../../../../canvas')
 
 const { MessageSelectMenu, MessageButton, MessageActionRow } = require("discord.js");
 const { stat } = require('fs');
@@ -10,6 +10,7 @@ module.exports = {
   platform: "dc",
   run: async (uhg, message, content) => {
     try {
+      return "Chybi CANVAS library"
       let args = String(content).split(' ')
 
       let cmd = args[0] || 'general'
@@ -20,8 +21,8 @@ module.exports = {
       let api = await uhg.api.call(args[1] || 'DavidCzPdy', ['hypixel', 'guild', 'online'], { premium: true} )
       if (!api.success) return api.reason
       
-      let img = await canva.run(data, api)
-      if (!img.name) return img
+      //let img = await canva.run(data, api)
+      //if (!img.name) return img
 
 
       let but_null = ((a, b='SECONDARY') => {return new MessageButton().setCustomId(`ECMD_${cmd}_null_${a}`).setStyle(b).setDisabled(true).setLabel(" ")})
