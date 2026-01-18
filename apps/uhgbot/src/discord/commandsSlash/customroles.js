@@ -1,35 +1,39 @@
 /**
  * src/discord/commandsSlash/customroles.js
- * Menu pro výběr volitelných rolí (Pingy, Movie Night atd.)
+ * Samopodpisovací role (Reaction Roles) přes tlačítka.
  */
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 
 module.exports = {
     name: 'customroles',
-    description: 'Vyvolá menu pro výběr Custom Rolí (Admin)',
+    description: 'Odeslat panel pro výběr rolí (Admin pouze)',
+    // Oprávnění pro spuštění příkazu (vytvoření panelu)
     permissions: [
         { type: 'USER', id: '378928808989949964' }, // DavidCzPdy
         { type: 'USER', id: '312861502073995265' }  // Farmans
     ],
 
-    // --- 1. ODESLÁNÍ PANELU (Admin only) ---
+    /**
+     * 1. ODESLÁNÍ PANELU
+     * Spustí se při napsání /customroles
+     */
     run: async (uhg, interaction) => {
+        // Použití Flags místo ephemeral:true (Discord.js v14 standard)
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const embed = new uhg.dc.Embed()
-            .setTitle("**Reaction Role**")
+            .setTitle("**UHG Reaction Roles**")
             .setColor(0x55FFFF)
             .setDescription(
-                "<:dot:1109460785723351110> **Ping Role**\n" +
-                "Tyto role slouží k tomu, abyste byli upozorněni na konkrétní novinky:\n\n" +
-                "<:discord:1003709661335277569> ➜ <@&1003713161238679652> (Discord Oznámení)\n" +
-                "<:saturn:1012080877242687500> ➜ <@&1003713511710543952> (SkyBlock Oznámení)\n" +
-                "<:games:1003709662941675541> ➜ <@&1003713647845052466> (Hypixel Games Oznámení)"
+                "Vyber si role, o které máš zájem. Kliknutím na tlačítko si roli přidáš nebo odebereš.\n\n" +
+                "**🔔 Oznámení (Pings)**\n" +
+                "<:discord:1003709661335277569> ➜ <@&1003713161238679652> (Discord Novinky)\n" +
+                "<:saturn:1012080877242687500> ➜ <@&1003713511710543952> (SkyBlock Novinky)\n" +
+                "<:games:1003709662941675541> ➜ <@&1003713647845052466> (Hypixel Novinky)"
             )
-            .setFooter({ text: "Kliknutím na tlačítko si roli přidáš nebo odebereš." });
+            .setFooter({ text: "Pokud tlačítka nereagují, kontaktuj technickou správu." });
 
-        // Tlačítka - ID formát: "customroles_toggle_IDROLE"
-        // 1. Řádek - Pingy
+        // První řada - Oznámení
         const row1 = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('customroles_toggle_1003713161238679652')
@@ -38,41 +42,49 @@ module.exports = {
             new ButtonBuilder()
                 .setCustomId('customroles_toggle_1003713511710543952')
                 .setStyle(ButtonStyle.Secondary)
-                .setEmoji('<:saturn:1012080877242687500>')
+                .setEmoji('<:saturn:1012080877242687500>'),
+            new ButtonBuilder()
+                .setCustomId('customroles_toggle_1003713647845052466')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('<:games:1003709662941675541>')
         );
 
 
-        // Odeslání do kanálu (ne ephemeral, aby to viděli všichni)
+
+        // Odeslání do kanálu, kde byl příkaz napsán
         await interaction.channel.send({ embeds: [embed], components: [row1] });
-        await interaction.editReply({ content: "✅ Panel s rolemi byl odeslán." });
+        await interaction.editReply({ content: "✅ Panel s rolemi byl úspěšně odeslán do tohoto kanálu." });
     },
 
-    // --- 2. REAKCE NA TLAČÍTKO ---
+    /**
+     * 2. LOGIKA PŘEPÍNÁNÍ ROLÍ
+     * Voláno automaticky přes interactionCreate.js (díky customId začínajícímu na customroles_toggle_)
+     */
     toggle: async (uhg, interaction) => {
-        // ID tlačítka: customroles_toggle_ROLEID
+        // ID role je třetí část ID tlačítka: customroles_toggle_123456...
         const roleId = interaction.customId.split('_')[2];
+        const member = interaction.member;
         const guild = interaction.guild;
 
-        if (!guild) return interaction.reply({ content: "Chyba serveru.", flags: [MessageFlags.Ephemeral] });
+        if (!guild) return;
 
-        // Získání role a člena
+        // Najdeme roli na serveru
         const role = guild.roles.cache.get(roleId);
-        const member = interaction.member;
-
         if (!role) {
-            return interaction.reply({ content: "❌ Tato role již na serveru neexistuje.", flags: [MessageFlags.Ephemeral] });
+            return interaction.reply({ content: "❌ Tato role nebyla na serveru nalezena.", flags: [MessageFlags.Ephemeral] });
         }
 
         try {
+            // Kontrola, zda uživatel roli má
             if (member.roles.cache.has(roleId)) {
-                // MÁ ROLI -> ODEBRAT
+                // ODEBRAT ROLI
                 await member.roles.remove(role);
                 await interaction.reply({ 
                     content: `🗑️ Role **${role.name}** ti byla odebrána.`, 
                     flags: [MessageFlags.Ephemeral] 
                 });
             } else {
-                // NEMÁ ROLI -> PŘIDAT
+                // PŘIDAT ROLI
                 await member.roles.add(role);
                 await interaction.reply({ 
                     content: `✅ Role **${role.name}** ti byla přidána.`, 
@@ -80,9 +92,9 @@ module.exports = {
                 });
             }
         } catch (e) {
-            console.error("Chyba při změně role:", e);
+            console.error(` [ROLES ERROR] Chyba přiřazení role: `.red, e.message);
             await interaction.reply({ 
-                content: "❌ Nepodařilo se změnit roli. (Možná má bot nižší oprávnění než role?)", 
+                content: "❌ Nepodařilo se změnit roli. Ujisti se, že bot má dostatečná oprávnění (Role bota musí být nad těmito rolemi).", 
                 flags: [MessageFlags.Ephemeral] 
             });
         }

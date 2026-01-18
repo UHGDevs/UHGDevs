@@ -286,7 +286,7 @@ class Uhg {
             /* DEBUG - Odkomentuj pokud to stále nepůjde
             */
             if (val === undefined) {
-                console.log(`[BADGE DEBUG] ${name}: Cesta '${cleanPath}' nenašla nic.`);
+                //console.log(`[BADGE DEBUG] ${name}: Cesta '${cleanPath}' nenašla nic.`);
                 // console.log(`Dostupne klíče v stats:`, api.stats ? Object.keys(api.stats) : 'žádné');
             }
             

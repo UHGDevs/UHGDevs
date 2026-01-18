@@ -143,7 +143,7 @@ module.exports = {
             const chunk = leaderboard.slice(i, i + pageSize);
             const description = header + "\n" + chunk.map((p, index) => {
                 const rank = i + index + 1;
-                const nameStyle = p.left ? `*${p.name}*` : `**${p.name}**`;
+                const nameStyle = p.left ? `*${uhg.dontFormat(p.name)}*` : `**${uhg.dontFormat(p.name)}**`;
                 return `\`#${rank}\` ${nameStyle}: \`${uhg.f(p.xp)}\``;
             }).join('\n');
 

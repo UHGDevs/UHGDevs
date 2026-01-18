@@ -52,9 +52,11 @@ module.exports = {
             await uhg.roles.applyBadgeRoles(member, hypixelData);
         }
 
+        await uhg.roles.applySplitRoles(member);
+
         // --- C) NICKNAME ---
         await uhg.roles.updateNickname(member, verify.nickname);
-        
+    
         updatedCount++;
     }
     

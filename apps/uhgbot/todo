@@ -2,6 +2,11 @@ dodělat LB mapu
 podívat se, jak funguje API část a případně opravit
 API - skyblock
 
+prefix a slash command haze error - ignorovat tuto kombinaci
+verify image is wrong
+posílání zpráv v minecraftu, když je bot offline, + napsat zpravu, kdyz nekdo posila na dc a neni online
+emoji za jmenem removed
+
 COMMANDS:
 say command
 arena brawl ranking funkce

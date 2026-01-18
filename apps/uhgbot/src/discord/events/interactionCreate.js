@@ -55,7 +55,7 @@ module.exports = async (uhg, interaction) => {
         const cmdName = parts[0]; 
         
         // Hledáme soubor buď v slash kolekci nebo v klasické
-        const cmdFile = uhg.dc.slash.get(cmdName) || uhg.dc.commands.get(cmdName);
+        const cmdFile = uhg.dc.slash.get(cmdName) || uhg.dc.commands.get(cmdName) || uhg.time.events.get(cmdName);;
         
         if (cmdFile) {
 

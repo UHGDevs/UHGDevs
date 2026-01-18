@@ -121,6 +121,9 @@ class RoleHandler {
             await this.applyBadgeRoles(member, hypixelData);
         }
 
+
+        await this.applySplitRoles(member);
+        
         // 5. Update Nickname (použijeme jméno z verify tabulky, která se taky aktualizuje)
         await this.updateNickname(member, verify.nickname);
 
@@ -184,6 +187,41 @@ class RoleHandler {
                 // Ignorujeme chybu, pokud má uživatel vyšší roli než bot
                 if (e.code !== 50013) console.error(`Nešlo změnit nick pro ${member.user.tag}`);
             });
+        }
+    }
+
+    async applySplitRoles(member) {
+        const guild = member.guild;
+
+        // 1. Najdeme všechny role, které mají v názvu "▬▬"
+        // Seřadíme je odshora dolů (podle pozice v seznamu rolí Discordu)
+        const splitRoles = [...guild.roles.cache.filter(r => r.name.includes('▬▬')).values()]
+            .sort((a, b) => b.position - a.position);
+
+        // Získáme pole čistě jen pozic (čísel)
+        const positions = splitRoles.map(r => r.position);
+
+        for (let i = 0; i < splitRoles.length; i++) {
+            const splitRole = splitRoles[i];
+            
+            // Horní hranice je pozice aktuálního splitu
+            const upperLimit = positions[i];
+            // Spodní hranice je pozice následujícího splitu (nebo 0, pokud je to ten nejnižší)
+            const lowerLimit = positions[i + 1] || 0;
+
+            // 2. Zkontrolujeme, zda má uživatel nějakou roli MEZI tímto splitem a tím pod ním
+            const hasRoleInSection = member.roles.cache.some(r => 
+                r.position < upperLimit && 
+                r.position > lowerLimit && 
+                r.id !== member.guild.id // Ignorujeme @everyone roli (má pozici 0)
+            );
+
+            // 3. Přidáme nebo odebereme split roli
+            if (hasRoleInSection) {
+                if (!member.roles.cache.has(splitRole.id)) await member.roles.add(splitRole).catch(() => {});
+            } else {
+                if (member.roles.cache.has(splitRole.id)) await member.roles.remove(splitRole).catch(() => {});
+            }
         }
     }
 }
