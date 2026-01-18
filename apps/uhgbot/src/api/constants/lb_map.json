@@ -1,0 +1,156 @@
+{
+  "general": {
+    "name": "General (Network)",
+    "root": "",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "level": "Network Level",
+          "karma": "Karma",
+          "aps": { "name": "Achievement Points", "db": "achievementPoints" },
+          "ranksGiven": "Ranks Gifted",
+          "giftsGiven": "Gifts Sent"
+        }
+      }
+    }
+  },
+  "bedwars": {
+    "name": "Bed Wars",
+    "root": "stats.bedwars",
+    "structure": {
+      "general": {
+        "name": "General Info",
+        "path": "",
+        "stats": {
+          "level": { "name": "Level", "db": "level", "display": "levelformatted" },
+          "coins": "Coins",
+          "xp": "Experience",
+          "challenges": "Challenges Completed",
+          "uniquechallenges": "Unique Challenges"
+        }
+      },
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak",
+          "games": "Games Played",
+          "iron": "Iron Collected", "gold": "Gold Collected", 
+          "diamond": "Diamond Collected", "emerald": "Emerald Collected"
+        }
+      },
+      "solo": {
+        "name": "Solo",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak", "games": "Games Played",
+          "iron": "Iron", "gold": "Gold", "diamond": "Diamond", "emerald": "Emerald"
+        }
+      },
+      "doubles": {
+        "name": "Doubles",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak", "games": "Games Played",
+          "iron": "Iron", "gold": "Gold", "diamond": "Diamond", "emerald": "Emerald"
+        }
+      },
+      "threes": {
+        "name": "3v3v3v3",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak", "games": "Games Played",
+          "iron": "Iron", "gold": "Gold", "diamond": "Diamond", "emerald": "Emerald"
+        }
+      },
+      "fours": {
+        "name": "4v4v4v4",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak", "games": "Games Played",
+          "iron": "Iron", "gold": "Gold", "diamond": "Diamond", "emerald": "Emerald"
+        }
+      },
+      "4v4": {
+        "name": "4v4",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "finalKills": "Final Kills", "finalDeaths": "Final Deaths", "fkdr": "FKDR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "bedsBroken": "Beds Broken", "bedsLost": "Beds Lost", "bblr": "BBLR",
+          "winstreak": "Winstreak", "games": "Games Played",
+          "iron": "Iron", "gold": "Gold", "diamond": "Diamond", "emerald": "Emerald"
+        }
+      }
+    }
+  },
+  "skywars": {
+    "name": "SkyWars",
+    "root": "stats.skywars",
+    "structure": {
+      "general": {
+        "name": "General Info",
+        "path": "",
+        "stats": {
+          "level": { "name": "Level", "db": "level", "display": "levelformatted" },
+          "coins": "Coins",
+          "heads": "Heads",
+          "souls": "Souls",
+          "shards": "Shards",
+          "opals": "Opals",
+          "tokens": "Tokens"
+        }
+      },
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played", "playtime": { "name": "Playtime", "db": "rawplaytime", "transform": "timeHours" },
+          "assists": "Assists"
+        }
+      }
+    }
+  },
+  "duels": {
+    "name": "Duels",
+    "root": "stats.duels",
+    "structure": {
+      "general": {
+        "name": "General Info",
+        "path": "",
+        "stats": {
+          "coins": "Coins",
+          "lootchests": "Loot Chests",
+          "winstreak": "Current Winstreak",
+          "bestwinstreak": "Best Winstreak"
+        }
+      },
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played"
+        }
+      }
+    }
+  }
+}
