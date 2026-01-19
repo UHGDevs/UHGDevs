@@ -73,7 +73,7 @@ module.exports = {
       let summary = "**10 nejlepších hráčů v GEXP za tento týden:**\n\n";
       for (let i = 0; i < top10.length; i++) {
         const playerInfo = await uhg.api.getMojang(top10[i].uuid);
-        summary += `\`#${i+1}\` **${playerInfo.username}** - ${uhg.f(top10[i].exp)}\n`;
+        summary += `\`#${i+1}\` **${uhg.dontFormat(playerInfo.username)}** - ${uhg.f(top10[i].exp)}\n`;
       }
       embed.setDescription(summary);
 

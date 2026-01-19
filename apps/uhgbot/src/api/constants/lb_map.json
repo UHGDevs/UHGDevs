@@ -9,7 +9,7 @@
         "stats": {
           "level": "Network Level",
           "karma": "Karma",
-          "aps": { "name": "Achievement Points", "db": "achievementPoints" },
+          "aps": { "name": "Achievement Points", "db": "aps" },
           "ranksGiven": "Ranks Gifted",
           "giftsGiven": "Gifts Sent"
         }
@@ -106,25 +106,72 @@
     "root": "stats.skywars",
     "structure": {
       "general": {
-        "name": "General Info",
+        "name": "General",
         "path": "",
         "stats": {
           "level": { "name": "Level", "db": "level", "display": "levelformatted" },
           "coins": "Coins",
-          "heads": "Heads",
           "souls": "Souls",
+          "heads": "Heads",
           "shards": "Shards",
           "opals": "Opals",
-          "tokens": "Tokens"
+          "tokens": "Cosmetic Tokens",
+          "playtime": { "name": "Playtime", "db": "rawplaytime", "transform": "timeHours" }
         }
       },
       "overall": {
         "name": "Overall",
         "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "games": "Games Played",
+          "assists": "Assists"
+        }
+      },
+      "solo_normal": {
+        "name": "Solo Normal",
+        "stats": {
           "wins": "Wins", "losses": "Losses", "wlr": "WLR",
           "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
-          "games": "Games Played", "playtime": { "name": "Playtime", "db": "rawplaytime", "transform": "timeHours" },
-          "assists": "Assists"
+          "games": "Games Played"
+        }
+      },
+      "solo_insane": {
+        "name": "Solo Insane",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played"
+        }
+      },
+      "team_normal": {
+        "name": "Team Normal",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played"
+        }
+      },
+      "team_insane": {
+        "name": "Team Insane",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played"
+        }
+      },
+      "ranked": {
+        "name": "Ranked",
+        "stats": {
+          "highestrt": "Nejlepší Rating",
+          "highestpos": "Nejlepší Position",
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
+          "games": "Games Played"
         }
       }
     }
@@ -134,21 +181,104 @@
     "root": "stats.duels",
     "structure": {
       "general": {
-        "name": "General Info",
+        "name": "General (Coins, Winstreak)",
         "path": "",
         "stats": {
           "coins": "Coins",
           "lootchests": "Loot Chests",
           "winstreak": "Current Winstreak",
-          "bestwinstreak": "Best Winstreak"
+          "bestwinstreak": "Best Winstreak",
+          "games": "Total Games Played"
         }
       },
       "overall": {
         "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR"
+        }
+      },
+      "uhc_duel": {
+        "name": "UHC Duel",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "skywars_duel": {
+        "name": "SkyWars Duel",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "bridge_duel": {
+        "name": "The Bridge",
         "stats": {
           "wins": "Wins", "losses": "Losses", "wlr": "WLR",
           "kills": "Kills", "deaths": "Deaths", "kdr": "KDR",
-          "games": "Games Played"
+          "goals": "Goals"
+        }
+      },
+      "sumo_duel": {
+        "name": "Sumo",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "classic_duel": {
+        "name": "Classic",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "op_duel": {
+        "name": "OP Duel",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "combo_duel": {
+        "name": "Combo",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "no_debuff_duel": {
+        "name": "No Debuff",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+       "bow_duel": {
+        "name": "Bow",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "blitz_duel": {
+        "name": "Blitz Duel",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
+        }
+      },
+      "mega_walls_duel": {
+        "name": "Mega Walls Duel",
+        "stats": {
+          "wins": "Wins", "losses": "Losses", "wlr": "WLR",
+          "kills": "Kills", "deaths": "Deaths", "kdr": "KDR"
         }
       }
     }

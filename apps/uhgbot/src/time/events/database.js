@@ -17,6 +17,7 @@ module.exports = {
         let successCount = 0;
         let errorCount = 0;
         let nameChanges = [];
+        let updatedNames = [];
 
         // 1. Získání fronty (Hráči, kteří nebyli aktualizováni více než 400 hodin)
         // Seřazeno od nejstarších (updated: 1)
@@ -36,6 +37,7 @@ module.exports = {
             
             if (api.success && api.hypixel) {
                 successCount++;
+                updatedNames.push(api.username);
 
                 // 2. KONTROLA ZMĚNY JMÉNA
                 // Pokud se jméno v API liší od toho v DB statistikách

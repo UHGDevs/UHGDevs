@@ -71,41 +71,56 @@ class RoleHandler {
         }
         if (!member) return false;
 
+        // Pomocná funkce pro bezpečné přidání role
+        const safeAdd = async (roleId) => {
+            if (!member.roles.cache.has(roleId)) {
+                // Kontrola hierarchie: Může bot tuto roli spravovat?
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) { 
+                    await member.roles.add(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        // Pomocná funkce pro bezpečné odebrání role
+        const safeRemove = async (roleId) => {
+            if (member.roles.cache.has(roleId)) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) {
+                    await member.roles.remove(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
+
         // 1. Získání verifikace (Cache/DB nebo Přednačteno)
         let verify = preloadedVerify;
         if (verify === undefined) {
             verify = await this.uhg.db.getVerify(member.id);
         }
         
-        let apiUsed = false;
+        let changed = false;
         
         // A. NENÍ VERIFIKOVANÝ -> CLEANUP
         if (!verify) {
-            if (member.roles.cache.has(this.roles.verified)) {
-                await member.roles.remove(this.roles.verified).catch(() => {});
-                apiUsed = true;
-            }
+            if (await safeRemove(this.roles.verified)) changed = true;
             for (const id of Object.values(this.roles.guild)) {
-                if (member.roles.cache.has(id)) {
-                    await member.roles.remove(id).catch(() => {});
-                    apiUsed = true;
-                }
+                if (await safeRemove(id)) changed = true;
             }
             const allBadgeRoles = this.badges.map(b => b.ids).flat();
             for (const id of allBadgeRoles) {
-                 if (member.roles.cache.has(id)) {
-                     await member.roles.remove(id).catch(() => {});
-                     apiUsed = true;
-                 }
+                 if (await safeRemove(id)) changed = true;
             }
-            return apiUsed; 
+            // Zde bychom mohli resetovat nick, ale to nebudeme počítat jako API change pro delay
+            return changed; 
         }
 
         // B. JE VERIFIKOVANÝ
-        if (!member.roles.cache.has(this.roles.verified)) {
-            await member.roles.add(this.roles.verified).catch(() => {});
-            apiUsed = true;
-        }
+        if (await safeAdd(this.roles.verified)) changed = true;
 
         // 2. Data o guildě (DB nebo Přednačteno)
         let dbGuild = preloadedGuild;
@@ -125,25 +140,74 @@ class RoleHandler {
             }
         }
 
-        // Aplikace změn
-        const gChanged = await this.applyGuildRoles(member, guildInfo);
-        
-        let bChanged = false;
-        if (stats) {
-            const hypixelData = { ...stats, stats: stats.stats };
-            bChanged = await this.applyBadgeRoles(member, hypixelData);
+        // 1. Guild Roles
+        const guildRoles = Object.values(this.roles.guild);
+        let roleToAdd = null;
+        if (guildInfo.guild) roleToAdd = this.roles.guild[guildInfo.member.rank];
+
+        for (const id of guildRoles) {
+            if (id === roleToAdd) { if (await safeAdd(id)) changed = true; } 
+            else { if (await safeRemove(id)) changed = true; }
         }
         
-        const nChanged = await this.updateNickname(member, verify.nickname);
-        const sChanged = await this.applySplitRoles(member);
+        // 2. Badges
+        if (stats) {
+            const hypixelData = { ...stats, stats: stats.stats };
+            for (const badge of this.badges) {
+                if (typeof badge.getRole === 'function') {
+                    try {
+                        const result = badge.getRole(badge.name, hypixelData);
+                        const allBadgeRoles = badge.ids || []; 
+                        const targetRole = result.role && result.role.id ? result.role.id : null;
 
-        return apiUsed || gChanged || bChanged || nChanged || sChanged;
+                        for (const id of allBadgeRoles) {
+                            if (id === targetRole) { if (await safeAdd(id)) changed = true; } 
+                            else { if (await safeRemove(id)) changed = true; }
+                        }
+                    } catch (e) {}
+                }
+            }
+        }
+        
+        // 3. Nickname (Optimalizováno)
+        const nChanged = await this.updateNickname(member, verify.nickname);
+        if (nChanged) changed = true;
+
+        // 4. Split Roles (Optimalizováno s kontrolou editable)
+        const sChanged = await this.applySplitRoles(member);
+        if (sChanged) changed = true;
+
+        return changed;
     }
 
     async applyGuildRoles(member, guildData) {
+        let changed = false;
+        
+        // Pomocné funkce pro tuto metodu
+        const safeAdd = async (roleId) => {
+            if (!member.roles.cache.has(roleId)) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) {
+                    await member.roles.add(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        const safeRemove = async (roleId) => {
+            if (member.roles.cache.has(roleId)) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) {
+                    await member.roles.remove(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
         const guildRoles = Object.values(this.roles.guild);
         let roleToAdd = null;
-        let changed = false;
 
         if (guildData && guildData.guild && guildData.name === "UltimateHypixelGuild") {
             const rank = guildData.member.rank; 
@@ -153,15 +217,9 @@ class RoleHandler {
 
         for (const id of guildRoles) {
             if (id === roleToAdd) {
-                if (!member.roles.cache.has(id)) {
-                    await member.roles.add(id).catch(() => {});
-                    changed = true;
-                }
+                if (await safeAdd(id)) changed = true;
             } else {
-                if (member.roles.cache.has(id)) {
-                    await member.roles.remove(id).catch(() => {});
-                    changed = true;
-                }
+                if (await safeRemove(id)) changed = true;
             }
         }
         return changed;
@@ -171,29 +229,44 @@ class RoleHandler {
         if (!hypixelStats || !hypixelStats.stats) return false;
         let changed = false;
 
+        const safeAdd = async (roleId) => {
+            if (!member.roles.cache.has(roleId)) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) {
+                    await member.roles.add(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        const safeRemove = async (roleId) => {
+            if (member.roles.cache.has(roleId)) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role && role.editable) {
+                    await member.roles.remove(roleId).catch(() => {});
+                    return true;
+                }
+            }
+            return false;
+        };
+
         for (const badge of this.badges) {
             if (typeof badge.getRole === 'function') {
                 try {
                     const result = badge.getRole(badge.name, hypixelStats);
+                    
                     const allBadgeRoles = badge.ids || []; 
                     const targetRole = result.role && result.role.id ? result.role.id : null;
 
                     for (const id of allBadgeRoles) {
                         if (id === targetRole) {
-                            if (!member.roles.cache.has(id)) {
-                                await member.roles.add(id).catch(() => {});
-                                changed = true;
-                            }
+                            if (await safeAdd(id)) changed = true;
                         } else {
-                            if (member.roles.cache.has(id)) {
-                                await member.roles.remove(id).catch(() => {});
-                                changed = true;
-                            }
+                            if (await safeRemove(id)) changed = true;
                         }
                     }
-                } catch (e) {
-                    console.error(`Chyba v badge ${badge.name}:`, e);
-                }
+                } catch (e) {}
             }
         }
         return changed;
@@ -203,10 +276,11 @@ class RoleHandler {
         if (!username) return false;
         if (member.id === member.guild.ownerId) return false;
         if (!member.guild.members.me.permissions.has(PermissionFlagsBits.ManageNicknames)) return false;
+        
+        // Bot nemůže měnit nick někomu, kdo má vyšší roli
         if (member.roles.highest.position >= member.guild.members.me.roles.highest.position) return false;
 
         const currentName = member.nickname || member.user.username;
-
         if (currentName !== username) {
             try {
                 await member.setNickname(username);
@@ -218,6 +292,24 @@ class RoleHandler {
 
     async applySplitRoles(member) {
         let changed = false;
+
+        // Zde pracujeme přímo s objekty rolí, ne jen s ID
+        const safeAdd = async (role) => {
+            if (!member.roles.cache.has(role.id) && role.editable) {
+                await member.roles.add(role).catch(() => {});
+                return true;
+            }
+            return false;
+        };
+
+        const safeRemove = async (role) => {
+            if (member.roles.cache.has(role.id) && role.editable) {
+                await member.roles.remove(role).catch(() => {});
+                return true;
+            }
+            return false;
+        };
+
         const splitRoles = [...member.guild.roles.cache.filter(r => r.name.includes('▬▬')).values()]
             .sort((a, b) => b.position - a.position);
 
@@ -235,15 +327,9 @@ class RoleHandler {
             );
 
             if (hasRoleInSection) {
-                if (!member.roles.cache.has(splitRole.id)) {
-                    await member.roles.add(splitRole).catch(() => {});
-                    changed = true;
-                }
+                if (await safeAdd(splitRole)) changed = true;
             } else {
-                if (member.roles.cache.has(splitRole.id)) {
-                    await member.roles.remove(splitRole).catch(() => {});
-                    changed = true;
-                }
+                if (await safeRemove(splitRole)) changed = true;
             }
         }
         return changed;
