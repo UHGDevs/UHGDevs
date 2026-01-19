@@ -17,46 +17,25 @@ module.exports = {
 
     // 1. Načtení dat z DB
     const dbGuild = await uhg.db.run.get("stats", "guild", { name: "UltimateHypixelGuild" }).then(n => n[0]);
-    
-    if (!dbGuild) return console.log(" [ROLES] UHG data nejsou v DB.".yellow);
+    const allVerify = await uhg.db.run.get("general", "verify");
+    if (!dbGuild || !allVerify) return console.log(" [ROLES] Chyba při načítání dat.".yellow);
 
-    const guildMembers = dbGuild.members;
-    const verifiedUsers = await uhg.db.run.get("general", "verify");
-    
     const dcMembers = await guild.members.fetch();
     let updatedCount = 0;
+    let changesCount = 0;
 
     for (const [id, member] of dcMembers) {
         if (member.user.bot) continue;
 
-        const verify = verifiedUsers.find(v => v._id == id);
-        if (!verify) continue;
+        const verifyData = allVerify.find(v => v._id == id) || null;
 
-        // --- A) GUILD ROLE (Z DB) ---
-        const gMember = guildMembers.find(m => m.uuid == verify.uuid);
+        const changed = await uhg.roles.updateMember(member, verifyData, dbGuild);
+
+        if (changed) {
+            changesCount++;
+            await uhg.delay(1000); 
+        } 
         
-        let guildInfo = { guild: false };
-        if (gMember) {
-            guildInfo = {
-                guild: true,
-                name: "UltimateHypixelGuild",
-                member: { rank: gMember.rank } // Rank z DB
-            };
-        }
-        await uhg.roles.applyGuildRoles(member, guildInfo);
-
-        // --- B) BADGES (Z DB Stats) ---
-        const stats = await uhg.db.getStats(verify.uuid);
-        if (stats) {
-            const hypixelData = { ...stats, stats: stats.stats }; 
-            await uhg.roles.applyBadgeRoles(member, hypixelData);
-        }
-
-        await uhg.roles.applySplitRoles(member);
-
-        // --- C) NICKNAME ---
-        await uhg.roles.updateNickname(member, verify.nickname);
-    
         updatedCount++;
     }
     

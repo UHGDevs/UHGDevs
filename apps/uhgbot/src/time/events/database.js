@@ -18,10 +18,10 @@ module.exports = {
         let errorCount = 0;
         let nameChanges = [];
 
-        // 1. Získání fronty (Hráči, kteří nebyli aktualizováni více než 48 hodin)
+        // 1. Získání fronty (Hráči, kteří nebyli aktualizováni více než 400 hodin)
         // Seřazeno od nejstarších (updated: 1)
         let updateQueue = await uhg.db.mongo.db("stats").collection("stats")
-            .find({ updated: { $lt: now - (3600000 * 48) } })
+            .find({ updated: { $lt: now - (3600000 * 400) } })
             .sort({ updated: 1 })
             .limit(40) // 40 hráčů každých 15 minut = ~3800 hráčů denně
             .toArray();
@@ -61,20 +61,42 @@ module.exports = {
 
         // 4. INFORMOVÁNÍ NA DISCORDU
         if (logsChannel && (successCount > 0 || errorCount > 0)) {
-            const embed = new uhg.dc.Embed()
-                .setTitle("Pravidelná aktualizace statistik")
-                .setColor(errorCount > 10 ? "Orange" : "Green")
-                .addFields(
-                    { name: "Aktualizováno", value: `✅ ${successCount} hráčů`, inline: true },
-                    { name: "Chyby", value: `❌ ${errorCount}`, inline: true }
-                )
-                .setTimestamp();
+                const embed = new uhg.dc.Embed()
+                    .setTitle("Pravidelná aktualizace statistik")
+                    .setColor(errorCount > 10 ? "Orange" : "Green")
+                    .addFields(
+                        { name: "Aktualizováno", value: `✅ ${successCount} hráčů`, inline: true },
+                        { name: "Chyby", value: `❌ ${errorCount}`, inline: true }
+                    )
+                    .setTimestamp();
 
-            if (nameChanges.length > 0) {
-                embed.addFields({ name: "Detekované změny jmen", value: nameChanges.join('\n').slice(0, 1024) });
+                // Výpis jmen aktualizovaných hráčů
+                if (updatedNames.length > 0) {
+                    // Spojíme jména čárkou
+                    let namesString = updatedNames.join(", ");
+                    
+                    // Ochrana proti limitu Embedu (1024 znaků)
+                    if (namesString.length > 1000) {
+                        namesString = namesString.slice(0, 1000) + " ... a další";
+                    }
+
+                    embed.addFields({ 
+                        name: "Seznam hráčů", 
+                        value: `\`\`\`${namesString}\`\`\``, 
+                        inline: false 
+                    });
+                }
+
+                // Výpis změn jmen
+                if (nameChanges.length > 0) {
+                    embed.addFields({ 
+                        name: "Detekované změny jmen", 
+                        value: nameChanges.join('\n').slice(0, 1024),
+                        inline: false
+                    });
+                }
+
+                logsChannel.send({ embeds: [embed] });
             }
-
-            logsChannel.send({ embeds: [embed] });
-        }
     }
 };

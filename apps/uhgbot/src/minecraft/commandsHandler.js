@@ -54,6 +54,15 @@ module.exports = async (uhg, pmsg) => {
         const mcRes = response.mc || (typeof response === 'string' ? response : null);
         
         if (mcRes) {
+
+            if (!uhg.mc.ready) {
+                if (pmsg.channel === 'Discord') {
+                    pmsg.message.channel.send("⚠️ **Bot je offline.** Příkaz byl zpracován, ale odpověď do hry nebyla odeslána.").catch(() => {});
+                }
+                return;
+            }
+
+
             let target = null;
 
             // Logika pro určení cíle v Minecraftu

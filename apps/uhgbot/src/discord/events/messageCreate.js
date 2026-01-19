@@ -8,6 +8,18 @@ module.exports = async (uhg, message) => {
     const offiChan = uhg.config.channels.officer;
 
     if (message.channel.id === guildChan || message.channel.id === offiChan) {
+
+         if (!uhg.mc.ready) {
+            return message.reply({ 
+                content: "⚠️ **Bot je offline** (Minecraft). Zpráva nebyla odeslána do hry.", 
+                failIfNotExists: false 
+            }).then(msg => {
+                //Smazat varování po 30s, ať nezasírá chat
+                setTimeout(() => msg.delete().catch(() => {}), 30000);
+            });
+        }
+
+
         if (uhg.filterMessage(message.content)) {
             return message.reply({ content: "Zpráva obsahuje blokované slovo.", failIfNotExists: false });
         }

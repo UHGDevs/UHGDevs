@@ -104,6 +104,8 @@ class Minecraft {
         this.client.on('end', (reason) => {
             console.log(' [MC] '.bgYellow.black + ` Odpojeno: ${reason}. Reconnect za 10s...`.yellow);
             this.uhg.mc.ready = false;
+            this.uhg.mc.send = []; 
+            this.lastSent = null;
             setTimeout(() => this.init(), this.reconnectDelay);
         });
         
@@ -111,6 +113,7 @@ class Minecraft {
     }
 
     send(msg) {
+        if (!msg || !this.uhg.mc.ready) return;
         const cleanMsg = String(msg).replace(/\*/g, '').trim();
          if (!cleanMsg) return;
         this.uhg.mc.send.push(cleanMsg);
