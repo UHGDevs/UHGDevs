@@ -1,6 +1,8 @@
 /**
  * src/discord/events/messageCreate.js
  */
+
+const emoji = require('node-emoji');
 module.exports = async (uhg, message) => {
     if (message.author.bot) return;
 
@@ -27,11 +29,24 @@ module.exports = async (uhg, message) => {
         const dbUser = await uhg.db.getVerify(message.author.id);
         const nickname = dbUser ? dbUser.nickname : (message.member?.nickname || message.author.username);
         
-        // PŘEVOD PINGŮ NA JMÉNA (<@ID> -> @Jméno)
-        let contentForMC = await discordPingsToNames(uhg, message);
+        // --- ZPRACOVÁNÍ TEXTU ---
+        
+        // 1. Převod Discord Custom Emojis (<:nazev:ID> -> :nazev:)
+        // Regex chytne <, volitelně 'a' (animované), :, jméno, :, ID, >
+        let contentForMC = message.content.replace(/<a?:(\w+):\d+>/g, ':$1:');
+
+        // 2. Převod Unicode Emojis (😂 -> :joy:)
+        contentForMC = emoji.unemojify(contentForMC);
+
+        // 3. Převod Pingů na Jména (@ID -> @Jméno)
+        // (Používáme upravený contentForMC, ne message.content)
+        contentForMC = await discordPingsToNames(uhg, contentForMC, message.guild);
+        
+        // 4. Oříznutí délky
+        contentForMC = contentForMC.slice(0, 200);
         
         const mcCmd = message.channel.id === offiChan ? "/go" : "/gc";
-        uhg.minecraft.send(`${mcCmd} ${nickname}: ${contentForMC}`);
+        uhg.minecraft.send(`${mcCmd} ${nickname}: ${contentForMC}`)
         
         if (message.content?.trim().startsWith(uhg.config.prefix) || message.content.startsWith('!')) {
         const args = message.content.startsWith('!') ? message.content.slice(1).trim().split(/ +/) : message.content.slice(uhg.config.prefix.length).trim().split(/ +/);
@@ -59,27 +74,28 @@ module.exports = async (uhg, message) => {
 /**
  * Převede Discord zmínky na text pro Minecraft
  */
-async function discordPingsToNames(uhg, message) {
-    let msg = message.content;
-    const matches = msg.match(/<@!?(\d+)>/g); // Najde <@ID> i <@!ID>
+async function discordPingsToNames(uhg, text, guild) {
+    let msg = text;
+    const matches = msg.match(/<@!?(\d+)>/g); 
     if (!matches) return msg;
 
     for (const match of matches) {
         const id = match.replace(/[<@!>]/g, '');
         
-        // 1. Zkusíme naši DB verifikací (získáme MC nick)
         const dbUser = await uhg.db.getVerify(id);
         if (dbUser) {
             msg = msg.replace(match, `@${dbUser.nickname}`);
             continue;
         }
 
-        // 2. Fallback na jméno na Discord serveru
-        const member = message.guild?.members.cache.get(id);
+        const member = guild?.members.cache.get(id);
         if (member) {
             msg = msg.replace(match, `@${member.nickname || member.user.username}`);
             continue;
         }
+
+        const user = uhg.dc.client.users.cache.get(id);
+        if (user) msg = msg.replace(match, `@${user.username}`);
     }
     return msg;
 }

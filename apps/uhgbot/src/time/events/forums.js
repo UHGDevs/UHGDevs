@@ -19,6 +19,8 @@ module.exports = {
         const ADMIN_CHAT_ID = '530496801782890527';
         const adminChannel = uhg.dc.client.channels.cache.get(ADMIN_CHAT_ID);
 
+        const MAX_AGE = 1000 * 60 * 60 * 24 * 2; // 2 dny 
+
         const feeds = [
             { url: 'https://hypixel.net/forums/news-and-announcements.4/-/index.rss', type: 'Main' },
             { url: 'https://hypixel.net/forums/skyblock-patch-notes.158/-/index.rss', type: 'SkyBlock' }
@@ -28,6 +30,11 @@ module.exports = {
             const feed = await parser.parseURL(feedInfo.url);
             
             for (const item of feed.items) {
+                const pubDate = new Date(item.pubDate || item.isoDate);
+                if ((Date.now() - pubDate.getTime()) > MAX_AGE) {
+                    continue; 
+                }
+
                 const guid = item.guid.split('/').pop() || item.guid;
 
                 // Kontrola v DB
@@ -42,7 +49,7 @@ module.exports = {
                     link: item.link,
                     author: item.creator,
                     type: feedInfo.type,
-                    timestamp: Date.now(),
+                    timestamp: pubDate.getTime() || Date.now(),
                     announced: false
                 };
                 await uhg.db.run.post("general", "forums", forumData);
@@ -54,7 +61,8 @@ module.exports = {
                         .setURL(item.link)
                         .setDescription(`**${item.title}**\n\nAutor: \`${item.creator}\``)
                         .setColor(feedInfo.type === 'SkyBlock' ? 0x00AA00 : 0xFFAA00)
-                        .addFields({ name: 'Role k označení', value: '*Zatím nevybráno*' });
+                        .addFields({ name: 'Role k označení', value: '*Zatím nevybráno*' })
+                        .setTimestamp(forumData.timestamp);
 
                     const buttons = new ActionRowBuilder().addComponents(
                         new ButtonBuilder()
@@ -91,7 +99,6 @@ module.exports = {
                     { label: 'Hypixel Oznámení', value: '1003713647845052466' },
                     { label: 'SkyBlock Oznámení', value: '1003713511710543952' },
                     { label: 'Discord Oznámení', value: '1003713161238679652' },
-                    { label: 'Everyone', value: 'everyone' },
                     { label: 'Neoznačovat', value: 'none' }
                 ])
         );
@@ -142,7 +149,7 @@ module.exports = {
 
         if (!data || data.announced) return interaction.reply({ content: "Chyba nebo již publikováno.", ephemeral: true });
 
-        const channel = uhg.dc.cache.channels.get('guild');
+        const channel = uhg.dc.client.channels.cache.get('468084524023021568');
         if (!channel) return interaction.reply({ content: "Kanál nenalezen.", ephemeral: true });
 
         // Vytáhneme pings z embedu v admin chatu
@@ -154,7 +161,7 @@ module.exports = {
             .setURL(data.link)
             .setColor(data.type === 'SkyBlock' ? 0x00AA00 : 0xFFAA00)
             .setDescription(`Na Hypixelu vyšel nový článek v kategorii **${data.type}**!\n\n🔗 **[Zobrazit článek na webu](${data.link})**`)
-            .setTimestamp();
+            .setTimestamp(data.timestamp);
 
         // Odeslání do hlavního chatu
         await channel.send({ 
@@ -166,13 +173,13 @@ module.exports = {
         await uhg.db.run.update("general", "forums", { guid: guid }, { announced: true });
 
         await interaction.update({ 
-            content: `✅ Odesláno do <#${channel.id}> uživatelem ${interaction.user.username}`, 
+            content: `✅ Odesláno do <#${channel.id}> uživatelem ${uhg.dontFormat(interaction.user.username)}`, 
             embeds: [], 
             components: [] 
         });
     },
 
     ignoruj: async (uhg, interaction) => {
-        await interaction.update({ content: `❌ Ignorováno (${interaction.user.username})`, embeds: [], components: [] });
+        await interaction.update({ content: `❌ Ignorováno (${uhg.dontformat(interaction.user.username)})`, embeds: [], components: [] });
     }
 };

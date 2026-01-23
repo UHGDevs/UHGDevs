@@ -141,13 +141,23 @@ class RoleHandler {
         }
 
         // 1. Guild Roles
-        const guildRoles = Object.values(this.roles.guild);
+        const guildRolesValues = Object.values(this.roles.guild);
         let roleToAdd = null;
         if (guildInfo.guild) roleToAdd = this.roles.guild[guildInfo.member.rank];
 
-        for (const id of guildRoles) {
-            if (id === roleToAdd) { if (await safeAdd(id)) changed = true; } 
-            else { if (await safeRemove(id)) changed = true; }
+        if (guildInfo.guild) {
+            const rank = guildInfo.member.rank;
+            if (this.roles.guild[rank]) roleToAdd = this.roles.guild[rank];
+        }
+
+        const memberRoleId = this.roles.guild["Member"];
+        for (const id of guildRolesValues) {
+            // Pokud je to role odpovídající ranku NEBO je to Member role a uživatel je v guildě (roleToAdd není null)
+            if (id === roleToAdd || (roleToAdd !== null && id === memberRoleId)) {
+                 if (await safeAdd(id)) changed = true; 
+            } else { 
+                 if (await safeRemove(id)) changed = true; 
+            }
         }
         
         // 2. Badges
@@ -183,7 +193,6 @@ class RoleHandler {
     async applyGuildRoles(member, guildData) {
         let changed = false;
         
-        // Pomocné funkce pro tuto metodu
         const safeAdd = async (roleId) => {
             if (!member.roles.cache.has(roleId)) {
                 const role = member.guild.roles.cache.get(roleId);
@@ -215,8 +224,10 @@ class RoleHandler {
             if (roleId) roleToAdd = roleId;
         }
 
+        const memberRoleId = this.roles.guild["Member"];
+
         for (const id of guildRoles) {
-            if (id === roleToAdd) {
+            if (id === roleToAdd || (roleToAdd !== null && id === memberRoleId)) {
                 if (await safeAdd(id)) changed = true;
             } else {
                 if (await safeRemove(id)) changed = true;

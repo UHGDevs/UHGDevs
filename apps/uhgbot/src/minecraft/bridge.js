@@ -34,13 +34,19 @@ module.exports = {
         });
     },
 
-    sendJoinRequest: async (uhg, username, level, discordTag) => {
+    sendJoinRequest: async (uhg, username, level, discordTag, prefix=null) => {
         const channel = uhg.dc.cache.channels.get('officer');
         if (!channel) return;
         const embed = new uhg.dc.Embed()
             .setTitle("Nová žádost o vstup!")
             .setColor("Yellow")
-            .setDescription(`**Hráč:** ${uhg.dontFormat(username)}\n**Level:** ${level}\n**Discord:** ${discordTag || 'Nepropojeno'}`);
+            .setThumbnail(uhg.getAvatar(username))
+            .addFields(
+                { name: "Hráč", value: `${uhg.dontFormat(prefix || username)}`, inline: true },
+                { name: "Level", value: `\`${level}\``, inline: true },
+                { name: "Discord", value: `\`${discordTag || 'Nepropojeno'}\``, inline: false }
+            )
+            .setFooter({ text: "Klikni na tlačítko pro akci ve hře" });
         
         const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
         const buttons = new ActionRowBuilder().addComponents(

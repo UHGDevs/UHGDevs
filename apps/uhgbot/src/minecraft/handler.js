@@ -108,20 +108,35 @@ module.exports = async (uhg, raw, motd) => {
         cleanMsg.startsWith("The Guild has reached Level") ||
         cleanMsg === "Already in a guild!" ||
         (cleanMsg.startsWith("The guild request from") && cleanMsg.includes("has expired")) ||
-        // Detekce login/logout zpráv (které začínají "Guild >", ale nemají dvojtečku)
-        (cleanMsg.endsWith("joined.") && cleanMsg.split(" ").length === 4) ||
-        (cleanMsg.endsWith("left.") && cleanMsg.split(" ").length === 4);
+        (cleanMsg.endsWith("joined.") && cleanMsg.split(" ").length === 4) && !cleanMsg.includes('Friend > ') ||
+        (cleanMsg.endsWith("left.") && cleanMsg.split(" ").length === 4) && !cleanMsg.includes('Friend > ') ||
+        cleanMsg.includes(" of this week's Guild Quest!");
 
     if (isSystemMsg) {
 
         // A. Interaktivní (Join Request)
-        if (cleanMsg.includes("has requested to join")) {
-            const user = cleanMsg.split(" ")[0];
-            const api = await uhg.api.call(user, ["hypixel"]);
-            const level = Math.floor(api.hypixel?.level || 0);
+        if (cleanMsg.includes("has requested to join the Guild!")) {
+            // Použijeme Regex pro přesné získání jména
+            // Ignoruje [Rank] na začátku, vezme slovo před "has requested"
+            // Příklad: "[MVP+] DavidCzPdy has requested..." -> DavidCzPdy
+            const requestMatch = cleanMsg.match(/(?:\[.*?\]\s+)?(\w+)\s+has requested to join the Guild!/);
+            if (requestMatch) {
+                const user = requestMatch[1];
+                
+                // Stáhneme data
+                const api = await uhg.api.call(user, ["hypixel"]);
+                
+                // Zpracování dat (pokud API selže, dáme defaulty)
+                const level = api.success && api.hypixel ? Math.floor(api.hypixel.level) : 0;
+                const discordTag = api.success && api.hypixel ? api.hypixel.links.DISCORD : "Nenačteno";
+                const prefix = api.success && api.hypixel ? api.hypixel.prefix : null;
 
-            bridge.sendJoinRequest(uhg, user, level, api.hypixel?.links?.DISCORD);
-            uhg.minecraft.send(`/go [JOIN] ${user} (Level ${level}) se chce připojit!`);
+                // Pošleme i rank jako argument
+                bridge.sendJoinRequest(uhg, user, level, discordTag, prefix);
+
+                // Info do Officer chatu ve hře
+                uhg.minecraft.send(`/go [${level}] ${user} se chce připojit do guildy!`);
+            }
             return;
         } 
         
@@ -145,7 +160,8 @@ module.exports = async (uhg, raw, motd) => {
             cleanMsg.includes("was demoted") || 
             cleanMsg.startsWith("The Guild has reached Level") ||
             cleanMsg.endsWith("joined.") ||
-            cleanMsg.endsWith("left.")
+            cleanMsg.endsWith("left.") ||
+            cleanMsg.includes(" of this week's Guild Quest!")
         ) {
             targetChannel = "guild";
         }
