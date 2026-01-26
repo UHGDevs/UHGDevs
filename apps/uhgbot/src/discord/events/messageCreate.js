@@ -30,6 +30,22 @@ module.exports = async (uhg, message) => {
         const nickname = dbUser ? dbUser.nickname : (message.member?.nickname || message.author.username);
         
         // --- ZPRACOVÁNÍ TEXTU ---
+
+        if (message.reference) {
+            try {
+                // Načteme původní zprávu
+                const repliedMsg = await message.fetchReference().catch(() => null);
+                if (repliedMsg) {
+                    // Zjistíme jméno autora původní zprávy (stejná logika: DB > Nickname > Username)
+                    const dbReplied = await uhg.db.getVerify(repliedMsg.author.id);
+                    const repliedName = dbReplied 
+                        ? dbReplied.nickname 
+                        : (repliedMsg.member?.nickname || repliedMsg.author.username);
+                    
+                    nickname = `${nickname} replied to ${repliedName}`;
+                }
+            } catch (e) {}
+        }
         
         // 1. Převod Discord Custom Emojis (<:nazev:ID> -> :nazev:)
         // Regex chytne <, volitelně 'a' (animované), :, jméno, :, ID, >

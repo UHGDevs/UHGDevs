@@ -2,7 +2,11 @@ module.exports = {
     name: "gaccept",
     description: 'Zobrazí seznam badges nebo zkontroluje hráče',
     permissions: [
-        { type: 'USER', id: '378928808989949964' }
+        { type: 'USER', id: '378928808989949964' },
+        { type: 'ROLE', id: '530504766225383425' },
+        { type: 'ROLE', id: '537252847025127424' },
+        { type: 'ROLE', id: '475585340762226698' },
+        { type: 'ROLE', id: '530504567528620063' },
     ],
     run: async (uhg, message) => {
         const embed = new uhg.dc.Embed()
@@ -23,11 +27,20 @@ module.exports = {
         // Pošleme příkaz do hry
         uhg.minecraft.send(`/g accept ${target}`);
 
+        const originalEmbed = interaction.message.embeds[0];
+        const embed = new uhg.dc.Embed(originalEmbed.data)
+            .setColor("Green") // Změna na zelenou
+            .setTitle(`✅ Žádost přijata - ${target}`)
+            .setFooter({ 
+                text: `Přijal: ${interaction.user.username}`, 
+                iconURL: interaction.user.displayAvatarURL() 
+            });
+
         // Odpovíme na Discordu
         await interaction.update({ 
             content: `⌛ Pokouším se přijmout **${target}**... (Pokud žádost vypršela, bot ho automaticky pozve)`, 
             components: [], 
-            embeds: interaction.message.embeds 
+            embeds: [embed] 
         });
     },
 

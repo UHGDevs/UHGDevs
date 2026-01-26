@@ -29,6 +29,8 @@ module.exports = {
         const tkjkApi = await uhg.api.call("574bfb977d4c475b8197b73b15194a2a", ["guild"]);
 
         if (!uhgApi.success || !uhgApi.guild.guild) throw new Error("API Error");
+
+        const hypixelDateKey = Object.keys(uhgApi.guild.all.members[0].expHistory)[0];
         
         // DB UPDATE (Důležité: uhgData obsahuje historii a aktuální členy)
         const uhgData = await updateGuildDB(uhg, uhgApi.guild.all);
@@ -52,7 +54,7 @@ module.exports = {
 
         if (now.getHours() === 4 && now.getMinutes() >= 50) {
              const todayKey = dateStr;
-             const todayGexp = uhgData.dailyxp[todayKey] || 0;
+             const todayGexp = uhgData.dailyxp[hypixelDateKey] || 0;
              let tkjkDaily = 0;
              const tkjkOld = await uhg.db.run.get("stats", "guild_daily", { name: "TKJK" });
              if (tkjkOld.length) {
@@ -60,7 +62,7 @@ module.exports = {
                  tkjkDaily = tkjkG.exp - last.exp;
              }
              const reportEmbed = new uhg.dc.Embed()
-                 .setTitle(`UHG vs TKJK - Denní Report (${dateStr})`)
+                 .setTitle(`UHG vs TKJK - Denní Report (${hypixelDateKey})`)
                  .setColor(todayGexp > tkjkDaily ? "Green" : "Orange")
                  .addFields(
                      { name: "UHG", value: `Lvl: **${uhg.f(uhgLvl, 3)}**\n+${uhg.f(todayGexp)} XP`, inline: true },
@@ -69,11 +71,11 @@ module.exports = {
                  ).setTimestamp();
              
              const reportChan = uhg.dc.client.channels.cache.get(CHANNELS.report);
-             const alreadySent = await uhg.db.run.get("stats", "guild_daily", { _id: dateStr });
+             const alreadySent = await uhg.db.run.get("stats", "guild_daily", { _id: hypixelDateKey });
              if (reportChan && alreadySent.length === 0) {
                  reportChan.send({ embeds: [reportEmbed] });
-                 await uhg.db.run.update("stats", "guild_daily", { _id: dateStr }, { _id: dateStr, name: "UHG", exp: uhgData.totalxp, level: uhgLvl, timestamp: Date.now() });
-                 await uhg.db.run.update("stats", "guild_daily", { _id: dateStr + "_tkjk" }, { _id: dateStr + "_tkjk", name: "TKJK", exp: tkjkG.exp, level: tkjkLvl, timestamp: Date.now() });
+                 await uhg.db.run.update("stats", "guild_daily", { _id: hypixelDateKey }, { _id: hypixelDateKey, name: "UHG", exp: uhgData.totalxp, level: uhgLvl, timestamp: Date.now() });
+                 await uhg.db.run.update("stats", "guild_daily", { _id: hypixelDateKey + "_tkjk" }, { _id: hypixelDateKey + "_tkjk", name: "TKJK", exp: tkjkG.exp, level: tkjkLvl, timestamp: Date.now() });
              }
         }
 
