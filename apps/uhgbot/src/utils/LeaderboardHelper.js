@@ -63,6 +63,7 @@ class LeaderboardHelper {
         
         if (transformName === 'nwLevel') return Math.floor(ApiFunctions.getNwLevel(val || 0));
         if (transformName === 'timeHours') return (val ? Math.floor(val / 60) + 'h' : '0h');
+        if (transformName === 'timeSeconds') return (val ? (val / 1000).toFixed(2) + 's' : 'N/A');
         
         return val;
     }

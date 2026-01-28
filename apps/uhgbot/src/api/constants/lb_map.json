@@ -282,5 +282,658 @@
         }
       }
     }
+  },
+  "arcade": {
+    "name": "Arcade Games",
+    "root": "stats.arcade",
+    "structure": {
+      "overall": {
+        "name": "Overall (Coins, Wins)",
+        "path": "",
+        "stats": {
+          "coins": "Coins",
+          "wins": "Total Wins"
+        }
+      },
+      "zombies": {
+        "name": "Zombies",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "bestround": "Best Round",
+          "headshots": "Headshots"
+        }
+      },
+      "partygames": {
+        "name": "Party Games",
+        "stats": {
+          "wins": "Wins",
+          "stars": "Stars",
+          "rounds": "Round Wins"
+        }
+      },
+      "hideandseek": {
+        "name": "Hide and Seek",
+        "path": "hideandseek.overall",
+        "stats": {
+          "wins": "Wins",
+          "seekerwins": "Seeker Wins",
+          "hiderwins": "Hider Wins"
+        }
+      },
+      "pixelparty": {
+        "name": "Pixel Party",
+        "stats": {
+          "wins": "Wins",
+          "games": "Games Played",
+          "highestround": "Highest Round",
+          "powerups": "Powerups Collected"
+        }
+      },
+      "miniwalls": {
+        "name": "Mini Walls",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "finals": "Final Kills",
+          "witherdmg": "Wither Damage"
+        }
+      },
+      "blockingdead": {
+        "name": "Blocking Dead",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "headshots": "Headshots"
+        }
+      },
+      "bountyhunters": {
+        "name": "Bounty Hunters",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "kdr": "KDR",
+          "bountykills": "Bounty Kills"
+        }
+      },
+      "football": {
+        "name": "Football",
+        "stats": {
+          "wins": "Wins",
+          "goals": "Goals"
+        }
+      },
+      "pixelpainters": {
+        "name": "Pixel Painters",
+        "stats": {
+          "wins": "Wins"
+        }
+      },
+      "dropper": {
+        "name": "The Dropper",
+        "stats": {
+          "wins": "Wins",
+          "games_finished": "Games Finished",
+          "fastest_game": { "name": "Fastest Run (s)", "db": "fastest_game", "display": "fastest_game", "transform": "timeSeconds" }
+        }
+      }
+    }
+  },
+  "arena": {
+    "name": "Arena Brawl",
+    "root": "stats.arena",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "keys": "Keys",
+          "winstreak": "Winstreak"
+        }
+      },
+      "solo": {
+        "name": "1v1",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "wlr": "WLR",
+          "kdr": "KDR"
+        }
+      },
+      "doubles": {
+        "name": "2v2",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "wlr": "WLR",
+          "kdr": "KDR"
+        }
+      },
+      "fours": {
+        "name": "4v4",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "wlr": "WLR",
+          "kdr": "KDR"
+        }
+      }
+    }
+  },
+  "bb": {
+    "name": "Build Battle",
+    "root": "stats.bb",
+    "structure": {
+      "general": {
+        "name": "General",
+        "path": "",
+        "stats": {
+          "score": "Score",
+          "title": "Title",
+          "coins": "Coins"
+        }
+      },
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins",
+          "games": "Games Played",
+          "wlr": "WLR"
+        }
+      },
+      "guess": {
+        "name": "Guess the Build",
+        "stats": {
+          "wins": "Wins",
+          "guesses": "Correct Guesses"
+        }
+      },
+      "pro": {
+        "name": "Pro Mode",
+        "stats": {
+          "wins": "Wins"
+        }
+      }
+    }
+  },
+  "blitz": {
+    "name": "Blitz SG",
+    "root": "stats.blitz",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "games": "Games Played"
+        }
+      }
+    }
+  },
+  "cac": {
+    "name": "Cops and Crims",
+    "root": "stats.cac",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "headshotkills": "Headshots",
+          "kdr": "KDR",
+          "coins": "Coins"
+        }
+      },
+      "defusal": {
+        "name": "Defusal",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "bombsplanted": "Bombs Planted",
+          "bombsdefused": "Bombs Defused"
+        }
+      },
+      "deathmatch": {
+        "name": "Team Deathmatch",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "kdr": "KDR"
+        }
+      },
+      "gungame": {
+        "name": "Gun Game",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "besttime": "Fastest Win"
+        }
+      }
+    }
+  },
+  "megawalls": {
+    "name": "Mega Walls",
+    "root": "stats.megawalls",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "finalKills": "Final Kills",
+          "fk": "Final Kills",
+          "fkdr": "FKDR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "witherdmg": "Wither Damage",
+          "coins": "Coins",
+          "class": "Chosen Class"
+        }
+      }
+    }
+  },
+  "murder": {
+    "name": "Murder Mystery",
+    "root": "stats.murder",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "games": "Games Played",
+          "murdererwins": "Murderer Wins",
+          "detectivewins": "Detective Wins",
+          "herowins": "Hero Wins"
+        }
+      },
+      "classic": {
+        "name": "Classic",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR"
+        }
+      },
+      "doubleup": {
+        "name": "Double Up",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR"
+        }
+      },
+      "assassins": {
+        "name": "Assassins",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR"
+        }
+      },
+      "infection": {
+        "name": "Infection",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "survivorwins": "Survivor Wins"
+        }
+      }
+    }
+  },
+  "paintball": {
+    "name": "Paintball",
+    "root": "stats.paintball",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "coins": "Coins",
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "killstreaks": "Killstreaks",
+          "shots": "Shots Fired"
+        }
+      }
+    }
+  },
+  "pit": {
+    "name": "The Pit",
+    "root": "stats.pit",
+    "structure": {
+      "overall": {
+        "name": "General",
+        "path": "",
+        "stats": {
+          "xp": { "name": "Prestige (XP)", "db": "xp", "display": "prestigeroman" },
+          "gold": "Gold",
+          "renown": "Renown",
+          "totalrenown": "Total Renown",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "contracts": "Contracts Completed",
+          "rawplaytime": { "name": "Playtime", "db": "rawplaytime", "transform": "timeHours" }
+        }
+      }
+    }
+  },
+  "quake": {
+    "name": "Quakecraft",
+    "root": "stats.quake",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "headshots": "Headshots",
+          "bestkillstreak": "Best Killstreak",
+          "coins": "Coins"
+        }
+      }
+    }
+  },
+  "smash": {
+    "name": "Smash Heroes",
+    "root": "stats.smash",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "level": "Smash Level",
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "games": "Games Played"
+        }
+      }
+    }
+  },
+  "speeduhc": {
+    "name": "Speed UHC",
+    "root": "stats.speeduhc",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "score": "Score",
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "assists": "Assists",
+          "winstreak": "Winstreak",
+          "killstreak": "Killstreak",
+          "highestwinstreak": "Best Winstreak",
+          "highestkillstreak": "Best Killstreak",
+          "coins": "Coins"
+        }
+      }
+    }
+  },
+  "tkr": {
+    "name": "Turbo Kart Racers",
+    "root": "stats.tkr",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "trophies": "Total Trophies",
+          "gold": "Gold Trophies",
+          "silver": "Silver Trophies",
+          "bronze": "Bronze Trophies",
+          "coins": "Coins",
+          "laps": "Laps Completed",
+          "collectedboxes": "Box Pickups"
+        }
+      }
+    }
+  },
+  "tntgames": {
+    "name": "TNT Games",
+    "root": "stats.tntgames",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "stats": {
+          "wins": "Wins",
+          "winstreak": "Winstreak",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "playtime": { "name": "Playtime", "db": "rawplaytime", "transform": "timeHours" }
+        }
+      },
+      "tntrun": {
+        "name": "TNT Run",
+        "stats": {
+          "wins": "Wins",
+          "deaths": "Deaths",
+          "record": { "name": "Best Time", "db": "rawrecord", "display": "record" }
+        }
+      },
+      "pvprun": {
+        "name": "PVP Run",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "record": { "name": "Best Time", "db": "rawrecord", "display": "record" }
+        }
+      },
+      "bowspleef": {
+        "name": "Bow Spleef",
+        "stats": {
+          "wins": "Wins",
+          "deaths": "Deaths",
+          "shots": "Tags/Shots"
+        }
+      },
+      "tnttag": {
+        "name": "TNT Tag",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "tagged": "Times Tagged"
+        }
+      },
+      "wizards": {
+        "name": "Wizards",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "points": "Points",
+          "assists": "Assists"
+        }
+      }
+    }
+  },
+  "uhc": {
+    "name": "UHC Champions",
+    "root": "stats.uhc",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "score": "Score",
+          "wins": "Wins",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "coins": "Coins",
+          "ultimates": "Ultimates Crafted",
+          "extraultimates": "Extra Ultimates"
+        }
+      }
+    }
+  },
+  "vampirez": {
+    "name": "VampireZ",
+    "root": "stats.vampirez",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Total Wins",
+          "humanwins": "Human Wins",
+          "vampirewins": "Vampire Wins",
+          "kills": "Total Kills",
+          "humankills": "Human Kills",
+          "vampirekills": "Vampire Kills",
+          "zombiekills": "Zombie Kills",
+          "goldbought": "Gold Bought",
+          "coins": "Coins"
+        }
+      }
+    }
+  },
+  "warlords": {
+    "name": "Warlords",
+    "root": "stats.warlords",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "assists": "Assists",
+          "killassists": "Kills+Assists",
+          "flagcaptures": "Flags Captured",
+          "flagreturns": "Flags Returned",
+          "coins": "Coins"
+        }
+      }
+    }
+  },
+  "ww": {
+    "name": "Wool Wars",
+    "root": "stats.ww",
+    "structure": {
+      "overall": {
+        "name": "Overall",
+        "path": "",
+        "stats": {
+          "level": { "name": "Level", "db": "level", "display": "levelformatted" },
+          "wins": "Wins",
+          "losses": "Losses",
+          "wlr": "WLR",
+          "kills": "Kills",
+          "deaths": "Deaths",
+          "kdr": "KDR",
+          "assists": "Assists",
+          "blocks_broken": "Blocks Broken",
+          "blocks_placed": "Wool Placed",
+          "powerups": "Powerups",
+          "coins": "Coins"
+        }
+      },
+      "archer": {
+        "name": "Archer",
+        "path": "classes.archer",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      },
+      "tank": {
+        "name": "Tank",
+        "path": "classes.tank",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      },
+      "golem": {
+        "name": "Golem",
+        "path": "classes.golem",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      },
+      "swordsman": {
+        "name": "Swordsman",
+        "path": "classes.swordsman",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      },
+      "engineer": {
+        "name": "Engineer",
+        "path": "classes.engineer",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      },
+      "assault": {
+        "name": "Assault",
+        "path": "classes.assault",
+        "stats": {
+          "wins": "Wins",
+          "kills": "Kills",
+          "games": "Games Played"
+        }
+      }
+    }
   }
 }

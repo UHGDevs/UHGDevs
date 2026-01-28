@@ -53,7 +53,6 @@ module.exports = {
         await updateName(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 5)}`);
 
         if (now.getHours() === 4 && now.getMinutes() >= 50) {
-             const todayKey = dateStr;
              const todayGexp = uhgData.dailyxp[hypixelDateKey] || 0;
              let tkjkDaily = 0;
              const tkjkOld = await uhg.db.run.get("stats", "guild_daily", { name: "TKJK" });
