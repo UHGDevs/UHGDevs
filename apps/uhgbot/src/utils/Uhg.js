@@ -67,7 +67,7 @@ class Uhg {
         const defaultConfig = {
             prefix: ".", minecraft: true, dev_mode: false, mc_all_logs: false, activity: "UHG bot",
             guildId: "455751845319802880", guildId_dev: "758650512827613195",
-            channels: { guild: "912776277361053758", guild_dev: "957005113149521930", officer: "929435160234053726", officer_dev: "957005146460684299", logs: "548772550386253824", bot: "1017334503066320906" },
+            channels: { guild: "912776277361053758", guild_dev: "957005113149521930", officer: "929435160234053726", officer_dev: "957005146460684299", logs: "548772550386253824", bot: "1017334503066320906", dm: "1466082546587799645" },
             time: {}, bannedWords: ["vape", "ip", "fag", "nigger", "negr", "kys", "hitler"]
         };
 

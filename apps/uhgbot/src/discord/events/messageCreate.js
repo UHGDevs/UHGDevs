@@ -81,7 +81,7 @@ module.exports = async (uhg, message) => {
 
     if (!message.guild) {
         let embed = ['image/png', 'image/jpeg'].some(v => message.attachments.first()?.contentType?.includes(v)) ? { title: `${message.author.username}'s dm`, description: message.content, image: { url: message.attachments.first().url } } : { title: `${message.author.username}'s dm` , description: message.content }
-        uhg.dc.cache.channels.get('logs')?.send({ 
+        uhg.dc.cache.channels.get('dm')?.send({ 
             embeds: [embed] 
         });
     }

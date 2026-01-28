@@ -81,11 +81,30 @@ module.exports = async (uhg, raw, motd) => {
         const dmMatch = cleanMsg.match(/From (?:\[.*?\] )?(\w+): (.*)/);
         if (dmMatch) {
             const [, username, content] = dmMatch;
+            const dmChannel = uhg.dc.cache.channels.get('dm');
+            if (dmChannel) {
+                dmChannel.send({ 
+                    content: `📩 **From ${username}:** ${content}`, 
+                    allowedMentions: { parse: [] } 
+                }).catch(() => {});
+            }
+
             require('./commandsHandler')(uhg, { username, content: content.trim(), channel: 'DM' });
-            return;
         }
     }
-
+    else if (cleanMsg.startsWith("To ")) {
+        const dmMatch = cleanMsg.match(/To (?:\[.*?\] )?(\w+): (.*)/);
+        if (dmMatch) {
+            const [, username, content] = dmMatch;
+            const dmChannel = uhg.dc.cache.channels.get('dm');
+            if (dmChannel) {
+                dmChannel.send({ 
+                    content: `📩 **To ${username}:** ${content}`, 
+                    allowedMentions: { parse: [] } 
+                }).catch(() => {});
+            }
+        }
+    }
 
     // ============================================================
     // 3. SYSTÉMOVÉ ZPRÁVY (Join, Leave, Promote...)

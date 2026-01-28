@@ -55,7 +55,7 @@ module.exports = {
                     '3. Nastav **Discord** na tvůj aktuální Discord nick: `' + interaction.user.username + '`\n' +
                     '4. Klikni na tlačítko **VERIFY** níže.'
                 )
-                .setThumbnail('https://i.imgur.com/3QZ7XqK.png');
+                //.setThumbnail('https://i.imgur.com/3QZ7XqK.png');
 
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()

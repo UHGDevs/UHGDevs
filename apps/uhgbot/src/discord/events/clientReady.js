@@ -28,24 +28,36 @@ module.exports = async (uhg, client) => {
         });
     };
 
-    // Registrace Slash příkazů
-    const guild = client.guilds.cache.get(uhg.config.guildId);
-    if (guild) {
-        try {
-            const commandsData = uhg.dc.slash.map(cmd => {
-                return {
-                    name: cmd.name,
-                    description: cmd.description || "UHG Command",
-                    // Oprava typů v opcích
-                    options: cmd.options ? fixTypes(JSON.parse(JSON.stringify(cmd.options))) : []
-                };
-            });
+    const commandsData = uhg.dc.slash.map(cmd => ({
+        name: cmd.name,
+        description: cmd.description || "UHG Command",
+        options: cmd.options ? fixTypes(JSON.parse(JSON.stringify(cmd.options))) : []
+    }));
 
-            await guild.commands.set(commandsData);
-            console.log(` [DISCORD] `.bgCyan.black + ` ${commandsData.length} Slash příkazů zaregistrováno.`.cyan);
-        } catch (e) {
-            console.error(" [ERROR] ".bgRed + " Chyba registrace Slash příkazů:".red);
-            console.error(e);
+    // 2. Globální registrace (pro všechny servery)
+    try {
+        await client.application.commands.set(commandsData);
+        console.log(` [DISCORD] `.bgCyan.black + ` Globální příkazy (${commandsData.length}) odeslány na API.`.cyan);
+    } catch (e) {
+        console.error(" [ERROR] Chyba globální registrace:".red, e.message);
+    }
+
+    // 3. Okamžitá registrace pro prioritní servery
+    // Tyto servery budou mít příkazy aktualizované hned po restartu/reloadu
+    const priorityGuilds = [
+        "455751845319802880", // Hlavní UHG
+        "758650512827613195"  // Testovací server
+    ];
+
+    for (const guildId of priorityGuilds) {
+        const guild = client.guilds.cache.get(guildId);
+        if (guild) {
+            try {
+                await guild.commands.set(commandsData);
+                console.log(` [DISCORD] `.bgCyan.black + ` Příkazy aktualizovány pro guildu: ${guild.name}`.cyan);
+            } catch (e) {
+                console.error(` [ERROR] Chyba registrace pro ${guildId}:`.red, e.message);
+            }
         }
     }
 
