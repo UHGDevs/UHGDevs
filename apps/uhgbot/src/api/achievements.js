@@ -1,5 +1,5 @@
 /**
- * src/utils/achievements.js
+ * src/api/achievements.js
  * Logika pro výpočet Legacy Achievement Points.
  */
 

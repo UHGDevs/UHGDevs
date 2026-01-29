@@ -27,7 +27,7 @@ module.exports = async (uhg, message) => {
         }
 
         const dbUser = await uhg.db.getVerify(message.author.id);
-        const nickname = dbUser ? dbUser.nickname : (message.member?.nickname || message.author.username);
+        const nickname = dbUser ? dbUser.username : (message.member?.username || message.author.username);
         
         // --- ZPRACOVÁNÍ TEXTU ---
 
@@ -39,8 +39,8 @@ module.exports = async (uhg, message) => {
                     // Zjistíme jméno autora původní zprávy (stejná logika: DB > Nickname > Username)
                     const dbReplied = await uhg.db.getVerify(repliedMsg.author.id);
                     const repliedName = dbReplied 
-                        ? dbReplied.nickname 
-                        : (repliedMsg.member?.nickname || repliedMsg.author.username);
+                        ? dbReplied.username 
+                        : (repliedMsg.member?.username || repliedMsg.author.username);
                     
                     nickname = `${nickname} replied to ${repliedName}`;
                 }
@@ -100,7 +100,7 @@ async function discordPingsToNames(uhg, text, guild) {
         
         const dbUser = await uhg.db.getVerify(id);
         if (dbUser) {
-            msg = msg.replace(match, `@${dbUser.nickname}`);
+            msg = msg.replace(match, `@${dbUser.username}`);
             continue;
         }
 

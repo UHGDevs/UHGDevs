@@ -1,267 +1,193 @@
 /**
- * src/utils/Api.js
+ * src/api/Api.js
+ * Hlavní rozcestník.
  */
-const axios = require('axios');
 const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
-const ApiFunctions = require('./ApiFunctions');
+
+// Import jednotlivých volání
+const CallMojang = require('./calls/Mojang');
+const CallHypixel = require('./calls/Hypixel');
+const CallSkyBlock = require('./calls/SkyBlock');
 
 class Api {
     constructor(uhg) {
         this.uhg = uhg;
         this.key = process.env.api_key;
-        this.apiCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
         
-        this.parsers = new Map();
-        this._loadParsers();
+        // Cache: 10 minut std, check každou minutu
+        this.cache = new NodeCache({ stdTTL: 600, checkperiod: 60 });
     }
 
-    _loadParsers() {
-        const gamesPath = path.resolve(__dirname, './games');
-        if (fs.existsSync(gamesPath)) {
-            const files = fs.readdirSync(gamesPath).filter(f => f.endsWith('.js'));
-            for (const file of files) {
-                try {
-                    const gameName = file.split('.')[0];
-                    this.parsers.set(gameName, require(path.join(gamesPath, file)));
-                } catch (e) {
-                    console.error(` [ERROR] ${file} Parser: ${e.message}`.red);
-                }
-            }
-        }
-    }
-
-    async call(input, calls = ["hypixel"]) {
+    /**
+     * Hlavní metoda volání
+     * @param {string} input - Jméno nebo UUID
+     * @param {string[]} types - ["hypixel", "skyblock", "guild", "online"]
+     */
+    async call(input, types = ["hypixel"], waitSave = false) {
         if (!input) return { success: false, reason: "Nebyl zadán vstup" };
 
-        const cacheKey = `call_${input.toLowerCase()}_${calls.sort().join(',')}`;
-        const cachedResult = this.apiCache.get(cacheKey);
-        if (cachedResult) return cachedResult;
+        try {
+            // 1. Získání Identity (Mojang)
+            const identity = await CallMojang(input, this.cache);
+            if (!identity.success) throw new Error(identity.reason);
 
-        const identity = await this.getMojang(input);
-        if (!identity.success) return { success: false, reason: "Hráč nenalezen v Mojang databázi." };
+            const { uuid, username } = identity;
+            const result = { success: true, uuid, username, ...identity };
 
-        let result = { 
-            success: true, 
-            uuid: identity.uuid, 
-            username: identity.username,
-            date: identity.date,
-            textures: identity.textures
-        };
+            // 2. Sestavení požadavků (Promises)
+            const promises = [];
 
-        const promises = [];
-        if (calls.includes("hypixel")) promises.push(this.getHypixel(identity.uuid));
-        if (calls.includes("guild")) promises.push(this.getGuild(identity.uuid));
-        if (calls.includes("online")) promises.push(this.getOnline(identity.uuid));
-        if (calls.includes("skyblock") || calls.includes("sb")) promises.push(this.getSkyblock(identity.uuid));
+            // HYPIXEL STATS
+            if (types.includes("hypixel") || types.includes("stats")) {
+                promises.push(
+                    CallHypixel.getStats(this.uhg, uuid, this.key)
+                        .then(parsed => {
+                            return { hypixel: parsed };
+                        })
+                );
+            }
 
-        const apiResults = await Promise.all(promises);
+            // GUILD
+            if (types.includes("guild")) {
+                promises.push(
+                    CallHypixel.getGuild(this.uhg, uuid, this.key)
+                        .then(guild => ({ guild }))
+                );
+            }
 
-        let criticalError = null;
-        apiResults.forEach(res => {
-            if (res._error) {
-                criticalError = res._error;
-            } else {
+            // ONLINE STATUS
+            if (types.includes("online")) {
+                promises.push(
+                    CallHypixel.getStatus(this.uhg, uuid, this.key)
+                        .then(online => ({ online }))
+                );
+            }
+
+            // SKYBLOCK
+            if (types.includes("skyblock") || types.includes("sb")) {
+                // Zkusíme vytáhnout achievementy z cache (pokud tam už hypixel data jsou)
+                const hypixelCache = this.cache.get(`hypixel_${uuid}`);
+                const achievements = hypixelCache?.achievements || null;
+                
+                promises.push(
+                    CallSkyBlock.getProfiles(this.uhg, uuid, this.key, achievements)
+                        .then(skyblock => ({ skyblock }))
+                );
+            }
+
+            // 3. Čekání na výsledky (FAIL-FAST)
+            // Pokud jakýkoliv promise selže, skočíme ihned do catch bloku
+            const responses = await Promise.all(promises);
+
+            // 4. Sloučení dat
+            responses.forEach(res => {
                 Object.assign(result, res);
+            });
+
+            // 5. Uložení do Cache (Hypixel data)
+            if (result.hypixel) {
+                // Pokud už v cache něco je, mergneme to (abychom nepřepsali třeba guild data pokud teď taháme jen stats)
+                const currentCache = this.cache.get(`hypixel_${uuid}`) || {};
+                this.cache.set(`hypixel_${uuid}`, { ...currentCache, ...result.hypixel });
             }
-        });
-
-        if (calls.includes("hypixel") && !result.hypixel) {
-            return { success: false, reason: "Hypixel API nevrátilo data (možná chyba parseru)." };
-        }
-
-        if (criticalError) {
-            return { success: false, reason: criticalError };
-        }
-
-        // --- INTELIGENTNÍ AUTO-SAVE ---
-        if (result.hypixel && this.uhg.db) {
-            // Spustíme asynchronně na pozadí, nečekáme na výsledek (nebrzdíme příkaz)
-            this._saveIfTracked(result.uuid, result.hypixel);
-        }
-
-        this.apiCache.set(cacheKey, result);
-        return result;
-    }
-
-    /**
-     * Interní funkce: Uloží statistiky jen pokud uživatel už v DB existuje.
-     */
-    async _saveIfTracked(uuid, stats) {
-        try {
-            const db = this.uhg.db.mongo.db("stats");
-            const col = db.collection("stats");
             
-            // Podíváme se, jestli už hráče sledujeme (CZ/SK filtr)
-            const exists = await col.findOne({ uuid: uuid }, { projection: { _id: 1 } });
-            
-            if (exists) {
-                // Hráč v DB je -> aktualizujeme mu stats čerstvými daty
-                await this.uhg.db.saveStats(uuid, stats);
-                // console.log(`[API] Automatický update: ${stats.username}`.gray);
+            // 6. SMART UPDATE (Uložení do DB)
+            if (waitSave) {
+                // Počkáme (např. u /database add, aby se hned ukázala data)
+                await this._smartSave(result);
+            } else {
+                // Nepočkáme (u běžných příkazů jako !bw), uložení proběhne na pozadí
+                this._smartSave(result);
             }
+            return result;
+
         } catch (e) {
-            // Tichá chyba, aby DB check neovlivnil chod bota
+            // Zde zachytíme jak chybu z Mojangu, tak jakoukoliv chybu z Promise.all
+            return { success: false, reason: e.message };
         }
     }
 
+     /**
+     * Helper pro získání identity hráče bez stahování herních statistik.
+     * Používají ho příkazy jako /database, /verify, /badges.
+     */
     async getMojang(input) {
-
-        const cacheKey = `mojang_${input.toLowerCase()}`;
-        const cached = this.apiCache.get(cacheKey);
-        if (cached) return cached;
-    
-        try {
-            const res = await axios.get(`https://api.ashcon.app/mojang/v2/user/${input}`);
-            const data = { 
-                success: true, 
-                uuid: res.data.uuid.replace(/-/g, ""), 
-                username: res.data.username,
-                date: new Date(res.data.created_at),
-                textures: res.data.textures
-            };
-
-            this.apiCache.set(cacheKey, data, 3600);
-            return data;
-        } catch (e) { return { success: false, reason: "Nevím, mojang" }; }
+        return await CallMojang(input, this.cache);
     }
 
-async getHypixel(uuid) {
-    try {
-        const res = await axios.get(`https://api.hypixel.net/player`, { 
-            params: { key: this.key, uuid } 
-        });
-
-        if (!res.data.success) return { _error: `Hypixel API: ${res.data.cause}` };
-        if (!res.data.player) return { _error: "Hráč nikdy nehrál na Hypixelu" };
-
-        const p = res.data.player;
-
-        // 1. ZÍSKÁNÍ ZÁKLADNÍHO OBJEKTU PŘES GENERAL.JS
-        // Ve starém botovi general.js vytvářel root celého API objektu.
-        const generalParser = this.parsers.get('general');
-        let playerStats = {};
-
-        if (generalParser) {
-            // Voláme general parser (předáváme hypixel_data, uuid, uhg_instance, displayname)
-            playerStats = await generalParser(p, uuid, this.uhg, p.displayname);
-        } else {
-            // Fallback pokud by general.js chyběl (aby bot nespadl)
-            playerStats = {
-                success: true,
-                type: 'hypixel',
-                _id: uuid,
-                uuid: uuid,
-                username: p.displayname,
-                level: ApiFunctions.getNwLevel(p.networkExp || 0),
-                aps: p.achievementPoints || 0
-            };
-        }
-
-        // 2. PŘIDÁNÍ STATS OBJEKTU PRO OSTATNÍ HRY
-        // Starý bot dělal: api.stats = {}
-        playerStats.stats = {};
-
-        // 3. CYKLUS PŘES VŠECHNY OSTATNÍ PARSERY (Kromě general.js)
-        for (const [game, parseFunc] of this.parsers) {
-            if (game === 'general') continue;
-            try {
-                // Některé hry mohou vyžadovat await, pokud jsi je tak v minulosti napsal
-                const result = await parseFunc(p); 
-                playerStats.stats[game] = result;
-            } catch (e) {
-                console.error(` [API Error] Parser ${game} selhal:`.red, e.message);
-            }
-        }
-
-        // Zajistíme, aby root obsahoval 'aps' pro AP command
-        // (původní general.js to dělal přes: aps: hypixel.achievementPoints || 0)
-        if (!playerStats.aps && p.achievementPoints) {
-            playerStats.aps = p.achievementPoints;
-        }
-
-        return { hypixel: playerStats };
-
-    } catch (e) {
-        const status = e.response?.status;
-        const cause = e.response?.data?.cause || e.message;
-        
-        // Logování jen pro vážné chyby (ne 404 hráč nenalezen)
-        if (status !== 404) {
-            console.error(` [API ERROR] Hypixel ${status}: ${cause}`.red);
-        }
-        
-        // Vrátíme objekt s chybou
-        let errorMsg = `Hypixel API Error: ${e.message}`;
-        if (status === 429) errorMsg = "Hypixel API Rate Limit (Too Many Requests). Zkus to za chvíli.";
-        if (status === 503) errorMsg = "Hypixel API je momentálně nedostupné (Maintenance).";
-        if (status === 403) errorMsg = "Neplatný API klíč.";
-
-        return { _error: errorMsg };
-    }
-}
-
-    async getGuild(uuid) {
-        try {
-            const res = await axios.get(`https://api.hypixel.net/guild`, { params: { key: this.key, player: uuid } });
-            const g = res.data.guild;
-            if (!g) return { guild: { guild: false, name: "Žádná" } };
-            return { guild: { guild: true, name: g.name, tag: g.tag, member: g.members.find(m => m.uuid === uuid), all: g }};
-        } catch (e) { return { _error: `Guild API: ${e.message}` } }
-    }
-
-    async getOnline(uuid) {
-        try {
-            const res = await axios.get(`https://api.hypixel.net/status`, { params: { key: this.key, uuid } });
-            return { online: ApiFunctions.getOnline(res.data.session) };
-        } catch (e) { return { _error: `Status API: ${e.message}` } }
-    }
     /**
-     * Komplexní parsování SkyBlocku (včetně profilů a Networthu)
+     * SMART SAVE (Strict Mode)
+     * Automaticky ukládá data do databáze 'data', kolekce 'users'.
      */
-    async getSkyblock(uuid) {
+    async _smartSave(data) {
+        if (!this.uhg.db || !data.uuid) return;
+        const uuid = data.uuid;
+        
         try {
-            const res = await axios.get(`https://api.hypixel.net/v2/skyblock/profiles`, { params: { key: this.key, uuid } });
-            if (!res.data.success || !res.data.profiles) return { skyblock: { profiles: [] } };
+            const userInDb = await this.uhg.db.getUser(uuid);
+            if (!userInDb) return; // Neukládáme neznámé hráče
 
-            const rawProfiles = res.data.profiles;
-            const profiles = [];
+            const updatePayload = {
+                username: data.username,
+                updated: Date.now()
+            };
+            if (data.created_at) updatePayload.created_at = new Date(data.created_at);
 
-            for (const p of rawProfiles) {
-                const memberData = p.members[uuid];
-                if (!memberData) continue;
-
-                // Základní formátování profilu (z tvého původního src/api/skyblock.js)
-                let profile = {
-                    id: p.profile_id,
-                    name: p.cute_name,
-                    mode: p.game_mode || "normal",
-                    selected: p.selected || false,
-                    last_save: p.last_save,
-                    bank: p.banking ? Math.floor(p.banking.balance) : -1,
-                    // Sem můžeš přidat další parsování (upgrades, community atd.)
-                };
-
-                // Zpracování člena profilu (tady by se dalo volat tvé player.js)
-                const playerParserPath = path.resolve(__dirname, './skyblock/player.js');
-                if (fs.existsSync(playerParserPath)) {
-                    const playerParser = require(playerParserPath);
-                    profile.member = playerParser(memberData, p, { cache: { hypixel_achievements: {} } });
-                } else {
-                    profile.member = memberData; // Raw data jako fallback
-                }
-
-                profiles.push(profile);
+            // Hypixel Stats - Ukládáme jen pokud má user povolené stats
+            if (data.hypixel && data.hypixel.stats && userInDb.stats) {
+                updatePayload.stats = data.hypixel.stats;
+                updatePayload.stats.updated = Date.now();
             }
 
-            // Seřazení: vybraný profil první, pak podle data uložení
-            profiles.sort((a, b) => (b.selected - a.selected) || (b.last_save - a.last_save));
+            // SkyBlock - Ukládáme jen pokud má user povolené sb
+            if (data.skyblock && data.skyblock.profiles && userInDb.sb) {
+                const selected = data.skyblock.profiles.find(p => p.selected) || data.skyblock.profiles[0];
+                
+                if (selected && selected.member) {
+                    const m = selected.member;
+                    updatePayload.sb = {
+                        updated: Date.now(),
+                        profile_id: selected.id,
+                        profile_name: selected.name,
+                        mode: selected.mode,
+                        coins: m.coins,
+                        skills: m.skills,
+                        skill_average: m.skill_average,
+                        dungeons: m.dungeons,
+                        slayers: m.slayers,
+                        mining: m.mining
+                    };
+                }
+            }
 
-            return { skyblock: { profiles } };
+            await this.uhg.db.saveUser(uuid, updatePayload);
+
+            const TRACKED_GUILDS = ["UltimateHypixelGuild", "TKJK", "Czech Team"];
+            if (data.guild && data.guild.guild) {
+                const g = data.guild;
+
+                // KONTROLA: Ukládáme jen pokud je to jedna z našich guild!
+                if (TRACKED_GUILDS.includes(g.name)) {
+                    
+                    const today = new Date().toISOString().slice(0, 10);
+                    
+                    // Metoda v Database.js, která updatuje konkrétní guildu v poli
+                    // Pokud tam guilda není (např. se do ní zrovna připojil), založí ji.
+                    // Ale protože userInDb check prošel, víme, že uživatel v DB je.
+                    await this.uhg.db.updateUserGexp(
+                        uuid, 
+                        g.name, 
+                        today, 
+                        g.member.dailygexp || 0, 
+                        g.member.rank
+                    );
+                }
+            }
+
         } catch (e) {
-            console.error(` [ERROR] SkyBlock API: ${e.message}`.red);
-            return { _error: `SkyBlock API: ${e.message}` };
+            console.error(` [DB ERROR] Smart Save (${data.username}): ${e.message}`.red);
         }
     }
 }

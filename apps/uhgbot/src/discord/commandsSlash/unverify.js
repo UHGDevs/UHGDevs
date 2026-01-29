@@ -1,20 +1,13 @@
 /**
  * src/discord/commandsSlash/unverify.js
- * Odstraní propojení Discordu a Minecraftu.
  */
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
     name: "unverify",
-    description: "Zruší propojení tvého účtu (nebo jiného uživatele)",
-    permissions: [], // Veřejný (pro sebe), admin kontrola uvnitř
+    description: "Zruší propojení účtu",
     options: [
-        {
-            name: "target",
-            description: "(Admin) Koho chceš odpojit?",
-            type: 6, // USER
-            required: false
-        }
+        { name: "target", description: "(Admin) Koho odpojit?", type: 6, required: false }
     ],
 
     run: async (uhg, interaction) => {
@@ -23,50 +16,21 @@ module.exports = {
         let targetUser = interaction.user;
         let isAdminAction = false;
 
-        // Kontrola admin módu
-        if (interaction.options.getUser('target')) {
-            // Zde doplň ID adminů nebo rolí
-            const adminIds = ['378928808989949964', '312861502073995265']; 
-            if (!adminIds.includes(interaction.user.id)) {
-                return interaction.editReply("❌ Nemáš oprávnění odpojit jiného uživatele.");
+        const targetOpt = interaction.options.getUser('target');
+        if (targetOpt) {
+            if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }], interaction)) {
+                return interaction.editReply("❌ Nemáš práva odpojit někoho jiného.");
             }
-            targetUser = interaction.options.getUser('target');
+            targetUser = targetOpt;
             isAdminAction = true;
         }
 
-        // 1. Smazání z databáze (použití nové metody)
         const deletedData = await uhg.db.deleteVerify(targetUser.id);
+        if (!deletedData) return interaction.editReply("⚠️ Uživatel není verifikovaný.");
 
-        if (!deletedData) {
-            return interaction.editReply(isAdminAction 
-                ? `⚠️ Uživatel **${targetUser.username}** není verifikovaný.`
-                : `⚠️ Nejsi verifikovaný. Použij \`/verify\`.`
-            );
-        }
+        const member = interaction.guild.members.cache.get(targetUser.id);
+        if (member) await uhg.roles.updateMember(member, null);
 
-        // 2. Aktualizace rolí na Discordu (odebrání)
-        try {
-            await uhg.roles.updateMember(targetUser.id);
-        } catch (e) {
-            console.error("Chyba při odebírání rolí:", e);
-        }
-
-        // 3. Odpověď
-        const embed = new uhg.dc.Embed()
-            .setTitle("🔗 Unverify Úspěšné")
-            .setColor("Red")
-            .setDescription(isAdminAction 
-                ? `Účet **${targetUser.username}** byl odpojen od nicku **${deletedData.nickname}**.`
-                : `Tvůj účet byl odpojen od nicku **${deletedData.nickname}**.`
-            )
-            .setFooter({ text: "Role a přezdívka byly resetovány." });
-
-        await interaction.editReply({ embeds: [embed] });
-
-        // Log
-        const logChannel = uhg.dc.cache.channels.get('logs');
-        if (logChannel) {
-            logChannel.send(`🗑️ **UNVERIFY:** ${interaction.user.username} odpojil účet ${deletedData.nickname} (${targetUser.username}).`);
-        }
+        await interaction.editReply(`✅ Účet **${targetUser.username}** byl odpojen od nicku **${deletedData.username}**.`);
     }
 };

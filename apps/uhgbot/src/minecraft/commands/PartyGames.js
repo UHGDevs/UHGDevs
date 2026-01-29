@@ -3,7 +3,7 @@ module.exports = {
     aliases: ["partygames", "pg"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
             const pg = api.hypixel.stats.arcade.partygames;

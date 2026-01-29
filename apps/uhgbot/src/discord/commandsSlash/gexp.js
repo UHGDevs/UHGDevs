@@ -11,13 +11,13 @@ if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 
 module.exports = {
     name: 'gexp',
-    description: 'Zobrazí GEXP leaderboard guildy',
+    description: 'Leaderboard GEXP',
     permissions: [],
     options: [
         {
             name: "period",
             description: "Časový úsek",
-            type: "STRING",
+            type: 3,
             required: true,
             choices: [
                 { name: 'Denní (Daily)', value: 'd' },
@@ -27,182 +27,156 @@ module.exports = {
                 { name: 'Celkový (Total)', value: 't' }
             ]
         },
-        { name: "guild", description: "Kterou guildu chceš vidět?", type: "STRING", required: false, choices: [{ name: 'UHG', value: 'UltimateHypixelGuild' }, { name: 'TKJK', value: 'TKJK' }] },
-        { name: "datum", description: "Konkrétní datum", type: "STRING", required: false }
+        { 
+            name: "guild", 
+            description: "Která guilda?", 
+            type: 3, 
+            choices: [{ name: 'UHG', value: 'UltimateHypixelGuild' }, { name: 'TKJK', value: 'TKJK' }] 
+        },
+        { name: "date", description: "Referenční datum (YYYY-MM-DD nebo YYYY-MM)", type: 3 }
     ],
 
     run: async (uhg, interaction) => {
         await interaction.deferReply();
+
         const period = interaction.options.getString('period');
         const guildName = interaction.options.getString('guild') || 'UltimateHypixelGuild';
-        const rawDate = interaction.options.getString('datum');
+        const customDate = interaction.options.getString('date');
 
-        // 1. PŘÍPRAVA FILTRU A ID CACHE
-        // Potřebujeme to vědět hned na začátku, abychom mohli zkontrolovat cache
-        const guildData = await uhg.db.run.get("stats", "guild", { name: guildName }).then(res => res[0]);
-        if (!guildData || !guildData.members.length) return interaction.editReply(`❌ Data pro guildu **${guildName}** nebyla nalezena.`);
+        const now = new Date();
+        let refDate = now;
 
-        const sampleHistory = guildData.members[0].exp.daily || {};
-        const availableDates = Object.keys(sampleHistory).sort().reverse();
+        if (customDate) {
+            const parsedDate = new Date(customDate.length === 7 ? `${customDate}-01` : customDate);
+            if (!isNaN(parsedDate)) refDate = parsedDate;
+        }
 
+        let dayList = [];
         let filterPrefix = "";
         let titleSuffix = "";
 
-        if (rawDate) {
-            filterPrefix = rawDate.replace(/[ .]/g, "-");
-            titleSuffix = `(${filterPrefix})`;
-        } else if (period === 'd') {
-            if (availableDates.length > 0) {
-                filterPrefix = availableDates[0];
-                titleSuffix = filterPrefix.split('-').reverse().join('. ');
-            } else return interaction.editReply("❌ V databázi nejsou žádná historická data.");
+        if (period === 'd') {
+            filterPrefix = refDate.toISOString().slice(0, 10);
+            dayList = [filterPrefix];
+            titleSuffix = filterPrefix;
         } else if (period === 'w') {
-            filterPrefix = "WEEKLY";
-            titleSuffix = "Posledních 7 dní";
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(refDate);
+                d.setDate(d.getDate() - i);
+                dayList.push(d.toISOString().slice(0, 10));
+            }
+            titleSuffix = `Týden (${dayList[6]} až ${dayList[0]})`;
         } else if (period === 'm') {
-            const today = new Date();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const yyyy = today.getFullYear();
-            filterPrefix = `${yyyy}-${mm}`;
-            titleSuffix = `Měsíc ${mm} ${yyyy}`;
+            filterPrefix = refDate.toISOString().slice(0, 7);
+            titleSuffix = `Měsíc ${filterPrefix}`;
         } else if (period === 'y') {
-            filterPrefix = `${new Date().getFullYear()}`;
+            filterPrefix = refDate.getFullYear().toString();
             titleSuffix = `Rok ${filterPrefix}`;
         } else {
-            filterPrefix = "TOTAL";
-            titleSuffix = "Celkem";
+            titleSuffix = "Celková historie";
         }
 
-        // --- OPTIMALIZACE: KONTROLA CACHE ---
-        // ID je nyní deterministické (stejné pro stejný dotaz)
-        const cacheId = `${guildName}_${period}_${filterPrefix}`;
-        let cacheFile = {};
-        try { if (fs.existsSync(CACHE_PATH)) cacheFile = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8')); } catch (e) {}
+        // ZÍSKÁNÍ SCALED EXP
+        let totalScaled = 0;
+        let gsQuery = { guild: guildName };
+        if (dayList.length) gsQuery.date = { $in: dayList };
+        else if (filterPrefix) gsQuery.date = { $regex: new RegExp(`^${filterPrefix}`) };
 
-        // Pokud máme v cache čerstvá data (mladší než 1 hodina), použijeme je a nepočítáme znovu
-        // (Výjimka: pokud někdo explicitně zadá datum, asi chce vidět, jestli se něco nezměnilo, ale pro běžný provoz stačí)
-        if (cacheFile[cacheId] && cacheFile[cacheId].timestamp > Date.now() - (1000 * 60 * 60)) {
-            const cachedData = cacheFile[cacheId];
-            const buttons = createButtons(cacheId, cachedData.pages.length);
-            return interaction.editReply({ embeds: [cachedData.pages[0]], components: [buttons] });
-        }
+        const guildHistory = await uhg.db.db.collection("guild_stats").find(gsQuery).toArray();
+        guildHistory.forEach(d => totalScaled += (d.dailyScaledExp || 0));
 
-        // 2. VÝPOČET STATISTIK (Pokud nejsou v cache)
-        const allMembers = [...(guildData.members || []), ...(guildData.left || [])];
+        // ZÍSKÁNÍ RAW EXP
+        const members = await uhg.db.db.collection("users").find(
+            { "guilds.name": guildName },
+            { projection: { username: 1, guilds: 1 } }
+        ).toArray();
+
         const leaderboard = [];
-        let totalRawGexp = 0;
+        let totalRaw = 0;
 
-        for (const member of allMembers) {
-            let xp = 0;
-            const history = member.exp ? member.exp.daily : {};
+        for (const user of members) {
+            const gData = user.guilds.find(g => g.name === guildName);
+            if (!gData || !gData.exp) continue;
 
-            if (period === 't') xp = Object.values(history).reduce((a, b) => a + b, 0);
-            else if (filterPrefix === "WEEKLY") {
-                const days = Object.keys(history).sort().reverse().slice(0, 7);
-                days.forEach(day => xp += history[day] || 0);
-            } else {
-                Object.keys(history).forEach(day => {
-                    if (day.startsWith(filterPrefix)) xp += history[day];
+            let userXp = 0;
+            if (period === 't') {
+                userXp = Object.values(gData.exp).reduce((a, b) => a + b, 0);
+            } else if (dayList.length > 0) {
+                dayList.forEach(d => userXp += (gData.exp[d] || 0));
+            } else if (filterPrefix) {
+                Object.keys(gData.exp).forEach(key => {
+                    if (key.startsWith(filterPrefix)) userXp += gData.exp[key];
                 });
             }
 
-            if (xp > 0 || guildData.members.find(m => m.uuid === member.uuid)) {
-                totalRawGexp += xp;
-                leaderboard.push({ name: member.name, xp: xp, left: !guildData.members.find(m => m.uuid === member.uuid) });
+            if (userXp > 0 || gData.active) {
+                totalRaw += userXp;
+                leaderboard.push({ name: user.username, xp: userXp, active: gData.active });
             }
         }
 
         leaderboard.sort((a, b) => b.xp - a.xp);
 
-        if (leaderboard.length === 0) return interaction.editReply(`❌ Pro období **${titleSuffix}** nebyla nalezena žádná data.`);
-
-        let totalScaledGexp = 0;
-        if (guildData.dailyxp) {
-            if (period === 't') totalScaledGexp = guildData.totalxp;
-            else if (filterPrefix === "WEEKLY") {
-                const days = Object.keys(guildData.dailyxp).sort().reverse().slice(0, 7);
-                days.forEach(day => totalScaledGexp += guildData.dailyxp[day] || 0);
-            } else {
-                Object.keys(guildData.dailyxp).forEach(day => {
-                    if (day.startsWith(filterPrefix)) totalScaledGexp += guildData.dailyxp[day];
-                });
-            }
-        }
-        if (totalScaledGexp === 0 && filterPrefix !== "TOTAL") totalScaledGexp = totalRawGexp;
-
-        // 3. STRÁNKOVÁNÍ
+        // STRÁNKOVÁNÍ A CACHE ID (DŮLEŽITÁ OPRAVA: Bez podtržítek!)
         const pageSize = 15;
-        const pages = [];
-        const header = `**GEXP Statistiky:**\n` +
-                       `• Total Raw: \`${uhg.f(totalRawGexp)}\`\n` +
-                       `• Total Scaled: \`${uhg.f(totalScaledGexp)}\`\n` +
-                       `• Průměr (Raw): \`${uhg.f(Math.round(totalRawGexp / leaderboard.length))}\`\n\n` +
-                       `**Leaderboard:**`;
+        const totalPages = Math.ceil(leaderboard.length / pageSize) || 1;
+        
+        // cacheId nesmí obsahovat '_', aby fungoval split v changePage
+        const cacheId = `${guildName.slice(0,3)}${period}${filterPrefix || 'all'}${customDate || 'now'}`.replace(/[^a-zA-Z0-9]/g, '');
 
+        const pages = [];
         for (let i = 0; i < leaderboard.length; i += pageSize) {
             const chunk = leaderboard.slice(i, i + pageSize);
-            const description = header + "\n" + chunk.map((p, index) => {
+            const description = chunk.map((p, index) => {
                 const rank = i + index + 1;
-                const nameStyle = p.left ? `*${uhg.dontFormat(p.name)}*` : `**${uhg.dontFormat(p.name)}**`;
+                const nameStyle = p.active ? `**${uhg.dontFormat(p.name)}**` : `*${uhg.dontFormat(p.name)}* (left)`;
                 return `\`#${rank}\` ${nameStyle}: \`${uhg.f(p.xp)}\``;
             }).join('\n');
 
-            pages.push({
-                title: `${guildName} GEXP - ${titleSuffix}`,
-                color: 0x55FFFF,
-                description: description,
-                footer: { text: `Strana ${pages.length + 1}/${Math.ceil(leaderboard.length / pageSize)} • ${leaderboard.length} hráčů` },
-                timestamp: new Date().toISOString()
-            });
+            const pageEmbed = new uhg.dc.Embed()
+                .setTitle(`${guildName} GEXP - ${titleSuffix}`)
+                .setColor(0x55FFFF)
+                .setDescription(
+                    `**Statistiky:**\n` +
+                    `• Scaled EXP: \`${uhg.f(totalScaled)}\`\n` +
+                    `• Raw EXP: \`${uhg.f(totalRaw)}\`\n` +
+                    `• Efektivita: \`${(uhg.ratio(totalScaled, totalRaw) * 100).toFixed(1)}%\`\n\n` +
+                    `**Leaderboard:**\n${description || "_Žádná data pro toto období_"}`
+                )
+                .setFooter({ text: `Strana ${pages.length + 1}/${totalPages} • ${leaderboard.length} hráčů` })
+                .setTimestamp();
+
+            pages.push(pageEmbed);
         }
 
-        // 4. ULOŽENÍ DO CACHE A ÚDRŽBA
-        // Promazání starých záznamů (30 dní = 2592000000 ms)
-        const MAX_AGE = 1000 * 60 * 60 * 24 * 30;
-        const now = Date.now();
-        for (const key in cacheFile) {
-            if (cacheFile[key].timestamp < now - MAX_AGE) delete cacheFile[key];
-        }
+        if (!pages.length) return interaction.editReply("❌ Pro toto období nebyla nalezena žádná data.");
 
-        cacheFile[cacheId] = { pages, timestamp: now };
-        
-        // Asynchronní zápis (neblokuje)
-        fs.writeFile(CACHE_PATH, JSON.stringify(cacheFile), (err) => { if (err) console.error("Cache write error:", err); });
+        saveToCache(cacheId, pages);
 
-        const buttons = createButtons(cacheId, pages.length);
+        const buttons = createButtons(cacheId, pages.length, 0);
         await interaction.editReply({ embeds: [pages[0]], components: [buttons] });
     },
 
     changePage: async (uhg, interaction) => {
         const parts = interaction.customId.split('_');
+        // parts[0] = gexp, parts[1] = changePage, parts[2] = cacheId, parts[3] = action
+        const cacheId = parts[2];
+        const action = parts[3];
 
-        const cacheId = parts.slice(2, 5).join('_'); // Zde je nyní např. "UltimateHypixelGuild_m_2023-10"
-        const action = parts[5];
+        const data = loadFromCache(cacheId);
+        if (!data) return interaction.reply({ content: "❌ Data vypršela. Spusť příkaz znovu.", flags: [MessageFlags.Ephemeral] });
 
-        let cacheFile = {};
-        try { if (fs.existsSync(CACHE_PATH)) cacheFile = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8')); } catch (e) {
-                await uhg.disableAllComponents(interaction);
-                return interaction.reply({ content: "❌ Data vypršela.", flags: [MessageFlags.Ephemeral] })
-        }
-
-        const data = cacheFile[cacheId];
-        if (!data) {
-            await uhg.disableAllComponents(interaction);
-            return interaction.reply({ content: "❌ Data vypršela (starší než 30 dní).", flags: [MessageFlags.Ephemeral] });
-        }
         let currentPage = 0;
         try {
-            const footer = interaction.message.embeds[0].footer.text;
-            currentPage = parseInt(footer.split(' ')[1].split('/')[0]) - 1;
+            const footerText = interaction.message.embeds[0].footer.text;
+            currentPage = parseInt(footerText.split(' ')[1].split('/')[0]) - 1;
         } catch (e) {}
 
-        const maxPage = data.pages.length - 1;
         let newPage = currentPage;
-
         if (action === '0') newPage = 0;
-        else if (action === 'last') newPage = maxPage;
         else if (action === 'prev') newPage = Math.max(0, currentPage - 1);
-        else if (action === 'next') newPage = Math.min(maxPage, currentPage + 1);
+        else if (action === 'next') newPage = Math.min(data.pages.length - 1, currentPage + 1);
+        else if (action === 'last') newPage = data.pages.length - 1;
 
         if (newPage === currentPage) return interaction.deferUpdate();
 
@@ -211,13 +185,31 @@ module.exports = {
     }
 };
 
-// Pomocná funkce pro tlačítka
-function createButtons(cacheId, totalPages, currentPage = 0) {
-    const maxPage = totalPages - 1;
+function createButtons(cacheId, totalPages, currentPage) {
     return new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_0`).setEmoji('⏮').setStyle(ButtonStyle.Primary).setDisabled(currentPage === 0),
         new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_prev`).setEmoji('◀').setStyle(ButtonStyle.Primary).setDisabled(currentPage === 0),
-        new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_next`).setEmoji('▶').setStyle(ButtonStyle.Primary).setDisabled(currentPage === maxPage),
-        new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_last`).setEmoji('⏭').setStyle(ButtonStyle.Primary).setDisabled(currentPage === maxPage)
+        new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_next`).setEmoji('▶').setStyle(ButtonStyle.Primary).setDisabled(currentPage === totalPages - 1),
+        new ButtonBuilder().setCustomId(`gexp_changePage_${cacheId}_last`).setEmoji('⏭').setStyle(ButtonStyle.Primary).setDisabled(currentPage === totalPages - 1)
     );
+}
+
+function saveToCache(id, pages) {
+    try {
+        let cache = {};
+        if (fs.existsSync(CACHE_PATH)) cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+        const now = Date.now();
+        // Promazání starší než 2 hodiny
+        for (const key in cache) { if (cache[key].timestamp < now - 7200000) delete cache[key]; }
+        cache[id] = { pages, timestamp: now };
+        fs.writeFileSync(CACHE_PATH, JSON.stringify(cache));
+    } catch (e) { console.error("Cache Save Error:", e); }
+}
+
+function loadFromCache(id) {
+    try {
+        if (!fs.existsSync(CACHE_PATH)) return null;
+        const cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+        return cache[id];
+    } catch (e) { return null; }
 }

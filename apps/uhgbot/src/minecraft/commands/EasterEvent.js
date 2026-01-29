@@ -6,7 +6,7 @@ module.exports = {
             // Logika argumentů (Nick vs Rok)
             let args = pmsg.args.split(" ");
             let year = new Date().getFullYear().toString();
-            let nickname = pmsg.nickname;
+            let nickname = pmsg.username;
 
             // Pokud první argument je rok (4 čísla)
             if (args[0] && args[0].length === 4 && !isNaN(args[0])) {
@@ -22,7 +22,7 @@ module.exports = {
             const api = await uhg.api.call(nickname, ["hypixel"]);
             if (!api.success) return api.reason;
 
-            const events = api.hypixel.seasonal.events.easter || {};
+            const events = api.hypixel.stats.general.seasonal.events.easter || {};
             
             if (!events[year]) {
                 return `Hráč **${api.username}** nehrál v roce ${year} Easter event.`;
@@ -30,7 +30,7 @@ module.exports = {
 
             const data = events[year];
             
-            let mcMessage = `**${year} EasterEvent**: **${api.username}** - Level ${Math.floor(data.level)} | ${uhg.f(data.xpleft)} XP do dalšího Levelu | ${uhg.f(api.hypixel.seasonal.silver)} Silver`;
+            let mcMessage = `**${year} EasterEvent**: **${api.username}** - Level ${Math.floor(data.level)} | ${uhg.f(data.xpleft)} XP do dalšího Levelu | ${uhg.f(api.hypixel.stats.general.seasonal.silver)} Silver`;
 
             let dcEmbed = new uhg.dc.Embed()
                 .setTitle(`Easter Event ${year} - ${uhg.dontFormat(api.username)}`)
@@ -39,7 +39,7 @@ module.exports = {
                 .addFields(
                     { name: "Level", value: `\`${Math.floor(data.level)}\``, inline: true },
                     { name: "XP do levelu", value: `\`${uhg.f(data.xpleft)}\``, inline: true },
-                    { name: "Total Silver", value: `\`${uhg.f(api.hypixel.seasonal.silver)}\``, inline: true }
+                    { name: "Total Silver", value: `\`${uhg.f(api.hypixel.stats.general.seasonal.silver)}\``, inline: true }
                 );
 
             if (pmsg.command) dcEmbed.setFooter({ text: `Command requested by: ${pmsg.username}` });

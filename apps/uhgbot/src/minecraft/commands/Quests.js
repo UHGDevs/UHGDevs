@@ -3,12 +3,12 @@ module.exports = {
     aliases: ["quests", "quest", "challenge", "challenges"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
             // Quests a Challenges jsou v rootu objektu (z general.js)
-            const quests = api.hypixel.quests || 0;
-            const challenges = api.hypixel.challenges || 0;
+            const quests = api.hypixel.stats.general.quests || 0;
+            const challenges = api.hypixel.stats.general.challenges || 0;
 
             let mcMessage = `**${api.username}** - ${uhg.f(quests)} Quests Completed | ${uhg.f(challenges)} Challenges Completed`;
 

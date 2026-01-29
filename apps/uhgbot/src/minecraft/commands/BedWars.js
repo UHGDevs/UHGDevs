@@ -8,7 +8,7 @@ module.exports = {
     run: async (uhg, pmsg) => {
         try {
             // 1. Získání dat přes sjednocené API
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
             
             // Pojistka, pokud hráč BedWars nikdy nehrál

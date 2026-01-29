@@ -3,7 +3,7 @@ module.exports = {
     aliases: ["ww", "wool", "wools", "woolwars"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
             const ww = api.hypixel.stats.ww;

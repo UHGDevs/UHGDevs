@@ -3,7 +3,7 @@ module.exports = {
     aliases: ["sw", "skywars", "rsw"], // Sloučeno s RSW
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
             const sw = api.hypixel.stats.skywars;

@@ -1,48 +1,54 @@
 /**
  * src/time/events/uhgrole.js
- * Aktualizace rolí čistě z databáze (žádné zbytečné API cally).
+ * Synchronizace rolí a přezdívek čistě z DB kolekce 'users'.
  */
 
 module.exports = {
   name: "uhgrole",
-  description: "Aktualizace rolí z DB (Guild Ranky + Badges + nicknames)",
+  description: "Aktualizace rolí z DB (Guild Ranky + Badges + Nicknames)",
   emoji: '🛡️',
-  time: '0 1 * * * *',
+  time: '0 1 * * * *', // Každou hodinu v 1. minutě
   onstart: false,
   run: async (uhg) => {
     const start = Date.now();
-    console.log(` [ROLES] `.bgBlue.black + ` Startuji update rolí z DB...`.blue);
+    console.log(` [ROLES] Spouštím synchronizaci rolí...`.blue);
     
     const guild = uhg.dc.client.guilds.cache.get(uhg.config.guildId);
     if (!guild) return;
 
-    // 1. Načtení dat z DB
-    const dbGuild = await uhg.db.run.get("stats", "guild", { name: "UltimateHypixelGuild" }).then(n => n[0]);
-    const allVerify = await uhg.db.run.get("general", "verify");
-    if (!dbGuild || !allVerify) return console.log(" [ROLES] Chyba při načítání dat.".yellow);
-
-    console.log(` [ROLES] Data připravena za ${((Date.now() - start) / 1000).toFixed(2)}s. Zpracovávám členy...`.gray);
-
-    const dcMembers = await guild.members.fetch();
-    let updatedCount = 0;
-    let changesCount = 0;
-
-    for (const [id, member] of dcMembers) {
-        if (member.user.bot) continue;
-
-        const verifyData = allVerify.find(v => v._id == id) || null;
-
-        const changed = await uhg.roles.updateMember(member, verifyData, dbGuild);
-
-        if (changed) {
-            changesCount++;
-            await uhg.delay(1000); 
-        } 
+    try {
+        // 1. ZÍSKÁNÍ AKTIVNÍCH ČLENŮ UHG (Projekce)
+        const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
         
-        updatedCount++;
+        // 2. NAČTENÍ VŠECH VERIFIKOVANÝCH (Abychom věděli, komu updatovat badges/nick)
+        const allVerified = await uhg.db.find("users", { discordId: { $exists: true } });
+
+        // 3. FETCH DISCORD ČLENŮ
+        const dcMembers = await guild.members.fetch();
+        let updatedCount = 0;
+        let changesCount = 0;
+
+        for (const [id, member] of dcMembers) {
+            if (member.user.bot) continue;
+
+            // Najdeme data uživatele v našem DB listu
+            const userData = allVerified.find(u => u.discordId === id);
+
+            // Zavoláme updateMember
+            // userData obsahuje .stats pro badges a .username pro přezdívku
+            // activeMembers obsahuje rank v guildě
+            const changed = await uhg.roles.updateMember(member, userData, activeMembers);
+
+            if (changed) {
+                changesCount++;
+                await uhg.delay(1000); // Prevence Rate Limitu
+            } 
+            updatedCount++;
+        }
+        
+        console.log(` [ROLES] Hotovo. (Check: ${updatedCount}, Změny: ${changesCount}) za ${((Date.now() - start) / 1000).toFixed(2)}s`.green);
+    } catch (e) {
+        console.error(" [ROLES ERROR] ".bgRed, e);
     }
-    
-    const totalTime = ((Date.now() - start) / 1000).toFixed(2);
-    console.log(` [ROLES] `.bgGreen.black + ` Hotovo za ${totalTime}s. (Check: ${updatedCount}, Změny: ${changesCount})`.green);
   }
 };

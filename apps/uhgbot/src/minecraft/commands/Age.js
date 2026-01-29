@@ -10,18 +10,18 @@ module.exports = {
     try {
       // 1. Získání dat z API
       // Pro datum vytvoření stačí volat 'mojang' (v našem call() je to defaultní identita)
-      let api = await uhg.api.call(pmsg.nickname, ["mojang"]);
+      let api = await uhg.api.call(pmsg.username, ["mojang"]);
       if (!api.success) return api.reason;
 
       // 2. Kontrola, zda máme datum (některé velmi staré účty ho nemusí v API mít)
-      if (!api.date || isNaN(api.date.getTime()) || api.date.getTime() === 0) {
+      if (!api.created_at || isNaN(api.created_at.getTime()) || api.created_at.getTime() === 0) {
         return `Nepodařilo se zjistit datum vytvoření účtu pro ${api.username}.`;
       }
 
-      const timestamp = Math.round(api.date.getTime() / 1000);
-      const den = api.date.getDate();
-      const mesic = api.date.getMonth() + 1;
-      const rok = api.date.getFullYear();
+      const timestamp = Math.round(api.created_at.getTime() / 1000);
+      const den = api.created_at.getDate();
+      const mesic = api.created_at.getMonth() + 1;
+      const rok = api.created_at.getFullYear();
 
       let mcMessage = `**${api.username}** - Účet vytvořen: ${den}. ${mesic}. ${rok}`;
 

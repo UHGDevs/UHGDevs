@@ -1,36 +1,15 @@
 /**
  * src/discord/commandsSlash/verify.js
  */
-const { 
-    ActionRowBuilder, ButtonBuilder, ButtonStyle, 
-    ModalBuilder, TextInputBuilder, TextInputStyle, 
-    MessageFlags 
-} = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, MessageFlags } = require('discord.js');
 
 module.exports = {
     name: 'verify',
     description: 'Propojení Discord účtu s Hypixel účtem',
-    permissions: [],
     options: [
-        {
-            name: 'nickname',
-            description: 'Tvůj Minecraft nick',
-            type: 3, // STRING
-            required: false
-        },
-        {
-            name: 'target',
-            description: '(Admin) Uživatel pro custom verifikaci',
-            type: 6, // USER
-            required: false
-        },
-        {
-            name: 'setup',
-            description: '(Admin) Pošle verifikační embed do kanálu',
-            type: 3, // STRING
-            required: false,
-            choices: [{ name: 'Odeslat Embed', value: 'send' }]
-        }
+        { name: 'nickname', description: 'Tvůj Minecraft nick', type: 3, required: false },
+        { name: 'target', description: '(Admin) Uživatel pro custom verifikaci', type: 6, required: false },
+        { name: 'setup', description: '(Admin) Pošle verifikační embed do kanálu', type: 3, required: false, choices: [{ name: 'Odeslat Embed', value: 'send' }] }
     ],
 
     run: async (uhg, interaction) => {
@@ -38,79 +17,47 @@ module.exports = {
         const nickname = interaction.options.getString('nickname');
         const targetUser = interaction.options.getUser('target');
 
-        // A. ADMIN SETUP
+        // 1. ADMIN SETUP (Odeslání zprávy s tlačítkem)
         if (setup === 'send') {
-            if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }, { type: 'ROLE', id: '530504567528620063' }], interaction)) {
+            if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }, { type: 'ROLE', id: '537252847025127424' }], interaction)) {
                 return interaction.reply({ content: 'Nemáš práva na setup.', flags: [MessageFlags.Ephemeral] });
             }
 
             const embed = new uhg.dc.Embed()
                 .setTitle('✅ UHG Verifikace')
                 .setColor(0x55FFFF)
-                .setDescription(
-                    'Pro získání přístupu na server a propojení statistik se musíš verifikovat.\n\n' +
-                    '**Postup:**\n' +
-                    '1. Jdi na Hypixel server (`mc.hypixel.net`).\n' +
-                    '2. Jdi do **My Profile** (hlava v hotbaru) -> **Social Media**.\n' +
-                    '3. Nastav **Discord** na tvůj aktuální Discord nick: `' + interaction.user.username + '`\n' +
-                    '4. Klikni na tlačítko **VERIFY** níže.'
-                )
-                //.setThumbnail('https://i.imgur.com/3QZ7XqK.png');
+                .setDescription('Pro přístup na server se musíš verifikovat.\n\n**Postup:**\n1. Jdi na Hypixel -> **Social Media**.\n2. Nastav Discord na: `' + interaction.user.username + '`\n3. Klikni na tlačítko níže.');
 
             const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setCustomId('verify_modalOpen')
-                    .setLabel('VERIFY')
-                    .setStyle(ButtonStyle.Success)
-                    .setEmoji('✅')
+                new ButtonBuilder().setCustomId('verify_modalOpen').setLabel('VERIFY').setStyle(ButtonStyle.Success).setEmoji('✅')
             );
 
             await interaction.channel.send({ embeds: [embed], components: [row] });
-            return interaction.reply({ content: 'Verifikační zpráva odeslána.', flags: [MessageFlags.Ephemeral] });
+            return interaction.reply({ content: 'Zpráva odeslána.', flags: [MessageFlags.Ephemeral] });
         }
 
-        // B. CUSTOM VERIFY (ADMIN)
+        // 2. CUSTOM VERIFY (Admin force)
         if (targetUser && nickname) {
-             if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }, { type: 'ROLE', id: '530504567528620063' }], interaction)) {
+             if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }], interaction)) {
                 return interaction.reply({ content: 'Nemáš práva na custom verify.', flags: [MessageFlags.Ephemeral] });
             }
             await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-            // Voláme proces s parametrem bypass = true
             return await verifyProcess(uhg, interaction, nickname, targetUser, true);
-        } else if (targetUser && !nickname) {
-            return interaction.reply({ content: 'Pro custom verify musíš zadat i nickname!', flags: [MessageFlags.Ephemeral] });
         }
 
-        // C. RUČNÍ VERIFIKACE (Self)
+        // 3. RUČNÍ VERIFIKACE (Self)
         if (nickname) {
             await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
             return await verifyProcess(uhg, interaction, nickname, interaction.user, false);
         }
 
-        // D. NÁPOVĚDA
-        return interaction.reply({ 
-            content: 'Použij `/verify [nickname]` nebo klikni na tlačítko v #verify kanálu.', 
-            flags: [MessageFlags.Ephemeral] 
-        });
+        return interaction.reply({ content: 'Použij `/verify [nickname]`', flags: [MessageFlags.Ephemeral] });
     },
 
     modalOpen: async (uhg, interaction) => {
-        const modal = new ModalBuilder()
-            .setCustomId('verify_modalSubmit')
-            .setTitle('Verifikace účtu');
-
-        const input = new TextInputBuilder()
-            .setCustomId('nickname')
-            .setLabel("Tvůj Minecraft Nickname")
-            .setStyle(TextInputStyle.Short)
-            .setPlaceholder("Např. DavidCzPdy")
-            .setRequired(true)
-            .setMinLength(3)
-            .setMaxLength(16);
-
-        const row = new ActionRowBuilder().addComponents(input);
-        modal.addComponents(row);
-
+        const modal = new ModalBuilder().setCustomId('verify_modalSubmit').setTitle('Verifikace účtu');
+        const input = new TextInputBuilder().setCustomId('nickname').setLabel("Tvůj Minecraft Nickname").setStyle(TextInputStyle.Short).setRequired(true).setMinLength(3).setMaxLength(16);
+        modal.addComponents(new ActionRowBuilder().addComponents(input));
         await interaction.showModal(modal);
     },
 
@@ -118,87 +65,27 @@ module.exports = {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
         const nickname = interaction.fields.getTextInputValue('nickname');
         await verifyProcess(uhg, interaction, nickname, interaction.user, false);
-    },
-
-    // Kompatibilita se starým tlačítkem
-    create: async (uhg, interaction) => module.exports.modalOpen(uhg, interaction)
+    }
 };
 
-/**
- * Hlavní verifikační logika
- * @param {object} interaction 
- * @param {string} nickname - Minecraft jméno
- * @param {object} discordUser - Discord uživatel (objekt)
- * @param {boolean} bypassCheck - Pokud true, nekontroluje propojení na Hypixelu (Custom verify)
- */
-async function verifyProcess(uhg, interaction, nickname, discordUser, bypassCheck) {
-    try {
-        // 1. Získání dat z API
-        const api = await uhg.api.call(nickname, ["hypixel", "guild"]);
-        
-        if (!api.success) {
-            return interaction.editReply(`❌ Hráč **${nickname}** nebyl nalezen (Mojang API).`);
+async function verifyProcess(uhg, interaction, nickname, discordUser, bypass) {
+    const api = await uhg.api.call(nickname, ["hypixel"]);
+    if (!api.success) return interaction.editReply(`❌ Hráč **${nickname}** nenalezen.`);
+
+    if (!bypass) {
+        const linked = api.hypixel.stats.general.links?.DISCORD;
+        if (linked?.toLowerCase() !== discordUser.username.toLowerCase()) {
+            return interaction.editReply(`❌ Neshoda! Na Hypixelu máš: \`${linked || "NIC"}\`.`);
         }
-
-        const hypixel = api.hypixel;
-
-        // 2. Kontrola propojení (pokud není bypass)
-        if (!bypassCheck) {
-            if (!hypixel || !hypixel.links || !hypixel.links.DISCORD) {
-                return interaction.editReply(`❌ Hráč **${api.username}** nemá na Hypixelu propojený Discord!\n\nPostupuj podle návodu.`);
-            }
-
-            const linkedDiscord = hypixel.links.DISCORD.toLowerCase();
-            const username = discordUser.username.toLowerCase();
-            const tag = discordUser.tag.toLowerCase(); 
-
-            // Kontrola shody
-            if (linkedDiscord !== username && linkedDiscord !== tag) {
-                return interaction.editReply(
-                    `❌ Verifikace selhala!\n\n` +
-                    `Na Hypixelu je: \`${hypixel.links.DISCORD}\`\n` +
-                    `Tvůj Discord: \`${discordUser.username}\`\n\n` +
-                    `Musí se shodovat.`
-                );
-            }
-        }
-
-        // 3. Uložení do DB
-        const verifyData = {
-            _id: discordUser.id,
-            uuid: api.uuid,
-            nickname: api.username,
-            names: api.names || [],
-            date: api.date || new Date(),
-            verifiedAt: Date.now()
-        };
-        
-        // Zde voláme nově přidanou metodu
-        await uhg.db.updateVerify(discordUser.id, verifyData);
-        
-        // Uložení stats
-        if (hypixel) await uhg.db.saveStats(api.uuid, hypixel);
-
-        // 4. Role a Nickname
-        let msg = `✅ **${bypassCheck ? 'Custom verifikace' : 'Verifikace'} úspěšná!**\nDiscord **${discordUser.username}** propojen s **${api.username}**.\n`;
-
-       try {
-            await uhg.roles.updateMember(interaction.user.id);
-            msg += `🔹 Role a statistiky byly aktualizovány.\n`;
-        } catch (e) {
-            console.error("Chyba při updateMember:", e);
-        }
-
-        await interaction.editReply({ content: msg, embeds: [] });
-
-        // Log
-        const logChannel = uhg.dc.cache.channels.get('logs');
-        if (logChannel) {
-            logChannel.send(`🔐 **VERIFY:** ${interaction.user.username} verifikoval ${discordUser.username} jako **${api.username}** ${bypassCheck ? '(FORCE)' : ''}.`);
-        }
-
-    } catch (e) {
-        console.error("Verify Error:", e);
-        return interaction.editReply("❌ Nastala interní chyba při verifikaci.");
     }
+
+    await uhg.db.updateVerify(discordUser.id, { uuid: api.uuid, username: api.username });
+    
+    // Update rolí
+    const userData = await uhg.db.getUser(api.uuid);
+    const activeMembers = await uhg.db.getOnlineMembers();
+    const member = interaction.guild.members.cache.get(discordUser.id);
+    if (member) await uhg.roles.updateMember(member, userData, activeMembers);
+
+    await interaction.editReply(`✅ Úspěšně propojeno s **${api.username}**.`);
 }

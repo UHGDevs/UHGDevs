@@ -1,6 +1,5 @@
 /**
  * src/discord/commandsSlash/lb.js
- * Optimalizovaný Leaderboard s MongoDB Projection.
  */
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const fs = require('fs');
@@ -12,36 +11,12 @@ if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 
 module.exports = {
     name: 'lb',
-    description: 'Zobrazí žebříček hráčů',
-    permissions: [],
+    description: 'Zobrazí žebříček hráčů z CZ/SK databáze',
     options: [
-        {
-            name: "minigame",
-            description: "Vyber minihru",
-            type: 3,
-            required: true,
-            autocomplete: true
-        },
-        {
-            name: "gamemode",
-            description: "Vyber mód",
-            type: 3,
-            required: true, // Nyní povinné, aby se načetly správné staty
-            autocomplete: true
-        },
-        {
-            name: "stat",
-            description: "Vyber statistiku",
-            type: 3,
-            required: true,
-            autocomplete: true
-        },
-        {
-            name: "find_player",
-            description: "Najít umístění hráče",
-            type: 3,
-            required: false
-        }
+        { name: "minigame", description: "Hra (např. BedWars)", type: 3, required: true, autocomplete: true },
+        { name: "gamemode", description: "Mód (např. overall)", type: 3, required: true, autocomplete: true },
+        { name: "stat", description: "Statistika (např. wins)", type: 3, required: true, autocomplete: true },
+        { name: "find_player", description: "Najít konkrétního hráče", type: 3, required: false }
     ],
 
     run: async (uhg, interaction) => {
@@ -52,165 +27,138 @@ module.exports = {
         const statKey = interaction.options.getString('stat');
         const searchPlayer = interaction.options.getString('find_player');
 
-        // 1. ZÍSKÁNÍ KONFIGURACE Z HELPERU
+        // 1. ZÍSKÁNÍ KONFIGURACE
         const config = uhg.lbHelper.getConfig(game, mode, statKey);
-        
-        if (!config) {
-            return interaction.editReply("❌ Neplatná kombinace hry, módu a statistiky.");
-        }
+        if (!config) return interaction.editReply("❌ Neplatná kombinace hry, módu a statistiky.");
 
-        // 2. DOTAZ DO DB
+        // 2. DOTAZ DO DB (Nová kolekce 'users')
         const projection = uhg.lbHelper.getProjection(config);
-        const data = await uhg.db.mongo.db("stats").collection("stats")
-            .find({}, { projection: projection })
+        
+        // Hledáme jen lidi, kteří mají danou statistiku (aby LB nebyl plný nul)
+        const query = { [config.dbPath]: { $exists: true, $ne: null } };
+        
+        const data = await uhg.db.db.collection("users")
+            .find(query, { projection })
             .toArray();
 
-        if (!data.length) return interaction.editReply("❌ Databáze statistik je prázdná.");
+        if (!data.length) return interaction.editReply("❌ V databázi nejsou pro tuto statistiku žádná data.");
 
-
-        // 3. ZPRACOVÁNÍ HODNOT
+        // 3. ZPRACOVÁNÍ A SEŘAZENÍ
         const leaderboard = [];
-        
         for (const player of data) {
-            // Hodnota pro řazení (číslo)
-            let sortValue = uhg.lbHelper.getValue(player, config.dbPath);
-            
-            // Hodnota pro zobrazení (může být string, např. "15✫")
-            let displayValue = uhg.lbHelper.getValue(player, config.displayPath, config.transform);
+            const sortValue = uhg.lbHelper.getValue(player, config.dbPath);
+            const displayValue = uhg.lbHelper.getValue(player, config.displayPath, config.transform) ?? sortValue;
 
-            // Pokud není display definovaný v JSONu jinak, je stejný jako sortValue
-            if (displayValue === undefined) displayValue = sortValue;
-
-            // Základní formátování čísel, pokud to není string
-            if (typeof displayValue === 'number') displayValue = uhg.f(displayValue);
-
-            // Filtrování nulových hodnot (kromě ratio stats)
-            if (sortValue > 0 || ['kdr', 'wlr', 'fkdr'].includes(statKey)) {
+            if (sortValue !== undefined && sortValue !== null) {
                 leaderboard.push({
-                    username: player.username,
+                    username: player.username || "Neznámý",
                     value: Number(sortValue) || 0,
-                    display: displayValue
+                    display: typeof displayValue === 'number' ? uhg.f(displayValue) : displayValue
                 });
             }
         }
 
-        // 4. SEŘAZENÍ
         leaderboard.sort((a, b) => b.value - a.value);
 
-        if (leaderboard.length === 0) return interaction.editReply(`❌ Žádná data pro **${config.name}**.`);
-
-        // 5. VYHLEDÁNÍ HRÁČE
+        // 4. STRÁNKOVÁNÍ
         let startPage = 0;
         let foundIndex = -1;
         if (searchPlayer) {
             foundIndex = leaderboard.findIndex(p => p.username.toLowerCase() === searchPlayer.toLowerCase());
             if (foundIndex !== -1) startPage = Math.floor(foundIndex / 20);
-            else await interaction.followUp({ content: `⚠️ Hráč **${searchPlayer}** nebyl v žebříčku nalezen.`, ephemeral: true });
         }
 
-        // 6. STRÁNKOVÁNÍ
         const pageSize = 20;
         const pages = [];
         const total = leaderboard.length;
-        const niceStatName = uhg.lbHelper.getStatName(game, mode, statKey);
-        const niceGameName = uhg.lbHelper.getGameName(game);
-        const niceModeName = uhg.lbHelper.getModeName(game, mode);
+        const cacheId = `lb${game}${mode}${statKey}`.replace(/[^a-zA-Z0-9]/g, '');
 
         for (let i = 0; i < total; i += pageSize) {
             const chunk = leaderboard.slice(i, i + pageSize);
             const description = chunk.map((p, index) => {
                 const rank = i + index + 1;
-                const nameStyle = (i + index) === foundIndex ? `**${uhg.dontFormat(p.username)}**` : `**${uhg.dontFormat(p.username)}**`; // `__**${uhg.dontFormat(p.username)}**__` : `**${uhg.dontFormat(p.username)}**`;
-                let icon = `\`#${rank}\``;
-                if (rank === 1) icon = "🥇";
-                if (rank === 2) icon = "🥈";
-                if (rank === 3) icon = "🥉";
-                return `${icon} ${nameStyle}: \`${p.display}\``;
+                // Zvýraznění hledaného hráče
+                const nameStr = (i + index) === foundIndex ? `__**${uhg.dontFormat(p.username)}**__` : `**${uhg.dontFormat(p.username)}**`;
+                
+                let medal = `\`#${rank}\``;
+                if (rank === 1) medal = "🥇";
+                if (rank === 2) medal = "🥈";
+                if (rank === 3) medal = "🥉";
+
+                return `${medal} ${nameStr}: \`${p.display}\``;
             }).join('\n');
 
-            pages.push({
-                title: `${niceGameName} - ${niceStatName}`,
-                color: 0x55FFFF,
-                description: `**Mód:** ${niceModeName}\n\n${description}`,
-                footer: { text: `Strana ${pages.length + 1}/${Math.ceil(total / pageSize)} • Hráčů: ${total}` },
-                timestamp: new Date().toISOString()
-            });
+            pages.push(new uhg.dc.Embed()
+                .setTitle(`${uhg.lbHelper.getGameName(game)} - ${uhg.lbHelper.getStatName(game, mode, statKey)}`)
+                .setColor(0x55FFFF)
+                .setDescription(`**Mód:** ${uhg.lbHelper.getModeName(game, mode)}\n\n${description}`)
+                .setFooter({ text: `Strana ${pages.length + 1}/${Math.ceil(total / pageSize)} • Hráčů: ${total}` })
+                .setTimestamp()
+            );
         }
 
-        // 7. CACHE A ODESLÁNÍ
-        const cacheId = `${game}_${statKey}_${mode}`;
+        // 5. CACHE A ODESLÁNÍ
         saveToCache(cacheId, pages);
-
         const buttons = createButtons(cacheId, pages.length, startPage);
         await interaction.editReply({ embeds: [pages[startPage]], components: [buttons] });
     },
 
-    // --- BUTTON INTERACTION ---
+    /**
+     * Přepínání stránek
+     */
     changePage: async (uhg, interaction) => {
         const parts = interaction.customId.split('_');
-        const cacheId = parts.slice(2, 5).join('_');
-        const action = parts[5];
+        const cacheId = parts[2];
+        const action = parts[3];
 
         const data = loadFromCache(cacheId);
-        if (!data) {
-            await uhg.disableAllComponents(interaction);
-            return interaction.reply({ content: "❌ Data vypršela.", flags: [MessageFlags.Ephemeral] });
-        }
+        if (!data) return interaction.reply({ content: "❌ Data vypršela.", flags: [MessageFlags.Ephemeral] });
 
-        let currentPage = 0;
-        try {
-            const footerText = interaction.message.embeds[0].footer.text;
-            currentPage = parseInt(footerText.split(' ')[1].split('/')[0]) - 1;
-        } catch (e) {}
-
-        const maxPage = data.pages.length - 1;
+        let currentPage = parseInt(interaction.message.embeds[0].footer.text.split(' ')[1].split('/')[0]) - 1;
         let newPage = currentPage;
 
         if (action === '0') newPage = 0;
-        else if (action === 'last') newPage = maxPage;
         else if (action === 'prev') newPage = Math.max(0, currentPage - 1);
-        else if (action === 'next') newPage = Math.min(maxPage, currentPage + 1);
+        else if (action === 'next') newPage = Math.min(data.pages.length - 1, currentPage + 1);
+        else if (action === 'last') newPage = data.pages.length - 1;
 
         if (newPage === currentPage) return interaction.deferUpdate();
 
         const buttons = createButtons(cacheId, data.pages.length, newPage);
         await interaction.update({ embeds: [data.pages[newPage]], components: [buttons] });
     },
-    // --- AUTOCOMPLETE (Používá helper) ---
+
+    /**
+     * Autocomplete (Našeptávač)
+     */
     autocomplete: async (uhg, interaction) => {
         const focused = interaction.options.getFocused(true);
         const search = focused.value.toLowerCase();
         
-        // 1. Výběr hry
-        if (focused.name === 'minigame') {
-            await interaction.respond(uhg.lbHelper.getGames(search));
-        } 
-        // 2. Výběr módu (závisí na hře)
-        else if (focused.name === 'gamemode') {
-            const game = interaction.options.getString('minigame');
-            if (game) await interaction.respond(uhg.lbHelper.getModes(game, search));
-            else await interaction.respond([{name: "Nejdřív vyber minihru", value: "null"}]);
-        } 
-        // 3. Výběr statistiky (závisí na módu)
-        else if (focused.name === 'stat') {
-            const game = interaction.options.getString('minigame');
-            const mode = interaction.options.getString('gamemode');
-            
-            if (game && mode) await interaction.respond(uhg.lbHelper.getStats(game, mode, search));
-            else if (game) await interaction.respond([{name: "Nejdřív vyber mód", value: "null"}]);
-            else await interaction.respond([{name: "Nejdřív vyber minihru", value: "null"}]);
+        if (focused.name === 'minigame') return interaction.respond(uhg.lbHelper.getGames(search));
+        
+        const game = interaction.options.getString('minigame');
+        if (focused.name === 'gamemode') {
+            if (!game) return interaction.respond([{name: "Nejdříve vyber hru", value: "null"}]);
+            return interaction.respond(uhg.lbHelper.getModes(game, search));
+        }
+
+        const mode = interaction.options.getString('gamemode');
+        if (focused.name === 'stat') {
+            if (!game || !mode) return interaction.respond([{name: "Vyber hru a mód", value: "null"}]);
+            return interaction.respond(uhg.lbHelper.getStats(game, mode, search));
         }
     }
 };
 
-// --- POMOCNÉ FUNKCE ---
-function createButtons(cacheId, totalPages, currentPage = 0) {
-    const maxPage = totalPages - 1;
+// --- POMOCNÉ FUNKCE CACHE ---
+
+function createButtons(cacheId, totalPages, currentPage) {
     return new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_0`).setEmoji('⏮').setStyle(ButtonStyle.Primary).setDisabled(currentPage === 0),
         new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_prev`).setEmoji('◀').setStyle(ButtonStyle.Primary).setDisabled(currentPage === 0),
-        new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_next`).setEmoji('▶').setStyle(ButtonStyle.Primary).setDisabled(currentPage === maxPage),
-        new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_last`).setEmoji('⏭').setStyle(ButtonStyle.Primary).setDisabled(currentPage === maxPage)
+        new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_next`).setEmoji('▶').setStyle(ButtonStyle.Primary).setDisabled(currentPage === totalPages - 1),
+        new ButtonBuilder().setCustomId(`lb_changePage_${cacheId}_last`).setEmoji('⏭').setStyle(ButtonStyle.Primary).setDisabled(currentPage === totalPages - 1)
     );
 }
 
@@ -220,15 +168,12 @@ function saveToCache(id, pages) {
     const now = Date.now();
     for (const key in cache) { if (cache[key].timestamp < now - 3600000) delete cache[key]; }
     cache[id] = { pages, timestamp: now };
-    fs.writeFile(CACHE_PATH, JSON.stringify(cache), () => {});
+    fs.writeFileSync(CACHE_PATH, JSON.stringify(cache));
 }
 
 function loadFromCache(id) {
     try {
-        if (fs.existsSync(CACHE_PATH)) {
-            const cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
-            return cache[id];
-        }
-    } catch (e) {}
-    return null;
+        const cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+        return cache[id];
+    } catch (e) { return null; }
 }

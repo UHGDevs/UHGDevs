@@ -13,7 +13,7 @@ module.exports = async (uhg, pmsg) => {
     if (!cmd) return;
 
     pmsg.command = commandName;
-    pmsg.nickname = args[0] || pmsg.username; 
+    pmsg.username = args[0] || pmsg.username; 
     pmsg.args = args.join(" ");
     pmsg.verify_data = await uhg.db.getVerify(pmsg.username);
 
@@ -56,7 +56,7 @@ module.exports = async (uhg, pmsg) => {
         if (mcRes) {
 
             if (!uhg.mc.ready) {
-                if (pmsg.channel === 'Discord') {
+                if (pmsg.channel === 'Discord' && (pmsg.message.channel.id === uhg.config.channels.officer || pmsg.message.channel.id === uhg.config.channels.guild)) {
                     pmsg.message.channel.send("⚠️ **Bot je offline.** Příkaz byl zpracován, ale odpověď do hry nebyla odeslána.").catch(() => {});
                 }
                 return;

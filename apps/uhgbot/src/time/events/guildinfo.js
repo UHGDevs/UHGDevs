@@ -1,19 +1,18 @@
 /**
  * src/time/events/guildinfo.js
+ * Kompletní správa guild, reportů a statistik bez snapshot kolekce.
  */
 const ApiFunctions = require('../../api/ApiFunctions');
-// Import pomocných funkcí z příkazu (abychom nepsali logiku 2x)
 const { generateUnelitesEmbed, generateUnverifiedEmbed } = require('../../discord/commandsSlash/guild_check');
 
 module.exports = {
   name: "guildinfo",
-  description: "Update DB, Kanály, Denní Reporty a Týdenní Check",
+  description: "Update členů v DB, statistiky a reporty",
   emoji: '📊',
-  time: '0 50 * * * *', 
+  time: '0 55 * * * *', 
   onstart: true,
   run: async (uhg) => {
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10);
     
     const CHANNELS = {
         members: "811865691908603904",
@@ -24,156 +23,172 @@ module.exports = {
         admin_weekly: "530496801782890527"
     };
 
-    try {
-        const uhgApi = await uhg.api.call("64680ee95aeb48ce80eb7aa8626016c7", ["guild"]);
-        const tkjkApi = await uhg.api.call("574bfb977d4c475b8197b73b15194a2a", ["guild"]);
+    const TRACKED = [
+        { name: "UltimateHypixelGuild", uuid: "64680ee95aeb48ce80eb7aa8626016c7" },
+        { name: "TKJK", uuid: "574bfb977d4c475b8197b73b15194a2a" }
+    ];
 
-        if (!uhgApi.success || !uhgApi.guild.guild) throw new Error("API Error");
+    const statsSummary = {};
 
-        const hypixelDateKey = Object.keys(uhgApi.guild.all.members[0].expHistory)[0];
-        
-        // DB UPDATE (Důležité: uhgData obsahuje historii a aktuální členy)
-        const uhgData = await updateGuildDB(uhg, uhgApi.guild.all);
-        const tkjkData = await updateGuildDB(uhg, tkjkApi.guild.all);
-        const tkjkG = tkjkApi.guild.all || { exp: 0 };
+    for (const gInfo of TRACKED) {
+        const api = await uhg.api.call(gInfo.uuid, ["guild"]);
+        if (!api.success || !api.guild.guild) continue;
 
-        // UPDATE KANÁLŮ
-        const uhgLvl = ApiFunctions.getGuildLevel(uhgData.totalxp);
-        const tkjkLvl = ApiFunctions.getGuildLevel(tkjkG.exp);
-        const diff = Math.abs(uhgLvl - tkjkLvl);
+        const guild = api.guild.all;
+        const hpDate = Object.keys(guild.members[0].expHistory)[0]; 
+        const apiMemberUuids = guild.members.map(m => m.uuid);
 
-        const updateName = async (id, name) => {
-            const chan = uhg.dc.client.channels.cache.get(id);
-            if (chan && chan.name !== name) await chan.setName(name).catch(() => {});
+        // 1. SCALED XP VÝPOČET (přes guild_stats)
+        const d = new Date(hpDate);
+        d.setDate(d.getDate() - 1);
+        const yestStr = d.toISOString().slice(0, 10);
+        const lastGS = await uhg.db.findOne("guild_stats", { _id: `${guild.name}-${yestStr}` });
+        const dailyScaled = lastGS ? (guild.exp - lastGS.totalExp) : 0;
+
+        // 2. UPDATE guild_stats
+        const gStats = {
+            guild: guild.name,
+            date: hpDate,
+            totalExp: guild.exp,
+            dailyScaledExp: dailyScaled,
+            level: ApiFunctions.getGuildLevel(guild.exp),
+            membersCount: guild.members.length,
+            updated: Date.now()
+        };
+        await uhg.db.db.collection("guild_stats").updateOne({ _id: `${guild.name}-${hpDate}` }, { $set: gStats }, { upsert: true });
+        statsSummary[guild.name] = gStats;
+
+        // 3. BULK UPDATE ČLENŮ V USERS
+        const bulkOps = [];
+        for (const m of guild.members) {
+            bulkOps.push({
+                updateOne: {
+                    filter: { _id: m.uuid },
+                    update: { 
+                        $pull: { guilds: { name: guild.name } }
+                    }
+                }
+            });
+            bulkOps.push({
+                updateOne: {
+                    filter: { _id: m.uuid },
+                    update: { 
+                        $push: { guilds: {
+                            name: guild.name,
+                            active: true,
+                            joined: m.joined,
+                            rank: m.rank,
+                            exp: m.expHistory,
+                            left: null
+                        }},
+                        $set: { updated: Date.now() }
+                    },
+                    upsert: true
+                }
+            });
+        }
+        if (bulkOps.length) await uhg.db.bulkUpdateUsers(bulkOps);
+
+        // 4. DETEKCE ODCHODŮ
+        await uhg.db.db.collection("users").updateMany(
+            { "guilds": { $elemMatch: { name: guild.name, active: true } }, "_id": { $nin: apiMemberUuids } },
+            { $set: { "guilds.$[elem].active": false, "guilds.$[elem].left": Date.now() } },
+            { arrayFilters: [{ "elem.name": guild.name, "elem.active": true }] }
+        );
+    }
+
+    // ============================================================
+    // DISCORD LOGIKA (Kanály a Reporty)
+    // ============================================================
+    
+    // A. Update Názvů Kanálů
+    if (statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
+        const u = statsSummary["UltimateHypixelGuild"];
+        const t = statsSummary["TKJK"];
+        const diff = Math.abs(u.level - t.level);
+
+        const update = async (id, name) => {
+            const c = uhg.dc.client.channels.cache.get(id);
+            if (c && c.name !== name) await c.setName(name).catch(()=>{});
         };
 
-        await updateName(CHANNELS.members, `Members: ${uhgData.members.length}/125`);
-        await updateName(CHANNELS.uhg_level, `Guild Level: ${uhg.f(uhgLvl)}`);
-        await updateName(CHANNELS.tkjk, `TKJK: ${uhg.f(tkjkLvl)}`);
-        await updateName(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 5)}`);
+        await update(CHANNELS.members, `Members: ${u.membersCount}/125`);
+        await update(CHANNELS.uhg_level, `UHG Level: ${uhg.f(u.level, 3)}`);
+        await update(CHANNELS.tkjk_level, `TKJK Level: ${uhg.f(t.level, 3)}`);
+        await update(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 4)}`);
+    }
 
-        if (now.getHours() === 4 && now.getMinutes() >= 50) {
-             const todayGexp = uhgData.dailyxp[hypixelDateKey] || 0;
-             let tkjkDaily = 0;
-             const tkjkOld = await uhg.db.run.get("stats", "guild_daily", { name: "TKJK" });
-             if (tkjkOld.length) {
-                 const last = tkjkOld.sort((a,b) => b.timestamp - a.timestamp)[0];
-                 tkjkDaily = tkjkG.exp - last.exp;
-             }
-             const reportEmbed = new uhg.dc.Embed()
-                 .setTitle(`UHG vs TKJK - Denní Report (${hypixelDateKey})`)
-                 .setColor(todayGexp > tkjkDaily ? "Green" : "Orange")
-                 .addFields(
-                     { name: "UHG", value: `Lvl: **${uhg.f(uhgLvl, 3)}**\n+${uhg.f(todayGexp)} XP`, inline: true },
-                     { name: "TKJK", value: `Lvl: **${uhg.f(tkjkLvl, 3)}**\n+${uhg.f(tkjkDaily)} XP`, inline: true },
-                     { name: "Rozdíl", value: `**${uhg.f(diff, 4)}**`, inline: false }
-                 ).setTimestamp();
-             
-             const reportChan = uhg.dc.client.channels.cache.get(CHANNELS.report);
-             const alreadySent = await uhg.db.run.get("stats", "guild_daily", { _id: hypixelDateKey });
-             if (reportChan && alreadySent.length === 0) {
-                 reportChan.send({ embeds: [reportEmbed] });
-                 await uhg.db.run.update("stats", "guild_daily", { _id: hypixelDateKey }, { _id: hypixelDateKey, name: "UHG", exp: uhgData.totalxp, level: uhgLvl, timestamp: Date.now() });
-                 await uhg.db.run.update("stats", "guild_daily", { _id: hypixelDateKey + "_tkjk" }, { _id: hypixelDateKey + "_tkjk", name: "TKJK", exp: tkjkG.exp, level: tkjkLvl, timestamp: Date.now() });
-             }
-        }
+    // B. Daily Report (05:55)
+    if (now.getHours() === 5) {
+        const reportChan = uhg.dc.cache.channels.get('report') || uhg.dc.client.channels.cache.get(CHANNELS.report);
+        const hpDate = statsSummary["UltimateHypixelGuild"]?.date;
+        if (reportChan && hpDate) {
+            const reportId = `REPORT-${hpDate}`;
+            const alreadySent = await uhg.db.findOne("guild_stats", { _id: reportId });
 
-        // B. TÝDENNÍ REPORT (Neděle 20:00 - 20:05)
-        // Používáme DB data (uhgData), abychom šetřili API
-        if (now.getDay() === 0 && now.getHours() === 19 && now.getMinutes() >= 50) {
-            const adminChan = uhg.dc.client.channels.cache.get(CHANNELS.admin_weekly);
-            if (adminChan) {
-                console.log(" [TIME] Odesílám týdenní reporty...".green);
+            if (!alreadySent && statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
+                const u = statsSummary["UltimateHypixelGuild"];
+                const t = statsSummary["TKJK"];
                 
-                // 1. Unelites (využíváme DB historii z updateGuildDB)
-                // Předáváme uhgData.members, což jsou "current" members ale s historií z DB
-                const unelitesEmbed = await generateUnelitesEmbed(uhg, uhgData.members, uhgData, 30);
-                
-                // 2. Unverified
-                const unverifiedEmbed = await generateUnverifiedEmbed(uhg, uhgData.members);
+                const d = new Date(hpDate); d.setDate(d.getDate() - 1);
+                const yStr = d.toISOString().slice(0, 10);
+                const oldU = await uhg.db.findOne("guild_stats", { _id: `UltimateHypixelGuild-${yStr}` });
+                const oldT = await uhg.db.findOne("guild_stats", { _id: `TKJK-${yStr}` });
 
-                await adminChan.send({ content: "📅 **Týdenní kontrola Guildy**", embeds: [unelitesEmbed, unverifiedEmbed] });
+                const gap = u.level - t.level;
+                const lastGap = (oldU && oldT) ? (oldU.level - oldT.level) : gap;
+                const delta = gap - lastGap;
+
+                const embed = new uhg.dc.Embed()
+                    .setTitle(`UHG vs TKJK - Denní Report (${hpDate})`)
+                    .setColor(delta >= 0 ? "Green" : "Orange")
+                    .addFields(
+                        { name: "UHG", value: `Lvl: **${uhg.f(u.level, 3)}** (+${uhg.f(oldU ? u.level-oldU.level : 0, 5)})\nXP: +${uhg.f(u.dailyScaledExp)}`, inline: true },
+                        { name: "TKJK", value: `Lvl: **${uhg.f(t.level, 3)}** (+${uhg.f(oldT ? t.level-oldT.level : 0, 5)})\nXP: +${uhg.f(t.dailyScaledExp)}`, inline: true },
+                        { name: "Trend", value: `Rozdíl: **${uhg.f(gap, 5)}** (${delta >= 0 ? "+" : ""}${uhg.f(delta, 5)})`, inline: false }
+                    );
+                await reportChan.send({ embeds: [embed] });
+                await uhg.db.updateOne("guild_stats", { _id: reportId }, { sent: true });
             }
         }
+    }
 
-    } catch (e) { throw e; }
+    // C. Weekly Report (Neděle 19:55)
+    if (now.getDay() === 0 && now.getHours() === 19) {
+        const adminChan = uhg.dc.client.channels.cache.get(CHANNELS.admin_weekly);
+        if (adminChan) {
+            // 1. Načteme členy (projekcí vytáhneme jen jméno, guildu a potřebný lastLogin ze stats)
+            const membersFromDb = await uhg.db.db.collection("users").find(
+                { "guilds": { $elemMatch: { name: "UltimateHypixelGuild", active: true } } },
+                { projection: { username: 1, guilds: 1, "stats.general.lastLogin": 1 } }
+            ).toArray();
+
+            // 2. Sestavení virtuálního objektu pro generateUnelitesEmbed
+            const virtualGuild = {
+                name: "UltimateHypixelGuild",
+                members: membersFromDb.map(m => {
+                    const g = m.guilds.find(x => x.name === "UltimateHypixelGuild");
+                    return { 
+                        uuid: m._id, 
+                        name: m.username, 
+                        exp: { daily: g.exp }, 
+                        rank: g.rank, 
+                        joined: g.joined,
+                        // DŮLEŽITÉ: Přidáme stats objekt, aby v něm funkce v guild_check.js našla lastLogin
+                        stats: m.stats 
+                    };
+                })
+            };
+
+            // 3. Spuštění funkcí z guild_check.js
+            const unelites = await generateUnelitesEmbed(uhg, virtualGuild.members, 30);
+            const unverified = await generateUnverifiedEmbed(uhg, virtualGuild.members);
+
+            await adminChan.send({ 
+                content: "📅 **Týdenní automatická kontrola UHG**", 
+                embeds: [unelites, unverified] 
+            });
+        }
+    }
   }
 };
-
-
-async function updateGuildDB(uhg, apiGuild) {
-    const today = Object.keys(apiGuild.members[0].expHistory)[0]; 
-    const yesterday = Object.keys(apiGuild.members[0].expHistory)[1];
-
-    let dbGuild = await uhg.db.run.get("stats", "guild", { _id: apiGuild._id }).then(res => res[0]);
-
-    if (!dbGuild) {
-        dbGuild = {
-            _id: apiGuild._id, name: apiGuild.name, members: [], left: [],
-            tdailyxp: {}, dailyxp: {}, raw_dailyxp: {}
-        };
-    }
-
-    dbGuild.updated = Date.now();
-    dbGuild.totalxp = apiGuild.exp;
-    dbGuild.tdailyxp = { ...dbGuild.tdailyxp, [today]: apiGuild.exp };
-    
-    if (dbGuild.tdailyxp[yesterday]) {
-        dbGuild.dailyxp = { ...dbGuild.dailyxp, [today]: apiGuild.exp - dbGuild.tdailyxp[yesterday] };
-    } else {
-        dbGuild.dailyxp[today] = 0; 
-    }
-
-    let todayRawSum = 0;
-    const currentUUIDs = [];
-
-    for (const apiMember of apiGuild.members) {
-        currentUUIDs.push(apiMember.uuid);
-        
-        let dbMemberIndex = dbGuild.members.findIndex(m => m.uuid === apiMember.uuid);
-        let oldHistory = {};
-        let dbMemberName = null;
-
-        if (dbMemberIndex >= 0) {
-            oldHistory = dbGuild.members[dbMemberIndex].exp.daily || {};
-            dbMemberName = dbGuild.members[dbMemberIndex].name;
-        } else {
-            const leftIndex = dbGuild.left.findIndex(m => m.uuid === apiMember.uuid);
-            if (leftIndex >= 0) {
-                oldHistory = dbGuild.left[leftIndex].exp.daily || {};
-                dbMemberName = dbGuild.left[leftIndex].name;
-                dbGuild.left.splice(leftIndex, 1);
-            }
-        }
-
-        if (!dbMemberName) {
-            const verified = await uhg.db.getVerify(apiMember.uuid);
-            dbMemberName = verified ? verified.nickname : apiMember.uuid;
-        }
-
-        todayRawSum += apiMember.expHistory[today] || 0;
-        const mergedHistory = { ...oldHistory, ...apiMember.expHistory };
-
-        const memberObj = {
-            uuid: apiMember.uuid, name: dbMemberName, joined: apiMember.joined,
-            questParticipation: apiMember.questParticipation, rank: apiMember.rank,
-            exp: { daily: mergedHistory }
-        };
-
-        if (dbMemberIndex >= 0) dbGuild.members[dbMemberIndex] = memberObj;
-        else dbGuild.members.push(memberObj);
-    }
-
-    if (!dbGuild.raw_dailyxp) dbGuild.raw_dailyxp = {};
-    dbGuild.raw_dailyxp[today] = todayRawSum;
-
-    for (let i = dbGuild.members.length - 1; i >= 0; i--) {
-        if (!currentUUIDs.includes(dbGuild.members[i].uuid)) {
-            dbGuild.left.push(dbGuild.members[i]);
-            dbGuild.members.splice(i, 1);
-        }
-    }
-
-    await uhg.db.run.update("stats", "guild", { _id: dbGuild._id }, dbGuild);
-    return dbGuild;
-}

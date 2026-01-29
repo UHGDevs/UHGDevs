@@ -5,7 +5,7 @@ module.exports = {
         try {
             // Logika argumentů (basic, deck, ranked)
             let args = pmsg.args.split(" ");
-            let targetName = pmsg.nickname;
+            let targetName = pmsg.username;
             let mode = null; // default
 
             const modesMap = {

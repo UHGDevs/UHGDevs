@@ -4,12 +4,8 @@ const func = require('../ApiFunctions');
 module.exports = async (hypixel = {} , uuid, client, username) => {
   const achievements = hypixel.achievements || {};
   const legacy = hypixel.stats.Legacy || {}
-
   let legacyAps = await require('../achievements').countPoints(client.aps ? client.aps.legacy: await client.cacheAps(), hypixel.achievementsOneTime, achievements)
   return ({
-    success: true,
-    type: 'hypixel',
-    _id: uuid,
     uuid: uuid,
     username: username || hypixel.displayname,
     rank: func.getRank(hypixel).rank,
@@ -46,7 +42,6 @@ module.exports = async (hypixel = {} , uuid, client, username) => {
     },
     totalDailyRewards: hypixel.totalDailyRewards || 0,
     dailyRewards: hypixel.rewardHighScore || 0,
-    updated: Number(new Date()),
     tourney: hypixel.tourney || {}
   })
 }

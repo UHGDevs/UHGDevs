@@ -3,10 +3,10 @@ module.exports = {
     aliases: ["lf", "lobbyfishing", "mainlobbyfishing", "lobbyfish"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
-            const fishing = api.hypixel.fishing;
+            const fishing = api.hypixel.stats.general.fishing;
 
             let mcMessage = `Lobby Fishing: **${api.username}** - ${uhg.f(fishing.fish)} Fish, ${uhg.f(fishing.junk)} Junk, ${uhg.f(fishing.treasure)} Treasure`;
 

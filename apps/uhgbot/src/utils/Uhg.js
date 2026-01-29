@@ -68,7 +68,7 @@ class Uhg {
             prefix: ".", minecraft: true, dev_mode: false, mc_all_logs: false, activity: "UHG bot",
             guildId: "455751845319802880", guildId_dev: "758650512827613195",
             channels: { guild: "912776277361053758", guild_dev: "957005113149521930", officer: "929435160234053726", officer_dev: "957005146460684299", logs: "548772550386253824", bot: "1017334503066320906", dm: "1466082546587799645" },
-            time: {}, bannedWords: ["vape", "ip", "fag", "nigger", "negr", "kys", "hitler"]
+            time: {}, database_stale_hours: 200, bannedWords: ["vape", "ip", "fag", "nigger", "negr", "kys", "hitler"]
         };
 
         if (!fs.existsSync(configPath)) {
@@ -248,68 +248,37 @@ class Uhg {
      */
 
     getBadgeRoles(name, api) {
-        const badge = this; // 'this' je objekt badge
-        
-        if (!api) return { name: badge.name, role: { name: 'Žádná role' }, delete: badge.roles };
+        const badge = this;
+        if (!api || !api.stats) return { name: badge.name, role: { name: 'Žádná role' }, tier: -1 };
 
         let stats = badge.stats.map(statKey => {
-            // 1. Sestavení plné cesty
-            // Spojíme hlavní cestu (např. "hypixel/stats/bedwars/") s klíčem (např. "overall/finalKills")
             let fullPath = (badge.path || "") + statKey;
-
-            // 2. Vyčištění cesty
-            // Chceme dostat čistou cestu uvnitř objektu (např. "bedwars/overall/finalKills")
-            // Odstraníme prefixy "hypixel/" a "stats/", které jsou v definicích navíc
             let cleanPath = fullPath
                 .replace(/^hypixel\//, '')
-                .replace(/^stats\//, '')
-                // Odstraníme zdvojená lomítka, kdyby vznikla
-                .replace(/\/\//g, '/');
+                .replace(/\//g, '.')
+                .replace(/\.\./g, '.')
+                .replace(/^\.|\.$/g, '');
 
-            // 3. Rozdělení na klíče
-            let keys = cleanPath.split('/').filter(n => n.length > 0);
-
-            // 4. Hledání hodnoty (Traverzování objektu)
-            // Funkce zkusí najít cestu přímo v 'api', nebo v 'api.stats'
-            const getVal = (obj, keyArr) => {
-                let current = obj;
-                for (let k of keyArr) {
-                    if (current === undefined || current === null) return undefined;
-                    current = current[k];
-                }
-                return current;
-            };
-
-            // Zkusíme najít v kořenu (api.bedwars...) nebo ve stats (api.stats.bedwars...)
-            let val = getVal(api, keys) ?? getVal(api.stats, keys);
-
-            /* DEBUG - Odkomentuj pokud to stále nepůjde
-            */
-            if (val === undefined) {
-                //console.log(`[BADGE DEBUG] ${name}: Cesta '${cleanPath}' nenašla nic.`);
-                // console.log(`Dostupne klíče v stats:`, api.stats ? Object.keys(api.stats) : 'žádné');
-            }
-            
-
-            return Number(val) || 0;
+            const val = cleanPath.split('.').reduce((o, k) => (o || {})[k], api);
+            return (val !== undefined && val !== null) ? Number(val) : 0;
         });
 
-        // 2. Vyhodnocení tierů (stejné jako předtím)
         let tierResults = stats.map((val, i) => {
-            if (val < badge.req[i][0]) return -1;
-            if (val < badge.req[i][1]) return 0;
-            if (val < badge.req[i][2]) return 1;
-            return 2;
+            const reqs = badge.req[i];
+            if (val >= reqs[2]) return 2; // God
+            if (val >= reqs[1]) return 1; // Expert
+            if (val >= reqs[0]) return 0; // Trained
+            return -1;
         });
 
+        // Nejnižší dosažený tier napříč všemi staty v kategorii
         let roleIndex = Math.min(...tierResults);
-        let roleToGet = roleIndex >= 0 ? badge.roles[roleIndex] : null;
-        let rolesToRemove = badge.roles.filter(r => r.id !== (roleToGet ? roleToGet.id : null));
+        let roleToGet = (roleIndex >= 0 && badge.roles[roleIndex]) ? badge.roles[roleIndex] : null;
 
         return {
             name: badge.name,
             role: roleToGet || { name: 'Žádná role' },
-            delete: rolesToRemove
+            tier: roleIndex // Přidáváme tier pro snadnější zobrazení v příkazu
         };
     }
 

@@ -10,10 +10,10 @@ module.exports = {
         try {
             // 1. Získání dat z API (v4 sjednocený call)
             // 'hypixel' call v pozadí spustí general.js a všechny ostatní parsery
-            let api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            let api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
-            let hypixel = api.hypixel;
+            let hypixel = api.hypixel?.stats?.general;
             if (!hypixel) return "Nepodařilo se načíst statistiky z Hypixel API.";
 
             // V nové struktuře (kde general.js je root) jsou tyto hodnoty přímo zde:

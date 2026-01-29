@@ -3,10 +3,10 @@ module.exports = {
     aliases: ["level", "lvl", "karma"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
-            const hypixel = api.hypixel;
+            const hypixel = api.hypixel.stats.general;
 
             let mcMessage = `**${api.username}** - Level ${uhg.f(hypixel.level)} | ${uhg.f(hypixel.karma)} Karma`;
 

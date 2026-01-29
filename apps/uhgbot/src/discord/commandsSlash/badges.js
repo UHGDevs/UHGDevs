@@ -1,13 +1,11 @@
 /**
  * src/discord/commandsSlash/badges.js
- * Přehled požadavků na odznáčky a kontrola nároku hráče.
  */
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
     name: 'badges',
-    description: 'Zobrazí seznam badges nebo zkontroluje hráče',
-    permissions: [],
+    description: 'Zobrazí seznam badges nebo progres hráče',
     options: [
         { name: "player", description: "Jméno hráče", type: 3, required: false },
         { name: "user", description: "Discord uživatel", type: 6, required: false }
@@ -16,18 +14,19 @@ module.exports = {
     run: async (uhg, interaction) => {
         await interaction.deferReply();
 
+        // Načtení badges pokud nejsou v paměti
         if (uhg.roles.badges.length === 0) await uhg.roles.loadBadges();
         const badges = uhg.roles.badges;
 
         const playerArg = interaction.options.getString('player');
         const userArg = interaction.options.getUser('user');
 
-        // A. SEZNAM VŠECH BADGES (Beze změny)
+        // --- A. SEZNAM POŽADAVKŮ (Bez argumentu) ---
         if (!playerArg && !userArg) {
             const embed = new uhg.dc.Embed()
-                .setTitle('📜 UHG Badges')
+                .setTitle('📜 UHG Badges - Požadavky')
                 .setColor(0x55FFFF)
-                .setDescription('Seznam odznaků a požadavků.');
+                .setDescription('Pro získání role musíš splnit **všechny** statistiky v dané kategorii.');
 
             for (const badge of badges) {
                 let desc = "";
@@ -36,100 +35,66 @@ module.exports = {
                     const reqs = badge.req[i].map(n => uhg.f(n)); 
                     desc += `• **${statName}:** ${reqs.join(' / ')}\n`;
                 }
-                const roleNames = badge.roles.map(r => `<@&${r.id}>`).join(' -> ');
-                embed.addFields({ 
-                    name: interaction.guild.id === uhg.config.guildId ? `${badge.name} (${roleNames})` : `${badge.name})`, 
-                    value: desc || "Chyba definice", 
-                    inline: false 
-                });
+                embed.addFields({ name: badge.name, value: desc || "Chyba definice", inline: true });
             }
             return interaction.editReply({ embeds: [embed] });
         }
 
-        // B. KONTROLA HRÁČE
-        let username = playerArg;
-        let uuid = null;
+        // --- B. KONTROLA PROGRESU HRÁČE ---
+        let targetId = userArg ? userArg.id : (playerArg || interaction.user.id);
+        
+        // Získáme uživatele z nové sjednocené kolekce 'users'
+        const userData = await uhg.db.getUser(targetId);
 
-        if (userArg) {
-            const dbUser = await uhg.db.getVerify(userArg.id);
-            if (dbUser) { username = dbUser.nickname; uuid = dbUser.uuid; }
-            else return interaction.editReply(`❌ Uživatel ${userArg} není verifikovaný.`);
-        } else if (!username) {
-            const dbUser = await uhg.db.getVerify(interaction.user.id);
-            if (dbUser) { username = dbUser.nickname; uuid = dbUser.uuid; }
-            else return interaction.editReply("❌ Nejsi verifikovaný.");
+        if (!userData) {
+            return interaction.editReply(`❌ Hráč **${playerArg || targetId}** nebyl nalezen v databázi.`);
         }
-
-        if (!uuid) {
-            const api = await uhg.api.getMojang(username);
-            if (api.success) uuid = api.uuid;
-            else return interaction.editReply(`❌ Hráč ${username} nenalezen.`);
-        }
-
-        const stats = await uhg.db.getStats(uuid);
-        if (!stats) return interaction.editReply(`❌ Hráč **${username}** není v databázi statistik.`);
-        // Struktura stats je: { _id, uuid, stats: { bedwars: {}, skywars: {} } }
-        const dbData = stats; 
 
         const embed = new uhg.dc.Embed()
-            .setTitle(`Badges: ${uhg.dontFormat(username)}`)
-            .setThumbnail(uhg.getAvatar(uuid))
+            .setTitle(`Badges: ${uhg.dontFormat(userData.username)}`)
+            .setThumbnail(uhg.getAvatar(userData._id))
             .setColor('Gold');
 
         let totalOwned = 0;
 
         for (const badge of badges) {
-            const result = badge.getRole(badge.name, dbData);
-            
-            let currentRole = result.role.name === 'Žádná role' ? null : result.role;
-            let tierIndex = -1;
-            if (currentRole) {
-                tierIndex = badge.roles.findIndex(r => r.id === currentRole.id);
-            }
+            const result = badge.getRole(badge.name, userData);
+            const tierIndex = result.tier; // Použijeme nově přidaný tier z Uhg.js
+
+            if (tierIndex >= 0) totalOwned++;
 
             let statusIcon = "❌";
             if (tierIndex === 0) statusIcon = "🥉";
             if (tierIndex === 1) statusIcon = "🥈";
             if (tierIndex === 2) statusIcon = "🥇";
 
-            if (tierIndex >= 0) totalOwned++;
-
-            // VÝPIS PROGRESU (Pro Embed)
             let progressDesc = "";
             for (let i = 0; i < badge.stats.length; i++) {
-                const statKey = (badge.path || "") + badge.stats[i];
-
-                // 1. Očistíme cestu, aby zbyla jen cesta uvnitř hry (např. "bedwars/overall/finalKills")
-                let cleanPath = statKey
-                    .replace(/^hypixel\//, '')
-                    .replace(/^stats\//, '')
-                    .replace(/\/\//g, '/');
-
-                // 2. Hledáme v datech her (dbData.stats)
-                // Pokud je cesta "bedwars/wins", hledáme v dbData.stats["bedwars"]["wins"]
-                let val = uhg.path(cleanPath, dbData.stats);
-                val = Number(val) || 0;
-
+                const statKey = badge.stats[i];
+                const fullPath = ((badge.path || "") + statKey).replace(/^hypixel\//, '').replace(/\//g, '.').replace(/\.\./g, '.').replace(/^\.|\.$/g, '');
+                
+                const val = fullPath.split('.').reduce((o, k) => (o || {})[k], userData) || 0;
                 const reqs = badge.req[i];
                 const statName = badge.statsNames ? badge.statsNames[i] : statKey;
 
-                let nextTarget = "MAX";
-                if (val < reqs[0]) nextTarget = uhg.f(reqs[0]);
-                else if (val < reqs[1]) nextTarget = uhg.f(reqs[1]);
-                else if (val < reqs[2]) nextTarget = uhg.f(reqs[2]);
+                // Ukazujeme cíl podle aktuálního tieru
+                let nextTarget = reqs[0]; // Cíl pro Trained
+                if (tierIndex === 0) nextTarget = reqs[1]; // Cíl pro Expert
+                if (tierIndex === 1) nextTarget = reqs[2]; // Cíl pro God
+                if (tierIndex === 2) nextTarget = "MAX";
 
-                progressDesc += `• ${statName}: **${uhg.f(val)}** / ${nextTarget}\n`;
+                progressDesc += `• ${statName}: **${uhg.f(val)}** / ${typeof nextTarget === 'number' ? uhg.f(nextTarget) : nextTarget}\n`;
             }
 
             embed.addFields({
-                name: `${statusIcon} ${badge.name} ${currentRole ? `(${currentRole.name})` : ''}`,
+                name: `${statusIcon} ${badge.name}`,
                 value: progressDesc,
                 inline: true
             });
         }
 
-        embed.setDescription(`Hráč vlastní **${totalOwned}** / **${badges.length}** odznaků.`);
-        embed.setFooter({ text: "Data jsou z cache databáze (nemusí být 100% aktuální)." });
+        embed.setDescription(`Hráč splňuje **${totalOwned}** / **${badges.length}** kategorií.`);
+        embed.setFooter({ text: "Data pochází z poslední aktualizace statistik." });
 
         await interaction.editReply({ embeds: [embed] });
     }

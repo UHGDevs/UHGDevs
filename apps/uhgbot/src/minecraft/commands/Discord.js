@@ -3,10 +3,10 @@ module.exports = {
     aliases: ["discord", "social", "socials", "dc"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
-            const links = api.hypixel.links || {};
+            const links = api.hypixel?.stats?.general?.links || {};
             const discordTag = links.DISCORD;
 
             let msg = discordTag || "Nemá propojený Discord";

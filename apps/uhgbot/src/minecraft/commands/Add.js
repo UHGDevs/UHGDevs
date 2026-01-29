@@ -7,7 +7,7 @@ module.exports = {
     aliases: ["add"],
     run: async (uhg, pmsg) => {
         try {
-            const authorized = ["Farmans", "Honzu", "unisdynasty", "DavidCzPdy", "0hBlood", "SolidL1m3", "Smolda", "Corruptedoslav", "macek2005"];
+            const authorized = ["Farmans", "Honzu", "unisdynasty", "DavidCzPdy", "SolidL1m3", "Smolda", "Corruptedoslav", "macek2005"];
             if (!authorized.includes(pmsg.username)) return "Nemáš oprávnění!";
 
             let target = pmsg.args.split(" ")[0];
@@ -19,7 +19,14 @@ module.exports = {
 
             // 2. EXPLICITNĚ uložíme do databáze (jelikož je to ADD příkaz)
             // Použijeme tvou metodu z Database.js
-            await uhg.db.saveStats(api.uuid, api.hypixel);
+            const data = {
+                _id: api.uuid,
+                uuid: api.uuid,
+                username: api.username,
+                created_at: api.created_at || null,
+                stats: api.hypixel.stats
+            };
+            await uhg.db.saveUser(api.uuid, data);
 
             // 3. Odpovědi
             let mcMessage = `Hráč ${api.username} byl přidán do CZ/SK databáze.`;

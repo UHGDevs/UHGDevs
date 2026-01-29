@@ -30,7 +30,7 @@ module.exports = async (uhg, interactionOrMessage) => {
             }
 
             const pmsg = {
-                username: (await uhg.db.getVerify(userId))?.nickname || interactionOrMessage.member?.nickname || interactionOrMessage.author?.username || "Unknown",
+                username: (await uhg.db.getVerify(userId))?.username || interactionOrMessage.member?.username || interactionOrMessage.author?.username || "Unknown",
                 content: content,
                 channel: 'Discord',
                 message: interactionOrMessage 

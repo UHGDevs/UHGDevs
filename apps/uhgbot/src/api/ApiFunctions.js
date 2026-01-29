@@ -1,7 +1,9 @@
 /**
  * src/api/ApiFunctions.js
- * Kompletní sada funkcí pro výpočty všech her na Hypixelu.
+ * Kompletní sada funkcí pro výpočty všech her a SkyBlocku na Hypixelu.
  */
+
+const sbConstants = require('./constants/skyblock');
 
 class ApiFunctions {
     // --- ZÁKLADNÍ FORMÁTOVÁNÍ ---
@@ -40,8 +42,42 @@ class ApiFunctions {
     }
 
     static getPlusColor(rank, plus) {
-        const colors = { 'MVP': '#55FFFF', 'MVP+': '#FF5555', 'MVP++': '#FFAA00', 'VIP+': '#55FF55', 'VIP': '#55FF55', 'PIG+++': '#FF55FF', 'OWNER': '#FF5555', 'ADMIN': '#FF5555', 'GM': '#00AA00', 'YOUTUBE': '#FF5555' };
-        return colors[rank] || '#BAB6B6';
+        // Fallback hodnoty
+        const defaultColor = { mc: '§7', hex: '#BAB6B6' };
+
+        if (!plus || rank === 'PIG+++' || rank === "OWNER" || rank === "ADMIN" || rank === "GM") {
+            const rankColor = {
+                'MVP': { mc: '§b', hex: '#55FFFF' },
+                'MVP+': { mc: '§c', hex: '#FF5555' },
+                'MVP++': { mc: '§c', hex: '#FFAA00' },
+                'VIP+': { mc: '§a', hex: '#55FF55' },
+                'VIP': { mc: '§a', hex: '#55FF55' },
+                'PIG+++': { mc: '§d', hex: '#FF55FF' },
+                'OWNER': { mc: '§c', hex: '#FF5555' },
+                'ADMIN': { mc: '§c', hex: '#FF5555' },
+                'GM': { mc: '§2', hex: '#00AA00' },
+                'YOUTUBE': { mc: '§c', hex: '#FF5555' } // Youtube většinou červená
+            }[rank];
+            return rankColor || defaultColor;
+        } else {
+            const rankColorMC = {
+                RED: { mc: '§c', hex: '#FF5555' },
+                GOLD: { mc: '§6', hex: '#FFAA00' },
+                GREEN: { mc: '§a', hex: '#55FF55' },
+                YELLOW: { mc: '§e', hex: '#FFFF55' },
+                LIGHT_PURPLE: { mc: '§d', hex: '#FF55FF' },
+                WHITE: { mc: '§f', hex: '#F2F2F2' },
+                BLUE: { mc: '§9', hex: '#5555FF' },
+                DARK_GREEN: { mc: '§2', hex: '#00AA00' },
+                DARK_RED: { mc: '§4', hex: '#AA0000' },
+                DARK_AQUA: { mc: '§3', hex: '#00AAAA' },
+                DARK_PURPLE: { mc: '§5', hex: '#AA00AA' },
+                DARK_GRAY: { mc: '§8', hex: '#555555' },
+                BLACK: { mc: '§0', hex: '#000000' },
+                DARK_BLUE: { mc: '§1', hex: '#0000AA'}
+            }[plus];
+            return rankColorMC || defaultColor;
+        }
     }
 
     // --- BEDWARS LEVELING ---
@@ -217,6 +253,146 @@ class ApiFunctions {
             currentExp -= need;
         }
         return 1000;
+    }
+
+     static getSbMode(mode) {
+        if (!mode) return 'Normal';
+        return mode.toLowerCase()
+            .replace('island', 'Stranded')
+            .replace('bingo', 'Bingo')
+            .replace('ironman', 'Ironman');
+    }
+
+    static getCataLvl(exp) {
+        if (!exp) return 0;
+        if (exp >= 569809640) return 50;
+        // Tabulka pro Cata levely (zjednodušená verze nebo import z constants)
+        const levels = sbConstants.dungeon_xp;
+        for (let i = 1; i <= 50; i++) {
+            if (exp < levels[i]) return i - 1 + (exp - levels[i-1]) / (levels[i] - levels[i-1]);
+        }
+        return 50;
+    }
+
+    static getHotmTier(exp) {
+        let tiers = [0, 3000, 12000, 37000, 97000, 197000, 347000, 557000, 847000, 1247000];
+        for (let i = 0; i < 10; i++) {
+            if (exp < tiers[i]) return i;
+        }
+        return 7; // Max tier (aktuálně 7 nebo 10 dle update, necháváme safe)
+    }
+
+    static getSkills(player, achievements = {}) {
+        let skills = {};
+        
+        // Seznam skillů k výpočtu
+        const skillList = sbConstants.skills || ['farming', 'mining', 'combat', 'foraging', 'fishing', 'enchanting', 'alchemy', 'taming', 'carpentry', 'runecrafting', 'social'];
+
+        for (let s of skillList) {
+            let skill = { exp: 0, level: 0, exp_current: 0, exp_missing: 0, progress: 0 };
+
+            // Získání EXP z API
+            let exp = player[`experience_skill_${s === 'social' ? 'social2' : s}`];
+            
+            // Fallback na achievementy, pokud je API vypnuté
+            if (exp === undefined || exp === null) {
+                const achName = sbConstants.skills_achievements[s];
+                skill.level = achievements[achName] || 0;
+                skills[s] = skill;
+                continue;
+            }
+
+            exp = Math.floor(exp);
+            skill.exp = exp;
+
+            // Výběr správné XP tabulky
+            let xpTable = sbConstants[s] || sbConstants.leveling_xp;
+            if (!xpTable) xpTable = sbConstants.leveling_xp;
+
+            // Zjištění Level Capu
+            let maxLevel = Math.max(...Object.keys(xpTable).map(Number));
+            const capConstant = sbConstants.skills_cap[s] || 50;
+            
+            // Pokud je skill cap vyšší než základní tabulka (např. Farming 60), přidáme post-50 tabulku
+            if (capConstant > maxLevel) {
+                xpTable = Object.assign({}, sbConstants.xp_past_50, xpTable);
+                maxLevel = capConstant;
+            }
+
+            let totalLevelExp = 0;
+            for (let x = 1; x <= maxLevel; x++) {
+                totalLevelExp += xpTable[x];
+                if (totalLevelExp > exp) {
+                    totalLevelExp -= xpTable[x];
+                    break;
+                } else {
+                    skill.level = x;
+                }
+            }
+
+            // Výpočet progresu do dalšího levelu
+            skill.exp_current = exp - totalLevelExp;
+            let nextLevelExp = skill.level < maxLevel ? Math.ceil(xpTable[skill.level + 1]) : 0;
+            
+            if (skill.level < maxLevel && nextLevelExp > 0) {
+                skill.exp_missing = nextLevelExp - skill.exp_current;
+                skill.progress = Math.floor((Math.max(0, Math.min(skill.exp_current / nextLevelExp, 1))) * 100);
+            } else {
+                skill.progress = 0;
+                skill.exp_missing = 0;
+            }
+            
+            skills[s] = skill;
+        }
+
+        // Výpočet Skill Average (SA)
+        let sa = 0;
+        let trueSa = 0;
+        // Počítáme jen hlavní skilly (bez cosmetics jako Runecrafting/Social/Carpentry)
+        const cos = ['runecrafting', 'social', 'carpentry'];
+        const mainSkills = skillList.filter(s => !cos.includes(s));
+        
+        for (let s of mainSkills) {
+            if (skills[s]) {
+                sa += skills[s].level;
+                trueSa += skills[s].level + (skills[s].progress / 100);
+            }
+        }
+        
+        const count = mainSkills.length || 1;
+        sa = Math.floor((sa / count) * 100) / 100;
+        trueSa = Math.floor((trueSa / count) * 100) / 100;
+
+        return { stats: skills, sa: sa, tSa: trueSa };
+    }
+
+    static getSlayers(slayerData) {
+        if (!slayerData) return {};
+        const slayers = {};
+        const types = ['zombie', 'spider', 'wolf', 'enderman', 'blaze', 'vampire'];
+        const totals = { 1: 5, 2: 15, 3: 200, 4: 1000, 5: 5000, 6: 20000, 7: 100000, 8: 400000, 9: 1000000 };
+
+        let totalSlayerXp = 0;
+
+        for (const type of types) {
+            const data = slayerData[`${type}_boss`] || {};
+            const exp = data.xp || 0;
+            totalSlayerXp += exp;
+
+            let level = 0;
+            for (let i = 1; i <= 9; i++) {
+                if (exp >= totals[i]) level = i;
+                else break;
+            }
+
+            slayers[type] = {
+                xp: exp,
+                level: level,
+                kills: Object.values(data).filter(n => typeof n === 'number' && n < 100000).reduce((a,b)=>a+b, 0) // Hrubý odhad killů
+            };
+        }
+        slayers.total_xp = totalSlayerXp;
+        return slayers;
     }
 }
 

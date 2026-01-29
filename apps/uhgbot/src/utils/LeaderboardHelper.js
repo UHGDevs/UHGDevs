@@ -42,8 +42,8 @@ class LeaderboardHelper {
             };
         }
         
-        if (config.dbPath.startsWith('.')) config.dbPath = config.dbPath.substring(1);
-        if (config.displayPath.startsWith('.')) config.displayPath = config.displayPath.substring(1);
+        config.dbPath = config.dbPath.replace(/^\.+|\.+$/g, '');
+        config.displayPath = config.displayPath.replace(/^\.+|\.+$/g, '');
 
         return config;
     }
@@ -68,7 +68,7 @@ class LeaderboardHelper {
         return val;
     }
 
-    // --- OPRAVENÉ AUTOCOMPLETE METODY ---
+    // --- AUTOCOMPLETE METODY ---
 
     getGames(search) {
         const allGames = Object.keys(this.map).map(k => ({ name: this.map[k].name, value: k }));

@@ -1,4 +1,4 @@
-const contants = {
+const constants = {
     skyblock_year_0: 1.5602757e+12,
   
     leveling_xp: {

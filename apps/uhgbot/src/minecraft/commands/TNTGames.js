@@ -3,7 +3,7 @@ module.exports = {
     aliases: ["tntgames", "tnt", "tnts", "tntgame", "wizard", "wizards", "tntrun", "pvprun", "tnttag", "bowspleef"],
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.nickname, ["hypixel"]);
+            const api = await uhg.api.call(pmsg.username, ["hypixel"]);
             if (!api.success) return api.reason;
 
             const tnt = api.hypixel.stats.tntgames;

@@ -1,7 +1,5 @@
 /**
  * src/discord/commandsSlash/guild_check.js
- * Kombinovaný příkaz pro kontrolu guildy (Unelites + Unverified).
- * Používá čerstvá data z API.
  */
 const { MessageFlags } = require('discord.js');
 
@@ -18,150 +16,128 @@ module.exports = {
     options: [
         {
             name: "type",
-            description: "Co chceš zobrazit?",
-            type: 3, // STRING
+            description: "Co chceš zkontrolovat?",
+            type: 3,
             required: true,
             choices: [
                 { name: 'Unelites (Neaktivní)', value: 'unelites' },
                 { name: 'Unverified (Nepropojení)', value: 'unverified' }
             ]
         },
-        {
-            name: "days",
-            description: "Počet dní pro Unelites (default: 30)",
-            type: 4, // INTEGER
-            required: false
-        }
+        { name: "days", description: "Počet dní pro Unelites (default: 30)", type: 4, required: false }
     ],
 
-    run: async (uhg, interaction) => {
+run: async (uhg, interaction) => {
         await interaction.deferReply();
         const type = interaction.options.getString('type');
+        const days = interaction.options.getInteger('days') || 30;
+
+        // 1. Získáme UUID aktivních členů
+        const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
         
-        // Získání čerstvých členů z API
-        const api = await uhg.api.call("64680ee95aeb48ce80eb7aa8626016c7", ["guild"]);
-        if (!api.success) return interaction.editReply("❌ Chyba Hypixel API: " + api.reason);
-        
-        const guildMembersApi = api.guild.all.members;
+        if (!activeMembers || !activeMembers.length) {
+            return interaction.editReply("❌ Chyba: Metoda `getOnlineMembers` nevrátila žádné členy. Zkontroluj, zda máš v DB u hráčů `active: true` v poli `guilds`.");
+        }
 
         if (type === 'unelites') {
-            const days = interaction.options.getInteger('days') || 30;
-            
-            // Načtení historie GEXP z DB
-            const guildDataDB = await uhg.db.run.get("stats", "guild", { name: "UltimateHypixelGuild" }).then(res => res[0]);
-            
-            if (!guildDataDB) return interaction.editReply("❌ Chybí historická data v DB.");
+            const uuids = activeMembers.map(m => m.uuid);
+            // Načteme plná data - OPRAVENO: přidána projekce pro celou složku guilds
+            const fullData = await uhg.db.db.collection("users").find(
+                { _id: { $in: uuids } },
+                { projection: { username: 1, guilds: 1, "stats.general.lastLogin": 1 } }
+            ).toArray();
 
-            const embed = await generateUnelitesEmbed(uhg, guildMembersApi, guildDataDB, days);
-            await interaction.editReply({ embeds: [embed] });
-        
+            const embed = generateUnelitesEmbed(uhg, fullData, days);
+            return interaction.editReply({ embeds: [embed] });
+
         } else if (type === 'unverified') {
-            const embed = await generateUnverifiedEmbed(uhg, guildMembersApi);
-            await interaction.editReply({ embeds: [embed] });
+            const embed = generateUnverifiedEmbed(uhg, activeMembers);
+            return interaction.editReply({ embeds: [embed] });
         }
     }
 };
 
-/**
- * OPTIMALIZOVANÁ funkce pro Unelites
- * Používá MongoDB Projection místo API callů
- */
-async function generateUnelitesEmbed(uhg, currentMembers, dbData, days = 30) {
+function generateUnelitesEmbed(uhg, members, days) {
     const IGNORED_RANKS = ["Guild Master", "Guild Manager", "Guild Officer", "Guild General"];
     
+    // Zjistíme nejnovější datum v DB
+    const allDates = members.flatMap(m => {
+        const g = m.guilds?.find(x => x.name === "UltimateHypixelGuild");
+        return g?.exp ? Object.keys(g.exp) : [];
+    }).filter(d => d.length === 10);
+
+    const latestDateStr = allDates.sort().reverse()[0] || new Date().toISOString().slice(0, 10);
+
     const checkDays = [];
     for (let i = 0; i < days; i++) {
-        const d = new Date(); d.setDate(d.getDate() - i);
+        const d = new Date(latestDateStr);
+        d.setDate(d.getDate() - i);
         checkDays.push(d.toISOString().slice(0, 10));
     }
 
-    let stats = [];
+    let results = [];
+    let staffCount = 0;
+    let newCount = 0;
+    let noDataCount = 0;
 
-    for (const member of currentMembers) {
-        if ((Date.now() - member.joined) / (1000 * 60 * 60 * 24) < 7) continue;
-        if (IGNORED_RANKS.includes(member.rank)) continue;
-
-        let sumGexp = 0;
-        const dbMember = dbData.members.find(m => m.uuid === member.uuid);
-        const dailyHistory = dbMember ? (dbMember.exp.daily || {}) : {}; 
-
-        for (const day of checkDays) sumGexp += dailyHistory[day] || 0;
+    for (const user of members) {
+        // Hledáme záznam UHG v poli guilds
+        const g = user.guilds?.find(x => x.name === "UltimateHypixelGuild");
         
-        const name = dbMember ? dbMember.name : member.uuid;
+        if (!g) { noDataCount++; continue; }
+        if (IGNORED_RANKS.includes(g.rank)) { staffCount++; continue; }
+        
+        // Členství pod 7 dní
+        if (g.joined && (Date.now() - Number(g.joined)) < (1000 * 60 * 60 * 24 * 7)) {
+            newCount++;
+            continue;
+        }
 
-        stats.push({ uuid: member.uuid, name: name, joined: member.joined, gexp: sumGexp });
+        let totalGexp = 0;
+        if (g.exp) {
+            checkDays.forEach(day => totalGexp += (g.exp[day] || 0));
+        }
+
+        const lastLogin = user.stats?.general?.lastLogin || 0;
+
+        results.push({
+            name: user.username || user._id,
+            gexp: totalGexp,
+            joined: g.joined,
+            lastLogin: lastLogin
+        });
     }
 
-    stats.sort((a, b) => a.gexp - b.gexp);
-    const top = stats.slice(0, 15);
-
-    // --- OPTIMALIZACE: Last Login z DB (Batch Query) ---
-    // Místo 15 API callů uděláme jeden dotaz do DB pro všechny UUID
-    const uuids = top.map(u => u.uuid);
-    
-    const dbLogins = await uhg.db.mongo.db("stats").collection("stats").find(
-        { uuid: { $in: uuids } },
-        { projection: { uuid: 1, lastLogin: 1 } } // Stahujeme jen to, co potřebujeme
-    ).toArray();
-
-    // Spárování dat
-    for (const u of top) {
-        const entry = dbLogins.find(d => d.uuid === u.uuid);
-        u.lastLogin = entry ? entry.lastLogin : null;
-    }
-    // ---------------------------------------------------
+    results.sort((a, b) => a.gexp - b.gexp);
+    const top = results.slice(0, 15);
 
     const description = top.map((u, i) => {
-        const joined = `<t:${Math.round(u.joined / 1000)}:R>`;
-        
-        // Logika pro zobrazení
-        let login = "`API OFF`"; // Default, pokud je null
-        if (u.lastLogin) {
-            login = `<t:${Math.round(u.lastLogin / 1000)}:R>`;
-        }
-        
+        const joined = u.joined ? `<t:${Math.round(Number(u.joined) / 1000)}:R>` : "`???`";
+        const login = u.lastLogin ? `<t:${Math.round(u.lastLogin / 1000)}:R>` : "`API OFF`";
         return `\`${i+1}.\` **${uhg.dontFormat(u.name)}** | ${days}d: \`${uhg.f(u.gexp)}\`\n> Joined: ${joined} • Login: ${login}`;
     }).join('\n');
 
-    return new uhg.dc.Embed()
-        .setTitle(`UNELITES - Nejméně GEXP (${days} dní)`)
-        .setDescription(description || "Všichni plní limity! 🎉")
+    const embed = new uhg.dc.Embed()
+        .setTitle(`UNELITES - Nejméně GEXP za ${days} dní`)
         .setColor("Red")
-        .setFooter({ text: "Hráči v guildě < 7 dní + staff jsou ignorováni." })
-        .setTimestamp();
+        .setDescription(description || "Všichni členové plní limity! 🎉")
+        .setFooter({ text: `Dne: ${latestDateStr} | Celkem v seznamu: ${members.length} | Staff: ${staffCount} | Noví: ${newCount} | Chyba dat: ${noDataCount}` });
+
+    return embed;
 }
 
-/**
- * Logika pro Unverified (Beze změny)
- */
-async function generateUnverifiedEmbed(uhg, guildMembers) {
-    const verifiedUsers = await uhg.db.run.get("general", "verify");
-    const verifiedUUIDs = verifiedUsers.map(n => n.uuid);
+function generateUnverifiedEmbed(uhg, activeMembers) {
+    const unverified = activeMembers
+        .filter(m => !m.discordId)
+        .sort((a, b) => (a.joined || 0) - (b.joined || 0));
 
-    const unverifiedMembers = [];
-
-    for (const member of guildMembers) {
-        if (!verifiedUUIDs.includes(member.uuid)) {
-            let name = member.uuid;
-            const statData = await uhg.db.getStats(member.uuid);
-            if (statData) name = statData.username;
-            
-            unverifiedMembers.push({ uuid: member.uuid, name: name, joined: member.joined });
-        }
-    }
-
-    unverifiedMembers.sort((a, b) => b.joined - a.joined);
-
-    const desc = unverifiedMembers.map(u => {
-        return `• **${uhg.dontFormat(u.name)}** (Joined: <t:${Math.round(u.joined/1000)}:R>)`;
+    const description = unverified.map(m => {
+        const joined = m.joined ? `<t:${Math.round(m.joined / 1000)}:R>` : "`???`";
+        return `• **${uhg.dontFormat(m.username || m.uuid)}** (Joined: ${joined})`;
     }).join('\n');
 
     return new uhg.dc.Embed()
-        .setTitle(`UNVERIFIED MEMBERS (${unverifiedMembers.length})`)
-        .setDescription(desc || "Všichni členové jsou verifikovaní! 🎉")
+        .setTitle(`UNVERIFIED ČLENOVÉ (${unverified.length})`)
         .setColor("Yellow")
-        .setFooter({ text: "Tito hráči nemají propojený Discord v naší databázi." });
+        .setDescription(description || "Všichni členové jsou verifikovaní! 🎉");
 }
-
-module.exports.generateUnelitesEmbed = generateUnelitesEmbed;
-module.exports.generateUnverifiedEmbed = generateUnverifiedEmbed;

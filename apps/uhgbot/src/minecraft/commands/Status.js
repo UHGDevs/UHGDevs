@@ -4,7 +4,7 @@ module.exports = {
     run: async (uhg, pmsg) => {
         try {
             // Voláme jen 'online' a 'mojang' pro jméno
-            const api = await uhg.api.call(pmsg.nickname, ["online", "mojang"]);
+            const api = await uhg.api.call(pmsg.username, ["online", "mojang"]);
             if (!api.success) return api.reason;
 
             const status = api.online;

@@ -4,7 +4,7 @@ module.exports = {
     run: async (uhg, pmsg) => {
         try {
             // Potřebujeme volat 'guild' endpoint
-            const api = await uhg.api.call(pmsg.nickname, ["guild"]);
+            const api = await uhg.api.call(pmsg.username, ["guild"]);
             if (!api.success) return api.reason;
 
             const guild = api.guild.guild;
