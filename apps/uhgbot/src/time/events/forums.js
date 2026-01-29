@@ -177,7 +177,6 @@ module.exports = {
 
         await interaction.update({ 
             content: `✅ Publikováno v <#${channel.id}> uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
-            embeds: [], 
             components: [] 
         });
     },
@@ -193,7 +192,6 @@ module.exports = {
 
         await interaction.update({ 
             content: `❌ Ignorováno uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
-            embeds: [], 
             components: [] 
         });
     }
