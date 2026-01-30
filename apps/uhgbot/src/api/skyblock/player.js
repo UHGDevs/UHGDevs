@@ -1,93 +1,89 @@
 /**
  * src/api/skyblock/player.js
  */
-const constants = require('../constants/skyblock');
 const func = require('../ApiFunctions');
 
-module.exports = (player, profile, extra = {}) => {
-  // Achievements předáváme z Api.js, aby fungoval výpočet skillů pro API-OFF hráče
-  const achievements = extra.achievements || {};
+module.exports = (profile, extra = {}) => {
 
-  // 1. SKILLS
-  const skillsData = func.getSkills(player, achievements);
+  const player = profile.members[profile.uuid];
+  const achievements = extra.achievements;
 
-  // 2. MINING
-  const miningData = player.mining_core || {};
-  
-  // 3. DUNGEONS
-  const dungeonsData = player.dungeons || {};
-  const cataExp = dungeonsData.dungeon_types?.catacombs?.experience || 0;
-  
-  // 4. SLAYERS
-  const slayersData = func.getSlayers(player.slayer_bosses);
+  const totalSocialExp = Object.values(profile.members).reduce((acc, m) => { return acc + (m.player_data?.experience?.SKILL_SOCIAL || 0) }, 0);
+  if (!player.player_data.experience) player.player_data.experience = {};
+  player.player_data.experience.SKILL_SOCIAL = totalSocialExp;
 
-  // 5. PENÍZE (Bank + Purse)
-  // Banka je v 'profile' objektu (protože je sdílená), Purse je v 'player' objektu
-  const purse = player.coin_purse || 0;
-  const bank = profile.banking ? (profile.banking.balance || 0) : 0;
+
+  const skills = func.getSkills(player, achievements || {})
+  const mining = player?.mining_core || {}
+  const dungeons = player?.dungeons || {}
 
   const api = {
-    username: player.displayname, // Toto si doplní Api.js, ale pro jistotu
-    uuid: player.uuid,
-    last_save: player.last_save,
-    first_join: player.first_join,
+    id: profile.profile_id,
+    name: profile.cute_name,
+    uuid: profile.uuid,
+    mode: func.getSbMode(profile.game_mode),
+    joined: player.profile.first_join || -1,
+    selected: profile.selected || false,          
 
-    // Status API
-    skills_api: !!player.experience_skill_farming, // Jednoduchý check
-    collections_api: !!player.collection,
-    inventory_api: !!player.inv_contents,
+    //community_upgrades: p.community_upgrades || {}
 
-    // Finance
-    coins: {
-        purse: Math.floor(purse),
-        bank: Math.floor(bank),
-        total: Math.floor(purse + bank)
-    },
-
-    // Skills
-    skills: skillsData.stats,
-    skill_average: skillsData.sa,
-    skill_average_progress: skillsData.tSa, // True Average (s desetinami)
-
-    // Dungeons
-    dungeons: {
-        level: Math.floor(func.getCataLvl(cataExp)),
-        level_float: func.getCataLvl(cataExp),
-        xp: cataExp,
-        classes: dungeonsData.player_classes || {}
-    },
-
-    // Slayers
-    slayers: slayersData,
-
-    // Mining Core
-    mining: {
-      powder_mithril: (miningData.powder_mithril || 0) + (miningData.powder_spent_mithril || 0),
-      powder_gemstone: (miningData.powder_gemstone || 0) + (miningData.powder_spent_gemstone || 0),
-      hotm_tier: func.getHotmTier(miningData.experience || 0),
-      hotm_xp: miningData.experience || 0,
-      commissions: achievements.skyblock_hard_working_miner || 0,
-    },
-
-    // Fairy Souls
-    fairy_souls: {
-      collected: player.fairy_souls_collected || 0,
-      unclaimed: player.fairy_souls || 0,
-      total: (player.fairy_souls_collected || 0) + (player.fairy_souls || 0)
+    apis: {
+      purse: player?.currencies?.coin_purse ? true: false,
+      bank: profile?.banking?.balance >= 0,
+      skill: !!player.player_data?.experience.SKILL_FARMING,
     },
     
-    // Misc
-    essence: {
-        undead: player.essence_undead || 0,
-        wither: player.essence_wither || 0,
-        dragon: player.essence_dragon || 0,
-        gold: player.essence_gold || 0,
-        diamond: player.essence_diamond || 0,
-        ice: player.essence_ice || 0,
-        spider: player.essence_spider || 0,
-        crimson: player.essence_crimson || 0
+
+    bank: {
+      purse: Math.floor(player?.currencies?.coin_purse || 0),
+      motes: Math.floor(player?.currencies?.motes_purse || 0),
+      bank:  Math.floor(profile?.banking?.balance || 0),
+      personal: Math.floor(player?.profile?.bank_account || 0),
+      total: Math.floor((player?.currencies?.coin_purse || 0) + (profile?.banking?.balance || 0) + (player?.profile?.bank_account || 0)),
+      networth: 0,
+    },
+
+    fairy_souls: {
+      total: player.fairy_soul.total_collected || 0,
+      unclaimed: player.fairy_soul.unspent_souls || 0,
+      boosted: player.fairy_soul.fairy_exchanges || 0
+    },
+
+    cakes: func.getCakes(player.player_data.temp_stat_buffs || []),
+
+    skills: skills.stats,
+    skill_average: skills.sa,
+    skill_average_progress: skills.tSa,
+
+    collection: Object.keys(player.collection || {}).reduce((object, key) => {object[key.toLowerCase()] = player.collection[key]; return object}, {}),
+
+    essence: func.parseEssence(player?.currencies?.essence),
+
+    mining: {
+      powder: (mining.powder_mithril || 0) + (mining.powder_spent_mithril || 0) + (mining.powder_gemstone || 0) + (mining.powder_spent_gemstone || 0),
+      powder_mithril: (mining.powder_mithril || 0) + (mining.powder_spent_mithril || 0),
+      powder_gemstone: (mining.powder_gemstone || 0) + (mining.powder_spent_gemstone || 0),
+      powder_glacite: (mining.powder_glacite || 0) + (mining.powder_spent_glacite || 0),
+      hotm_xp: mining.experience || 0,
+      hotm_tier: func.getHotmTier(mining.experience || 0),
+      nucleus: player?.leveling?.completions?.NUCLEUS_RUNS || 0,
+      commissions: achievements?.skyblock_hard_working_miner || undefined,
+      scatha: (player?.player_stats?.kills?.scatha || 0) + (player?.player_stats?.kills?.scatha_10 || 0) || (player?.bestiary?.kills?.scatha || 0) + (player?.bestiary?.kills?.scatha_10 || 0),
+    },
+
+    dungeons: {
+      secrets: dungeons?.secrets || 0,
+      currentClass: dungeons?.selected_dungeon_class || "",
+      lastRun: func.getFloorShort(dungeons.last_dungeon_run),
+      level: func.f(func.getCataLvl(dungeons?.dungeon_types?.catacombs?.experience || 0)),
+      runs: (dungeons?.dungeon_types?.catacombs?.tier_completions?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.tier_completions?.total || 0),
+      secretsratio: func.ratio(dungeons?.secrets, (dungeons?.dungeon_types?.catacombs?.tier_completions?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.tier_completions?.total || 0)),
+      mobkills: (dungeons?.dungeon_types?.catacombs?.mobs_killed?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.mobs_killed?.total || 0),
     }
   };
 
-  return api;
+  
+
+
+  return (api)
 };

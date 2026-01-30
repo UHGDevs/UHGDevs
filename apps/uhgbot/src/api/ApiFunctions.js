@@ -7,9 +7,20 @@ const sbConstants = require('./constants/skyblock');
 
 class ApiFunctions {
     // --- ZÁKLADNÍ FORMÁTOVÁNÍ ---
+    /**
+     * Formátování čísel podle českého standardu
+     * @param {number} number - Číslo k formátování
+     * @param {number} max - Maximální počet desetinných míst
+     * @returns {string} Např. "1 234 567,89"
+     */
     static f(number, max = 2) {
-        if (!Number(number) && number !== 0) return number;
-        return Number(number).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: max });
+        if (number === undefined || number === null) return "0";
+        if (isNaN(number)) return number;
+
+        return Number(number).toLocaleString('cs-CZ', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: max
+        }).replace(/\u00A0/g, ' '); // Převede nezalomitelnou mezeru na klasickou
     }
 
     static ratio(n1 = 0, n2 = 0, n3 = 2) {
@@ -282,22 +293,33 @@ class ApiFunctions {
         return 7; // Max tier (aktuálně 7 nebo 10 dle update, necháváme safe)
     }
 
+    /**
+     * Výpočet SkyBlock Skillů (Aktualizováno pro player_data.experience)
+     * @param {Object} player - member data z SkyBlock API (v2)
+     * @param {Object} achievements - achievementy z Hypixel Player API (fallback)
+     */
     static getSkills(player, achievements = {}) {
-        let skills = {};
+        const constants = require('./constants/skyblock');
+        const skills = {};
         
-        // Seznam skillů k výpočtu
-        const skillList = sbConstants.skills || ['farming', 'mining', 'combat', 'foraging', 'fishing', 'enchanting', 'alchemy', 'taming', 'carpentry', 'runecrafting', 'social'];
+        // Data v novém API jsou zanořená v player_data.experience
+        const experienceData = player.player_data?.experience || {};
+        
+        // Seznam skillů ke zpracování
+        const skillList = ['farming', 'mining', 'combat', 'foraging', 'fishing', 'enchanting', 'alchemy', 'taming', 'carpentry', 'runecrafting', 'social'];
 
-        for (let s of skillList) {
-            let skill = { exp: 0, level: 0, exp_current: 0, exp_missing: 0, progress: 0 };
-
-            // Získání EXP z API
-            let exp = player[`experience_skill_${s === 'social' ? 'social2' : s}`];
+        for (const s of skillList) {
+            const skill = { exp: 0, level: 0, exp_current: 0, exp_missing: 0, progress: 0 };
             
-            // Fallback na achievementy, pokud je API vypnuté
+            // Sestavení klíče (např. farming -> SKILL_FARMING)
+            const apiKey = `SKILL_${s.toUpperCase()}`;
+            let exp = experienceData[apiKey];
+
+            // --- FALLBACK NA ACHIEVEMENTY (pokud je Skills API vypnuté) ---
+            // nefunguje
             if (exp === undefined || exp === null) {
-                const achName = sbConstants.skills_achievements[s];
-                skill.level = achievements[achName] || 0;
+                const achName = constants.skills_achievements ? constants.skills_achievements[s] : null;
+                skill.level = achName ? (achievements[achName] || 0) : 0;
                 skills[s] = skill;
                 continue;
             }
@@ -305,65 +327,61 @@ class ApiFunctions {
             exp = Math.floor(exp);
             skill.exp = exp;
 
-            // Výběr správné XP tabulky
-            let xpTable = sbConstants[s] || sbConstants.leveling_xp;
-            if (!xpTable) xpTable = sbConstants.leveling_xp;
+            // --- VÝPOČET LEVELU Z EXP ---
+            // leveling_xp obsahuje 1-50, xp_past_50 obsahuje 51-60
+            const fullXpTable = { ...constants.leveling_xp, ...constants.xp_past_50 };
+            const cap = constants.skills_cap[s] || 50;
 
-            // Zjištění Level Capu
-            let maxLevel = Math.max(...Object.keys(xpTable).map(Number));
-            const capConstant = sbConstants.skills_cap[s] || 50;
-            
-            // Pokud je skill cap vyšší než základní tabulka (např. Farming 60), přidáme post-50 tabulku
-            if (capConstant > maxLevel) {
-                xpTable = Object.assign({}, sbConstants.xp_past_50, xpTable);
-                maxLevel = capConstant;
-            }
-
-            let totalLevelExp = 0;
-            for (let x = 1; x <= maxLevel; x++) {
-                totalLevelExp += xpTable[x];
-                if (totalLevelExp > exp) {
-                    totalLevelExp -= xpTable[x];
-                    break;
+            let totalExpToCurrentLevel = 0;
+            for (let i = 1; i <= cap; i++) {
+                const stepExp = fullXpTable[i];
+                if (exp >= totalExpToCurrentLevel + stepExp) {
+                    totalExpToCurrentLevel += stepExp;
+                    skill.level = i;
                 } else {
-                    skill.level = x;
+                    break;
                 }
             }
 
-            // Výpočet progresu do dalšího levelu
-            skill.exp_current = exp - totalLevelExp;
-            let nextLevelExp = skill.level < maxLevel ? Math.ceil(xpTable[skill.level + 1]) : 0;
+            // --- VÝPOČET PROGRESU DO DALŠÍHO LEVELU ---
+            const nextLevel = skill.level + 1;
+            const nextLevelReq = nextLevel <= cap ? fullXpTable[nextLevel] : 0;
+
+            skill.exp_current = exp - totalExpToCurrentLevel;
             
-            if (skill.level < maxLevel && nextLevelExp > 0) {
-                skill.exp_missing = nextLevelExp - skill.exp_current;
-                skill.progress = Math.floor((Math.max(0, Math.min(skill.exp_current / nextLevelExp, 1))) * 100);
+            if (nextLevelReq > 0) {
+                skill.exp_missing = nextLevelReq - skill.exp_current;
+                // Procento progresu (na 2 desetinná místa)
+                skill.progress = Math.floor((skill.exp_current / nextLevelReq) * 10000) / 100;
             } else {
-                skill.progress = 0;
+                // Hráč dosáhl MAX levelu (včetně limitu 60)
+                skill.progress = 100;
                 skill.exp_missing = 0;
             }
-            
+
             skills[s] = skill;
         }
 
-        // Výpočet Skill Average (SA)
-        let sa = 0;
-        let trueSa = 0;
-        // Počítáme jen hlavní skilly (bez cosmetics jako Runecrafting/Social/Carpentry)
-        const cos = ['runecrafting', 'social', 'carpentry'];
-        const mainSkills = skillList.filter(s => !cos.includes(s));
-        
-        for (let s of mainSkills) {
+        // --- VÝPOČET SKILL AVERAGE (SA) ---
+        // Seznam skillů pro průměr (Carpentry se u UHG většinou započítává, Runecrafting a Social ne)
+        const saList = ['farming', 'mining', 'combat', 'foraging', 'fishing', 'enchanting', 'alchemy', 'taming', 'carpentry'];
+        let saSum = 0;
+        let tSaSum = 0;
+
+        for (const s of saList) {
             if (skills[s]) {
-                sa += skills[s].level;
-                trueSa += skills[s].level + (skills[s].progress / 100);
+                saSum += skills[s].level;
+                // tSa započítává i desetinný progres z XP (např. 45.87)
+                tSaSum += (skills[s].level + (skills[s].progress / 100));
             }
         }
-        
-        const count = mainSkills.length || 1;
-        sa = Math.floor((sa / count) * 100) / 100;
-        trueSa = Math.floor((trueSa / count) * 100) / 100;
 
-        return { stats: skills, sa: sa, tSa: trueSa };
+        const count = saList.length || 1;
+        return {
+            stats: skills,
+            sa: Math.floor((saSum / count) * 100) / 100,
+            tSa: Math.floor((tSaSum / count) * 100) / 100
+        };
     }
 
     static getSlayers(slayerData) {
@@ -393,6 +411,107 @@ class ApiFunctions {
         }
         slayers.total_xp = totalSlayerXp;
         return slayers;
+    }
+
+    /**
+   * Seřadí pole cakes:
+   * 1. Nejdříve neaktivní (expirované).
+   * 2. Poté aktivní, seřazené podle času vypršení (od nejbližšího).
+   *
+   * @param {Array} cakes - Vstupní pole
+   * @returns {Array} Nové seřazené pole
+   */
+  static getCakes(cakes) {
+    // 1. Definice všech existujících dortů (aby se vypsaly i ty, co hráč nemá)
+    const ALL_CAKE_TYPES = [
+        { stat_id: 'mining_fortune', key: 'cake_mining_fortune', amount: 5 },
+        { stat_id: 'strength', key: 'cake_strength', amount: 2 },
+        { stat_id: 'walk_speed', key: 'cake_walk_speed', amount: 10 },
+        { stat_id: 'vitality', key: 'cake_vitality', amount: 1 },
+        { stat_id: 'health', key: 'cake_health', amount: 10 },
+        { stat_id: 'pet_luck', key: 'cake_pet_luck', amount: 1 },
+        { stat_id: 'sea_creature_chance', key: 'cake_sea_creature_chance', amount: 1 },
+        { stat_id: 'rift_time', key: 'cake_rift_time', amount: 10 },
+        { stat_id: 'magic_find', key: 'cake_magic_find', amount: 1 },
+        { stat_id: 'foraging_fortune', key: 'cake_foraging_fortune', amount: 5 },
+        { stat_id: 'true_defense', key: 'cake_true_defense', amount: 1 },
+        { stat_id: 'farming_fortune', key: 'cake_farming_fortune', amount: 10 },
+        { stat_id: 'cold_resistance', key: 'cake_cold_resistance', amount: 1 },
+        { stat_id: 'defense', key: 'cake_defense', amount: 3 },
+        { stat_id: 'intelligence', key: 'cake_intelligence', amount: 5 }
+    ];
+
+    // Ošetření vstupu (pokud je null/undefined, použijeme prázdné pole)
+    const inputCakes = cakes || [];
+    const now = Date.now();
+
+    // 2. Spojení definic s daty z API
+    const mergedList = ALL_CAKE_TYPES.map(defaultCake => {
+        // Zkusíme najít dort v datech od hráče
+        const found = inputCakes.find(c => c.stat_id === defaultCake.stat_id);
+        
+        if (found) {
+            return found; // Použijeme data z API (včetně expire_at)
+        } else {
+            // Pokud hráč dort nemá, vrátíme default s expire_at: null
+            return { ...defaultCake, expire_at: null };
+        }
+    });
+
+    // 3. Rozdělení na Active a Inactive
+    // Active = má expire_at A je v budoucnosti
+    const active = mergedList.filter(c => c.expire_at && c.expire_at > now);
+    // Inactive = nemá expire_at NEBO je v minulosti
+    const inactive = mergedList.filter(c => !c.expire_at || c.expire_at <= now);
+
+    // 4. Seřazení
+    // Active: vzestupně podle času (nejbližší konec nahoře)
+    active.sort((a, b) => a.expire_at - b.expire_at);
+    // Inactive: abecedně (aby to vypadalo hezky)
+    inactive.sort((a, b) => a.stat_id.localeCompare(b.stat_id));
+
+    // 5. Vrácení spojeného pole
+    return [...inactive, ...active];
+  }
+
+    static parseEssence(essenceData) {
+        // Pojistka pro případ, že data neexistují
+        if (!essenceData) return {};
+
+        const result = {};
+
+        // Projdeme všechny klíče v objektu (DIAMOND, WITHER...)
+        for (const key in essenceData) {
+            // 1. Převedeme klíč na malá písmena (UNDEAD -> undead)
+            // 2. Vytáhneme hodnotu 'current', nebo 0 pokud chybí
+            result[key.toLowerCase()] = essenceData[key].current || 0;
+        }
+
+        return result;
+    }
+
+    /**
+     * Převede název dungeon podlaží na zkratku (např. MASTER_CATACOMBS_FLOOR_FIVE -> MM5)
+     * @param {string} name - Interní název z API
+     * @returns {string} Zkratka (F0-F7 nebo MM1-MM7)
+     */
+    static getFloorShort(name) {
+        if (!name) return "";
+
+        const floors = {
+            'ZERO': '0', 'ONE': '1', 'TWO': '2', 'THREE': '3',
+            'FOUR': '4', 'FIVE': '5', 'SIX': '6', 'SEVEN': '7'
+        };
+
+        // Zjistíme číslo podlaží (poslední slovo v řetězci)
+        const parts = name.toUpperCase().split('_');
+        const floorWord = parts[parts.length - 1];
+        const floorNum = floors[floorWord] || "";
+
+        // Určíme prefix: MASTER_CATACOMBS -> MM, CATACOMBS -> F
+        const prefix = name.startsWith('MASTER') ? 'MM' : 'F';
+
+        return prefix + floorNum;
     }
 }
 

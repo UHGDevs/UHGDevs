@@ -134,10 +134,15 @@ class Uhg {
         });
     }
 
-       /** Formátování čísel (např. 1000 -> 1,000) */
-    f(n, max = 2) { 
-        if (n === undefined || n === null) return "0";
-        return Number(n) ? n.toLocaleString('en', { maximumFractionDigits: max }) : n; 
+       /** Formátování čísel (např. 1000 -> 1 000) */
+    f(number, max = 2) {
+        if (number === undefined || number === null) return "0";
+        if (isNaN(number)) return number;
+
+        return Number(number).toLocaleString('cs-CZ', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: max
+        }).replace(/\u00A0/g, ' '); // Převede nezalomitelnou mezeru na klasickou
     }
 
     /** Peněžní formátování (K, M, B) */
@@ -299,6 +304,23 @@ class Uhg {
         try {
             await interaction.message.edit({ components: newComponents });
         } catch (e) {}
+    }
+
+    /**
+     * Zformátuje text tak, aby první písmeno bylo velké a zbytek malý.
+     * @param {string} str - Vstupní text (např. "skyBLOCK" nebo "MASTER")
+     * @returns {string} Zformátovaný text (např. "Skyblock" nebo "Master")
+     */
+    capitalize(str) {
+        if (!str || typeof str !== 'string') return "";
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+    /* BEDWARS_CHALLENGER -> Bedwars Challenger*/
+    capitalizeWords(str) {
+        if (!str) return "";
+        return str.split('_').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
     }
 }
 

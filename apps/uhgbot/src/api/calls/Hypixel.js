@@ -9,8 +9,12 @@ module.exports = {
      */
     getStats: async (uhg, uuid, key) => {
         const res = await axios.get(`https://api.hypixel.net/player`, { params: { key, uuid } });
-        if (!res.data.success || !res.data.player) throw new Error("Hráč nebyl nalezen v Hypixel DB");
-
+        if (!res.data.success) {
+            throw new Error(res.data.cause || "Neznámá chyba Hypixel API");
+        }
+        if (res.data.player) {
+            throw new Error("Hráč nebyl nalezen v Hypixel DB");
+        }
         const p = res.data.player;
         const api = {};
         api.stats = {
@@ -47,6 +51,10 @@ module.exports = {
      */
     getGuild: async (uhg, uuid, key) => {
         const res = await axios.get(`https://api.hypixel.net/guild`, { params: { key, player: uuid } });
+        if (!res.data.success) {
+            throw new Error(res.data.cause || "Neznámá chyba Hypixel API");
+        }
+
         const g = res.data.guild;
         
         if (!g) return { guild: false, name: "Žádná" };
@@ -68,6 +76,9 @@ module.exports = {
      */
     getStatus: async (uhg, uuid, key) => {
         const res = await axios.get(`https://api.hypixel.net/status`, { params: { key, uuid } });
+        if (!res.data.success) {
+            throw new Error(res.data.cause || "Neznámá chyba Hypixel API");
+        }
         return ApiFunctions.getOnline(res.data.session);
     }
 };

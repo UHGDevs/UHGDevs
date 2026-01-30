@@ -20,95 +20,108 @@ class Api {
         this.cache = new NodeCache({ stdTTL: 600, checkperiod: 60 });
     }
 
-    /**
+/**
      * Hlavní metoda volání
      * @param {string} input - Jméno nebo UUID
      * @param {string[]} types - ["hypixel", "skyblock", "guild", "online"]
+     * @param {boolean} waitSave - Zda čekat na zápis do DB
      */
     async call(input, types = ["hypixel"], waitSave = false) {
         if (!input) return { success: false, reason: "Nebyl zadán vstup" };
 
         try {
-            // 1. Získání Identity (Mojang)
+            // 1. Získání Identity (Mojang) - Cache je uvnitř CallMojang
             const identity = await CallMojang(input, this.cache);
             if (!identity.success) throw new Error(identity.reason);
 
             const { uuid, username } = identity;
             const result = { success: true, uuid, username, ...identity };
 
-            // 2. Sestavení požadavků (Promises)
+            // 2. Kontrola Cache pro jednotlivé moduly
             const promises = [];
+            const fetchTypes = [];
 
-            // HYPIXEL STATS
-            if (types.includes("hypixel") || types.includes("stats")) {
-                promises.push(
-                    CallHypixel.getStats(this.uhg, uuid, this.key)
-                        .then(parsed => {
-                            return { hypixel: parsed };
-                        })
-                );
+            for (const type of types) {
+                const cacheKey = `${type}_${uuid}`;
+                const cachedData = this.cache.get(cacheKey);
+
+                if (cachedData) {
+                    result[type] = cachedData;
+                } else {
+                    fetchTypes.push(type);
+                }
             }
 
-            // GUILD
-            if (types.includes("guild")) {
-                promises.push(
-                    CallHypixel.getGuild(this.uhg, uuid, this.key)
-                        .then(guild => ({ guild }))
-                );
+            // Pokud máme vše v cachi, rovnou uložíme (pokud je třeba) a vrátíme
+            if (fetchTypes.length === 0) {
+                if (waitSave) await this._smartSave(result);
+                else this._smartSave(result);
+                return result;
             }
 
-            // ONLINE STATUS
-            if (types.includes("online")) {
-                promises.push(
-                    CallHypixel.getStatus(this.uhg, uuid, this.key)
-                        .then(online => ({ online }))
-                );
+            let hypixelPromise = null;
+
+            // 3. Sestavení požadavků pro chybějící data
+            if (fetchTypes.includes("hypixel") || fetchTypes.includes("stats")) {
+                hypixelPromise = CallHypixel.getStats(this.uhg, uuid, this.key);
+                promises.push(hypixelPromise.then(res => ({ hypixel: res })));
             }
 
-            // SKYBLOCK
-            if (types.includes("skyblock") || types.includes("sb")) {
-                // Zkusíme vytáhnout achievementy z cache (pokud tam už hypixel data jsou)
-                const hypixelCache = this.cache.get(`hypixel_${uuid}`);
-                const achievements = hypixelCache?.achievements || null;
-                
-                promises.push(
-                    CallSkyBlock.getProfiles(this.uhg, uuid, this.key, achievements)
-                        .then(skyblock => ({ skyblock }))
-                );
+            if (fetchTypes.includes("guild")) {
+                promises.push(CallHypixel.getGuild(this.uhg, uuid, this.key).then(guild => ({ guild })));
             }
 
-            // 3. Čekání na výsledky (FAIL-FAST)
-            // Pokud jakýkoliv promise selže, skočíme ihned do catch bloku
+            if (fetchTypes.includes("online")) {
+                promises.push(CallHypixel.getStatus(this.uhg, uuid, this.key).then(online => ({ online })));
+            }
+
+            if (fetchTypes.includes("skyblock") || fetchTypes.includes("sb")) {
+                const runSb = async () => {
+                    let achs = null;
+
+                    // A) Pokud se Hypixel stahuje v TOMTO callu, počkáme na něj
+                    if (hypixelPromise) {
+                        try {
+                            const hpData = await hypixelPromise;
+                            achs = hpData.achievements;
+                        } catch (e) { /* Hypixel selhal, achs zůstane null */ }
+                    } 
+                    
+                    // B) Pokud se Hypixel v tomto callu nestahuje, zkusíme ho vytáhnout z cache
+                    if (!achs) {
+                        achs = this.cache.get(`hypixel_${uuid}`)?.achievements;
+                    }
+
+                    const sbData = await CallSkyBlock.getProfiles(this.uhg, uuid, this.key, achs);
+                    return { skyblock: sbData };
+                };
+                promises.push(runSb());
+            }
+
+            // 4. Čekání na výsledky
             const responses = await Promise.all(promises);
 
-            // 4. Sloučení dat
+            // 5. Sloučení dat a ULOŽENÍ DO CACHE
             responses.forEach(res => {
                 Object.assign(result, res);
+                
+                // Automaticky uložíme každý nově stažený modul do jeho vlastní cache
+                for (const [moduleName, data] of Object.entries(res)) {
+                    this.cache.set(`${moduleName}_${uuid}`, data);
+                }
             });
 
-            // 5. Uložení do Cache (Hypixel data)
-            if (result.hypixel) {
-                // Pokud už v cache něco je, mergneme to (abychom nepřepsali třeba guild data pokud teď taháme jen stats)
-                const currentCache = this.cache.get(`hypixel_${uuid}`) || {};
-                this.cache.set(`hypixel_${uuid}`, { ...currentCache, ...result.hypixel });
-            }
-            
-            // 6. SMART UPDATE (Uložení do DB)
-            if (waitSave) {
-                // Počkáme (např. u /database add, aby se hned ukázala data)
-                await this._smartSave(result);
-            } else {
-                // Nepočkáme (u běžných příkazů jako !bw), uložení proběhne na pozadí
-                this._smartSave(result);
-            }
+            // 6. SMART UPDATE (Uložíme do DB jen to, co je v 'result')
+            if (waitSave) await this._smartSave(result);
+            else this._smartSave(result);
+
             return result;
 
         } catch (e) {
-            // Zde zachytíme jak chybu z Mojangu, tak jakoukoliv chybu z Promise.all
+            console.error(` [API ERROR] call: ${e.message}`.red);
             return { success: false, reason: e.message };
         }
     }
-
      /**
      * Helper pro získání identity hráče bez stahování herních statistik.
      * Používají ho příkazy jako /database, /verify, /badges.
@@ -164,7 +177,7 @@ class Api {
 
             await this.uhg.db.saveUser(uuid, updatePayload);
 
-            const TRACKED_GUILDS = ["UltimateHypixelGuild", "TKJK", "Czech Team"];
+            const TRACKED_GUILDS = ["UltimateHypixelGuild", "TKJK"/*, "Czech Team"*/];
             if (data.guild && data.guild.guild) {
                 const g = data.guild;
 

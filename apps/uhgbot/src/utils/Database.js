@@ -183,10 +183,6 @@ class Database {
         }
     }
 
-    /* ==========================================================================
-       LEGACY ALIASES (Pro kompatibilitu se starým kódem v commands/events)
-       ========================================================================== */
-
     /**
      * Získá statistiky hráče (bez SkyBlock data a dalších zbytečností).
      * Optimalizováno pomocí Mongo Projection.
@@ -383,47 +379,6 @@ class Database {
                 { upsert: true }
             );
         }
-    }
-
-    /* ==========================================================================
-       LEGACY WRAPPER (db.run)
-       Tento getter zajišťuje, že starý kód (uhg.db.run.get...) bude fungovat,
-       ale automaticky přesměruje požadavky do nové databáze a nových kolekcí.
-       ========================================================================== */
-    
-    get run() {
-        // Funkce pro mapování starých názvů kolekcí na nové
-        const mapCollection = (col) => {
-            if (col === "stats") return "users";
-            if (col === "verify") return "users";
-            if (col === "guild") return "guilds";
-            return col; // Ostatní (např. forums, loot) zůstávají stejné
-        };
-
-        return {
-            get: async (dbName, col, query) => {
-                if (!this.db) return [];
-                const newCol = mapCollection(col);
-                return await this.db.collection(newCol).find(query).toArray();
-            },
-            post: async (dbName, col, data) => {
-                if (!this.db) return;
-                const newCol = mapCollection(col);
-                return await this.db.collection(newCol).insertOne(data);
-            },
-            update: async (dbName, col, query, data) => {
-                if (!this.db) return;
-                const newCol = mapCollection(col);
-                // Fix pro starý update: pokud data neobsahují operátor (např. $set), přidáme ho
-                const updateOp = Object.keys(data).some(k => k.startsWith('$')) ? data : { $set: data };
-                return await this.db.collection(newCol).updateOne(query, updateOp, { upsert: true });
-            },
-            delete: async (dbName, col, query) => {
-                if (!this.db) return;
-                const newCol = mapCollection(col);
-                return await this.db.collection(newCol).deleteOne(query);
-            }
-        };
     }
 }
 

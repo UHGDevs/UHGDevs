@@ -26,13 +26,15 @@ module.exports = {
              * Vybíráme hráče, kteří mají stats.updated starší než staleTimestamp.
              * Řadíme od nejstarších, aby se fronta hýbala.
              */
-            let queue = await uhg.db.db.collection("users")
-                .find({ 
-                    "stats.updated": { $lt: staleTimestamp } 
-                })
-                .sort({ "stats.updated": 1 }) 
-                .limit(LIMIT)
-                .toArray();
+            let queue = await uhg.db.db.collection("users").find({
+                $or: [
+                    { "updated": { $lt: staleTimestamp } },
+                    { "stats": { $exists: true }, "stats.updated": { $lt: staleTimestamp } }
+                ]
+            })
+            .sort({ "stats.updated": 1, "updated": 1 }) 
+            .limit(LIMIT)
+            .toArray();
 
             // Pokud v režimu údržby nikdo takto starý v DB není, končíme bez logování
             if (!queue.length) return;
@@ -48,7 +50,8 @@ module.exports = {
 
             for (let player of queue) {
                 // Voláme API (to v sobě spustí _smartSave v Api.js)
-                const api = await uhg.api.call(player._id, ["hypixel"]);
+                const types = player.stats ? ["hypixel"] : [];
+                const api = await uhg.api.call(player._id, types, true);
 
                 if (api.success) {
                     results.success++;
@@ -61,15 +64,14 @@ module.exports = {
                 } else {
                     results.error++;
                     // PROTI ZACYKLENÍ: I u chyby updatneme timestamp, aby hráč neblokoval začátek fronty
-                    await uhg.db.db.collection("users").updateOne(
-                        { _id: player._id },
-                        { $set: { "stats.updated": now, updated: now } }
-                    );
+                    const errUpdate = { updated: now };
+                    if (player.stats) errUpdate["stats.updated"] = now;
+                    await uhg.db.db.collection("users").updateOne({ _id: player._id }, { $set: errUpdate });
                     console.log(` [DATABASE] Chyba u ${player.username || player._id}: ${api.reason}`.red);
                 }
 
                 // API Rate Limit Protection
-                await uhg.delay(1200);
+                await uhg.delay(1000);
             }
 
             // ============================================================
