@@ -62,9 +62,25 @@ module.exports = {
     },
 
     modalSubmit: async (uhg, interaction) => {
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
-        const nickname = interaction.fields.getTextInputValue('nickname');
-        await verifyProcess(uhg, interaction, nickname, interaction.user, false);
+        await interaction.deferUpdate();
+        const uuid = interaction.customId.split('_')[2];
+        const discordId = interaction.fields.getTextInputValue('discordId');
+
+        const mojang = await uhg.api.getMojang(uuid);
+        if (mojang.success) {
+            // Update verify v DB
+            await uhg.db.updateVerify(discordId, { uuid: mojang.uuid, username: mojang.username });
+            
+            // OKAMŽITÝ UPDATE ROLÍ
+            const member = interaction.guild.members.cache.get(discordId);
+            if (member) {
+                const userData = await uhg.db.getUser(mojang.uuid);
+                const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
+                await uhg.roles.updateMember(member, userData, activeMembers);
+            }
+        }
+
+        return module.exports.render(uhg, interaction, uuid);
     }
 };
 

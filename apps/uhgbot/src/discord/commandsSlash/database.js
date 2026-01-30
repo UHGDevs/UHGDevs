@@ -128,8 +128,16 @@ module.exports = {
 
         if (action === 'roles') {
             await interaction.deferUpdate();
-            const user = await uhg.db.getUser(id); // id je zde discordId
-            await uhg.roles.updateMember(id, user); 
+            const member = interaction.guild.members.cache.get(id);
+            if (!member) return interaction.followUp({ content: "❌ Uživatel nebyl nalezen na serveru.", ephemeral: true });
+
+            // 2. Načteme data z DB a seznam členů guildy (pro ranky)
+            const userData = await uhg.db.getUser(id);
+            const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
+
+            // 3. Spustíme update
+            await uhg.roles.updateMember(member, userData, activeMembers);
+            
             return interaction.followUp({ content: "✅ Role byly aktualizovány.", ephemeral: true });
         }
 

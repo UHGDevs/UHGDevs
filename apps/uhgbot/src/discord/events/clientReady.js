@@ -1,7 +1,8 @@
 /**
  * src/discord/events/clientReady.js
- * Spouští se při startu bota (v14 kompatibilní).
  */
+
+const { PermissionFlagsBits } = require('discord.js');
 
 module.exports = async (uhg, client) => {
     console.log(`--------------------------------------------------`.gray);
@@ -28,11 +29,22 @@ module.exports = async (uhg, client) => {
         });
     };
 
-    const commandsData = uhg.dc.slash.map(cmd => ({
-        name: cmd.name,
-        description: cmd.description || "UHG Command",
-        options: cmd.options ? fixTypes(JSON.parse(JSON.stringify(cmd.options))) : []
-    }));
+    const commandsData = uhg.dc.slash.map(cmd => {
+        const data = {
+            name: cmd.name,
+            description: cmd.description || "UHG Command",
+            options: cmd.options ? fixTypes(JSON.parse(JSON.stringify(cmd.options))) : []
+        };
+
+        // Pokud má příkaz v souboru definovaná permissions, nastavíme mu defaultní schování.
+        // Discord API nebere konkrétní ID, ale jen "typ" oprávnění.
+        // Nastavíme 'ManageGuild' (Správa serveru) jako pojistku pro viditelnost.
+        if (cmd.permissions && cmd.permissions.length > 0) {
+            data.default_member_permissions = PermissionFlagsBits.ManageGuild.toString();
+        }
+
+        return data;
+    });
 
     // 2. Globální registrace (pro všechny servery)
     try {
@@ -51,13 +63,20 @@ module.exports = async (uhg, client) => {
 
     for (const guildId of priorityGuilds) {
         const guild = client.guilds.cache.get(guildId);
-        if (guild) {
+        let test = false;
+        if (guild && test) {
             try {
                 await guild.commands.set(commandsData);
                 console.log(` [DISCORD] `.bgCyan.black + ` Příkazy aktualizovány pro guildu: ${guild.name}`.cyan);
             } catch (e) {
                 console.error(` [ERROR] Chyba registrace pro ${guildId}:`.red, e.message);
             }
+        } else if (guild) {
+                const localCmds = await guild.commands.fetch();
+                if (localCmds.size > 0) {
+                    await guild.commands.set([]); // Smaže lokální kopie
+                    console.log(` [CLEANUP] Smazány lokální duplicity na serveru: ${guild.name}`.yellow);
+                }
         }
     }
 

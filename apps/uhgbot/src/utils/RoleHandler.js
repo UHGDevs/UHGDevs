@@ -62,7 +62,7 @@ class RoleHandler {
      */
     async updateMember(member, userData, activeMembersList = []) {
         // Pokud bota někdo omezil v právech nebo je to někdo nad ním, nic neuděláme
-        if (!member || !member.manageable) return false;
+        if (!member || typeof member !== 'object' || !member.guild || !member.manageable) return false;
 
         let changed = false;
 
