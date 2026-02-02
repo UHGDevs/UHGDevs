@@ -523,6 +523,162 @@ class ApiFunctions {
 
         return prefix + floorNum;
     }
+
+    /**
+     * Vypočítá Garden Level z expů.
+     * @param {number} exp - Celkové Garden Experience
+     * @returns {{level: number, levelProgress: number, all: number}} 
+     * - level: Capped level (max 15)
+     * - levelProgress: Capped level s desetinami (např. 14.50)
+     * - all: Uncapped level (např. 18.25)
+     */
+    static getGardenLevel(exp) {
+        if (!exp || isNaN(exp)) return { level: 0, levelMin: 0, all: 0 };
+
+        // Tabulka XP potřebných pro dosažení daného levelu
+        // Index 0 = XP pro Level 1 (0 XP)
+        // Index 1 = XP pro Level 2 (100 XP)
+        // ...
+        const xpTable = [
+            0,      // Level 1
+            70,    // Level 2
+            140,    // Level 3
+            280,    // Level 4
+            520,   // Level 5
+            1120,   // Level 6
+            2620,   // Level 7
+            4620,   // Level 8
+            7120,   // Level 9
+            10120,   // Level 10
+            20120,   // Level 11
+            30120,  // Level 12
+            40120,  // Level 13
+            50120,  // Level 14
+            60120   // Level 15 (MAX)
+        ];
+
+        let level = 0;
+        let flooredLevel = 0; // Celé číslo levelu (1-15)
+
+        // 1. Zjištění dosaženého celého levelu
+        for (let i = 0; i < xpTable.length; i++) {
+            if (exp >= xpTable[i]) {
+                flooredLevel = i + 1; // Index 0 je Level 1
+            } else {
+                break;
+            }
+        }
+
+        // 2. Výpočet přesného levelu (float)
+        let exactLevel = 0;
+
+        if (flooredLevel >= 15) {
+            // Logika pro Uncapped (nad Level 15)
+            // Používáme poslední známý interval (Level 14 -> 15 je 10000 XP)
+            const maxReq = xpTable[14];
+            const lastGap = 10000;
+            
+            const overflow = exp - maxReq;
+            exactLevel = 15 + (overflow / lastGap);
+        } else {
+            // Logika pro běžné levely (1-14)
+            const currentReq = xpTable[flooredLevel - 1];
+            const nextReq = xpTable[flooredLevel];
+            const needed = nextReq - currentReq;
+            const progress = exp - currentReq;
+            
+            exactLevel = flooredLevel + (progress / needed);
+        }
+
+        return {
+            levelMin: Math.min(15, Math.floor(exactLevel)), // Oficiální Level (Max 15)
+            level: Math.min(15, parseFloat(exactLevel.toFixed(2))), // Oficiální Level + progres
+            all: parseFloat(exactLevel.toFixed(2)) // Teoretický nekonečný level
+        };
+    }
+
+    /**
+     * Vypočítá stav Composteru na základě zastaralých dat.
+     * @param {Object} data - Objekt composter_data z Hypixel API
+     */
+    static getComposter(data) {
+        if (!data) return {};
+
+        const now = Date.now();
+        const lastSave = data.last_save;
+        
+        // --- 1. KONSTANTY A VYLEPŠENÍ ---
+        const speedLvl = data.upgrades?.speed || 0;
+        const costLvl = data.upgrades?.cost_reduction || 0;
+        const multiDropLvl = data.upgrades?.multi_drop || 0;
+
+        // Čas na jeden cyklus (v sekundách)
+        const secondsPerCycle = 600 / (1 + (speedLvl * 0.2));
+        // Spotřeba na jeden cyklus
+        const omPerCycle = 4000 * (1 - (costLvl * 0.01));
+        const fuelPerCycle = 2000;
+        // Výnos z jednoho cyklu (Multi-drop zvyšuje průměrný počet vyrobených kusů)
+        const yieldPerCycle = 1 + (multiDropLvl * 0.03);
+
+
+        // --- 2. VÝPOČET STAVU "TEĎ" ---
+        const elapsedSeconds = (now - lastSave) / 1000;
+
+        // Maximální možný počet cyklů ze surovin, co jsme měli
+        const maxCyclesByOm = data.organic_matter / omPerCycle;
+        const maxCyclesByFuel = data.fuel_units / fuelPerCycle;
+        const totalPossibleCycles = Math.min(maxCyclesByOm, maxCyclesByFuel);
+
+        // Kolik cyklů reálně proběhlo od uložení do teď
+        const actualCyclesSinceSave = Math.min(Math.floor(elapsedSeconds / secondsPerCycle), totalPossibleCycles);
+
+        // Odhad aktuálního množství kompostu (původní + nově vyrobený)
+        const currentCompostItems = data.compost_items + Math.floor(actualCyclesSinceSave * yieldPerCycle);
+        const compostAtEnd = data.compost_items + Math.floor(totalPossibleCycles * yieldPerCycle);
+
+        // Aktuální suroviny (simulované)
+        const simOm = Math.floor(Math.max(0, data.organic_matter - (actualCyclesSinceSave * omPerCycle)));
+        const simFuel = Math.floor(Math.max(0, data.fuel_units - (actualCyclesSinceSave * fuelPerCycle)));
+
+
+        // --- 3. PREDIKCE DO BUDOUCNA ---
+        let timeRemainingSec = 0;
+        let isActive = true;
+
+        if (simOm < omPerCycle || simFuel < fuelPerCycle) {
+            isActive = false; // Došlo to během doby od uložení
+        } else {
+            const remainingCycles = Math.min(simOm / omPerCycle, simFuel / fuelPerCycle);
+            timeRemainingSec = remainingCycles * secondsPerCycle;
+        }
+
+        // Pomocná funkce pro Minecraft formát (2hod 21min)
+        const formatMcTime = (totalSec) => {
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            if (h > 0) return `${h}hod ${m}min`;
+            return `${m}min`;
+        };
+
+        return {
+            active: isActive,
+            compostWaiting: Math.floor(currentCompostItems),
+            compostAtEnd: Math.floor(compostAtEnd),
+            last_save: lastSave,
+            
+            // Čas do vyprázdnění (pro MC chat)
+            mcTimeRemaining: isActive ? formatMcTime(timeRemainingSec) : "EMPTY",
+            
+            // Kdy to dojde (pro Discord timestamp)
+            emptyAt: Math.floor(isActive ? (now + timeRemainingSec * 1000) : (lastSave + totalPossibleCycles * secondsPerCycle * 1000)),
+
+            resources: {
+                om: simOm,
+                fuel: simFuel,
+                limit: (data.organic_matter / omPerCycle) < (data.fuel_units / fuelPerCycle) ? "Organic Matter" : "Fuel"
+            }
+        };
+    }
 }
 
 module.exports = ApiFunctions;

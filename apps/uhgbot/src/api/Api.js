@@ -5,6 +5,7 @@
 const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
+const { getPrices } = require('skyhelper-networth');
 
 // Import jednotlivých volání
 const CallMojang = require('./calls/Mojang');
@@ -18,17 +19,22 @@ class Api {
         
         // Cache: 10 minut std, check každou minutu
         this.cache = new NodeCache({ stdTTL: 600, checkperiod: 60 });
+
+        this.prices = {};
+        this.startPriceUpdater()
+        
     }
 
 /**
      * Hlavní metoda volání
      * @param {string} input - Jméno nebo UUID
      * @param {string[]} types - ["hypixel", "skyblock", "guild", "online"]
-     * @param {boolean} waitSave - Zda čekat na zápis do DB
+     * @param {object{}} options - např. Zda čekat na zápis do DB
      */
-    async call(input, types = ["hypixel"], waitSave = false) {
+    async call(input, types = ["hypixel"], options = {}) {
         if (!input) return { success: false, reason: "Nebyl zadán vstup" };
 
+        let waitSave = options.waitSave || false;
         try {
             // 1. Získání Identity (Mojang) - Cache je uvnitř CallMojang
             const identity = await CallMojang(input, this.cache);
@@ -43,7 +49,19 @@ class Api {
 
             for (const type of types) {
                 const cacheKey = `${type}_${uuid}`;
-                const cachedData = this.cache.get(cacheKey);
+                let cachedData = this.cache.get(cacheKey);
+
+                if (cachedData && options.cachePath) {
+                    if (options.cachePath.startsWith(type)) {
+                        const tempObj = { [type]: cachedData };
+                        const valueToCheck = this._resolvePath(tempObj, options.cachePath);
+
+                        if (valueToCheck === undefined) {
+                            this.cache.del(cacheKey);
+                            cachedData = null;
+                        }
+                    }
+                }
 
                 if (cachedData) {
                     result[type] = cachedData;
@@ -92,7 +110,7 @@ class Api {
                         achs = this.cache.get(`hypixel_${uuid}`)?.achievements;
                     }
 
-                    const sbData = await CallSkyBlock.getProfiles(this.uhg, uuid, this.key, achs);
+                    const sbData = await CallSkyBlock.getProfiles(this.uhg, uuid, this.key, {...options, achievements: achs});
                     return { skyblock: sbData };
                 };
                 promises.push(runSb());
@@ -162,17 +180,13 @@ class Api {
                     const m = selected.member;
                     updatePayload.sb = {
                         updated: Date.now(),
-                        profile_id: selected.id,
-                        profile_name: selected.name,
-                        mode: selected.mode,
-                        coins: m.coins,
-                        skills: m.skills,
-                        skill_average: m.skill_average,
-                        dungeons: m.dungeons,
-                        slayers: m.slayers,
-                        mining: m.mining
                     };
                 }
+            }
+
+            if (userInDb.garden?.emptyAt && data.skyblock?.profiles.find(n => n.name == userInDb.garden.profileName)?.garden?.composter?.emptyAt) {
+                if (data.skyblock?.profiles.find(n => n.name == userInDb.garden.profileName)?.garden?.composter?.emptyAt > Date.now()) updatePayload["garden.alert_sent"] = false;
+                updatePayload["garden.emptyAt"] = data.skyblock?.profiles.find(n => n.name == userInDb.garden.profileName)?.garden?.composter?.emptyAt || undefined;
             }
 
             await this.uhg.db.saveUser(uuid, updatePayload);
@@ -202,6 +216,39 @@ class Api {
         } catch (e) {
             console.error(` [DB ERROR] Smart Save (${data.username}): ${e.message}`.red);
         }
+    }
+
+    async startPriceUpdater() {
+        try {
+            this.prices = await getPrices();
+        } catch (e) {
+            console.error(`[PRICES ERROR] Načítání cen: ${e.message}`.red);
+        }
+        setInterval(async () => {
+            try {
+                this.prices = await getPrices();
+            } catch (e) {
+                console.error(`[PRICES ERROR] Načítání Cen: ${e.message}`.red);
+            }
+        }, 1000 * 60 * 60); // 1 za hodinu 
+    }
+
+    /**
+     * Pomocná metoda pro procházení objektu stringovou cestou
+     * @param {Object} obj 
+     * @param {String} path např. "skyblock/profiles[0]/garden/level"
+     */
+    _resolvePath(obj, path) {
+        // Rozdělí cestu podle / . [ ] a odstraní prázdné znaky
+        // "profiles[0]" -> ["profiles", "0"]
+        const keys = path.replace(/\[/g, '.').replace(/\]/g, '').split(/[\/\.]/).filter(k => k);
+        
+        let current = obj;
+        for (const key of keys) {
+            if (current === undefined || current === null) return undefined;
+            current = current[key];
+        }
+        return current;
     }
 }
 

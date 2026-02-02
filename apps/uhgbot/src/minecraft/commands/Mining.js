@@ -23,6 +23,7 @@ module.exports = {
                 mining.powder_mithril ? ` | Powder: ${uhg.money(mining.powder_mithril)} Mithril`: null,
                 mining.powder_gemstone ? ` ${uhg.money(mining.powder_gemstone)} Gemstone`: null,
                 mining.powder_glacite ? ` ${uhg.money(mining.powder_glacite)} Glacite`: null,
+                mining.mineshafts ? ` ${uhg.f(mining.mineshafts)} Mineshafts`: null,
                 profil.collection.gemstone_collection || profil.collection.hard_stone ? ' | Collection:' : null,
                 profil.collection.gemstone_collection ? ` ${uhg.money(profil.collection.gemstone_collection)} Gemstone` : null,
                 profil.collection.gemstone_collection && profil.collection.hard_stone ? ',': null,

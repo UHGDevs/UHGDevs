@@ -17,5 +17,7 @@ wins
 
 cakes
 skills: základní, opravit achievementy (volat v call i hypixel) + přidat možnost vybrat konkretni skill. Přidat embed, chybí hunting
-Cata, Class, Coins, Mining - chybí discord podrobnější
-crimson, networth, slayers
+Cata, Class, Coins, Mining, Networth, Crimson, End - chybí discord podrobnější
+slayers - chybí úplně
+
+fix profile switching with cache, fix ,garden grapes. Add cakes, check composter 

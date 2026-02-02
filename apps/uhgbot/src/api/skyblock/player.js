@@ -42,6 +42,7 @@ module.exports = (profile, extra = {}) => {
       total: Math.floor((player?.currencies?.coin_purse || 0) + (profile?.banking?.balance || 0) + (player?.profile?.bank_account || 0)),
       networth: 0,
     },
+    networth: {},
 
     fairy_souls: {
       total: player.fairy_soul.total_collected || 0,
@@ -69,6 +70,7 @@ module.exports = (profile, extra = {}) => {
       nucleus: player?.leveling?.completions?.NUCLEUS_RUNS || 0,
       commissions: achievements?.skyblock_hard_working_miner || undefined,
       scatha: (player?.player_stats?.kills?.scatha || 0) + (player?.player_stats?.kills?.scatha_10 || 0) || (player?.bestiary?.kills?.scatha || 0) + (player?.bestiary?.kills?.scatha_10 || 0),
+      mineshafts: player?.glacite_player_data?.mineshafts_entered || 0,
     },
 
     dungeons: {
@@ -86,7 +88,26 @@ module.exports = (profile, extra = {}) => {
         archer: func.f(func.getCataLvl(dungeons?.player_classes?.archer?.experience), 2, true),
         tank: func.f(func.getCataLvl(dungeons?.player_classes?.tank?.experience), 2, true),
       },
-      classavg: 0,
+      classavg: 0, // funguje - pod api upravuju
+    },
+
+    crimson: {
+      fraction: player?.nether_island_player_data?.selected_faction || "Žádná",
+      rep: player?.nether_island_player_data[`${player?.nether_island_player_data?.selected_faction || 'nic'}_reputation`] || 0,
+      dojo: Object.entries(player?.nether_island_player_data?.dojo)?.reduce((acc, [key, val]) => key.includes('points') ? acc + val : acc, 0) || 0,
+      kuudras: Object.entries(player?.nether_island_player_data?.kuudra_completed_tiers)?.reduce((acc, [key, val]) => !key.includes('highest') ? acc + val : acc, 0) || 0,
+      trophies: player?.trophy_fish?.total_caught || 0,
+    },
+
+    end: {
+      eyes: player?.player_data?.end_island?.summoning_eyes_collected || 0,
+      eyes_placed: player?.player_data?.end_island?.summoning_eyes_contributed?.total || 0,
+      drags: player?.player_data?.end_island?.dragon_fight?.amount_summoned.total || 0,
+      soulflow: player?.item_data?.soulflow || 0
+    },
+
+    garden: {
+      copper: player?.garden_player_data?.copper || 0,
     }
   };
 

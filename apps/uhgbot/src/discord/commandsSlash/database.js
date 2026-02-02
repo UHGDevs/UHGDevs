@@ -112,7 +112,7 @@ module.exports = {
             }
 
             // 3. Voláme API se zapnutým čekáním na save (waitSave = true)
-            await uhg.api.call(id, ["hypixel"], true); 
+            await uhg.api.call(id, ["hypixel"], {waitSave: true}); 
             
             return module.exports.render(uhg, interaction, id);
         }

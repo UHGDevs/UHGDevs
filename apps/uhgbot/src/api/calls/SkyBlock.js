@@ -1,8 +1,10 @@
 const axios = require('axios');
 const path = require('path');
+const { ProfileNetworthCalculator } = require('skyhelper-networth');
+const func = require('../ApiFunctions');
 
 module.exports = {
-    getProfiles: async (uhg, uuid, key, achievements = null) => {
+    getProfiles: async (uhg, uuid, key, options = {}) => {
         const res = await axios.get(`https://api.hypixel.net/v2/skyblock/profiles`, { params: { key, uuid } });
         if (!res.data.success) {
             throw new Error(res.data.cause || "Neznámá chyba Hypixel API");
@@ -12,17 +14,76 @@ module.exports = {
         }
 
         const profiles = [];
-        const parserPath = path.resolve(__dirname, '../skyblock/player.js');
-        const playerParser = require(parserPath);
+        const playerParser = require(path.resolve(__dirname, '../skyblock/player.js'));
 
         for (const p of res.data.profiles) {
-            if (!p.members[uuid]) continue;
-            p.uuid = uuid;
+          if (!p.members[uuid]) continue;
+          p.uuid = uuid;
 
-            profiles.push(playerParser(p, { achievements: achievements }))
+          const profile = playerParser(p, { achievements: options.achievements })
+
+          if (options.networth && (p.selected || options.museumAll || options.profileName == profile.name)) {
+            
+            let museumData;
+              try {
+                const museumRes = await axios.get(`https://api.hypixel.net/v2/skyblock/museum`, { params: { key, profile: p.profile_id } });
+                if (museumRes.data.members && museumRes.data.members[uuid]) {
+                    museumData = museumRes.data.members[uuid];
+                }
+              } catch (e) {}
+
+            const calculator = new ProfileNetworthCalculator(
+              p.members[uuid],          // 1. Raw data hráče
+              museumData,               // 2. Museum data
+              p.banking?.balance || 0   // 3. Banka
+            );
+            const nwData = await calculator.getNetworth({
+              prices: uhg.api.prices,
+              onlyNetworth: false,
+              returnItemData: false 
+            });
+
+            profile.bank.networth = nwData.networth;
+            profile.networth = nwData;
+            
+          }
+
+          if (options.garden && (p.selected || options.all || options.profileName == profile.name)) {
+            const gardenRes = await axios.get(`https://api.hypixel.net/v2/skyblock/garden`, { params: { key, profile: p.profile_id } });
+            if (!gardenRes.data.success) throw new Error(res.data.cause || "Neznámá chyba Garden API");
+            let gardenData = gardenRes.data.garden || {};
+            
+            let gardenLevel = func.getGardenLevel(gardenData.garden_experience) 
+            profile.garden.level = gardenLevel.level;
+            profile.garden.levelInfinitive = gardenLevel.all;
+            profile.garden.visitors = gardenData.commission_data?.total_completed || 0
+            profile.garden.unique = gardenData.commission_data?.unique_npcs_served || 0
+            profile.garden.composter = func.getComposter(gardenData.composter_data)
+            profile.garden.composter.prices = {
+              now: (uhg.api.prices['COMPOST'] || 0) * (profile.garden.composter?.compostWaiting || 0),
+              later: (uhg.api.prices['COMPOST'] || 0) * (profile.garden.composter?.compostAtEnd || 0)
+            }
+          }
+
+          profiles.push(profile)
         }
 
-        profiles.sort((a, b) => (b.selected - a.selected) || (b.first_join - a.first_join));
+        profiles.sort((a, b) => {
+            if (options.profileName) {
+                // Pokud 'a' je hledaný profil, posuň ho nahoru (-1)
+                if (a.name.toLowerCase() === options.profileName.toLowerCase()) return -1;
+                // Pokud 'b' je hledaný profil, posuň ho nahoru (1, aby 'a' šlo dolů)
+                if (b.name.toLowerCase() === options.profileName.toLowerCase()) return 1;
+            }
+            // 2. Priorita: Vybraný profil (Selected)
+            // b.selected - a.selected (true je 1, false je 0)
+            // Pokud b je selected (1) a a není (0) -> 1 - 0 = 1 (b jde dopředu) -> Správně
+            if (a.selected !== b.selected) {
+                return (b.selected || 0) - (a.selected || 0);
+            }
+            // 3. Priorita: Datum připojení (First Join) - od nejnovějšího
+            return b.first_join - a.first_join;
+        });
 
         return { profiles };
     }
@@ -52,7 +113,9 @@ profiles: array             - []
     bank:  int
     personal: int                                                      : 0
     total: int
-    networth: int             - currenty 0
+    networth: int
+  
+  networth: object      - needs options
 
   fairy_souls: object
     total: int                - fairysouls found
@@ -103,6 +166,7 @@ profiles: array             - []
     nucleus: int
     commissions: int
     scatha: int
+    mineshafts: int
 
   dungeons: object
     secrets: int
@@ -120,4 +184,24 @@ profiles: array             - []
       tank: int
     classavg: int
 
-    `
+  crimson: object
+    fraction: string
+    rep: int
+    dojo: int
+    kuudras: int
+    trophies: int
+
+  end: object
+    eyes: int
+    eyes_placed: int
+    drags: int
+    soulflow: int
+
+  garden: object           - needs options
+    copper: int            - always
+    level: double
+    levelInfinitive: double
+    visitors: int
+    unique: int
+    composter: int
+  `

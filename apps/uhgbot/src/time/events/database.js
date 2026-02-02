@@ -51,7 +51,7 @@ module.exports = {
             for (let player of queue) {
                 // Voláme API (to v sobě spustí _smartSave v Api.js)
                 const types = player.stats ? ["hypixel"] : [];
-                const api = await uhg.api.call(player._id, types, true);
+                const api = await uhg.api.call(player._id, types, {waitSave: true});
 
                 if (api.success) {
                     results.success++;
