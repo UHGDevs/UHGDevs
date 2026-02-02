@@ -34,7 +34,7 @@ module.exports = (hypixel) => {
       coins: skywars.coins || 0,
       souls: skywars.souls || 0,
       shards: skywars.shard || 0,
-      shardsp: func.f((skywars.shard || 0) / 200, "", 2),
+      shardsp: func.f((skywars.shard || 0) / 200, 2, true),
       heads: skywars.heads || 0,
       tokens: skywars.cosmetic_tokens || 0,
       opals: skywars.opals || 0,

@@ -135,23 +135,54 @@ class Uhg {
     }
 
        /** Formátování čísel (např. 1000 -> 1 000) */
-    f(number, max = 2) {
-        if (number === undefined || number === null) return "0";
-        if (isNaN(number)) return number;
 
+    f(number, max = 2, asNumber = false) {
+        // Ošetření neplatných vstupů
+        if (number === undefined || number === null || isNaN(number)) {
+            return asNumber ? 0 : "0";
+        }
+
+        // Pokud chceme vrátit číslo (pro API/DB)
+        if (asNumber) {
+            // parseFloat(toFixed) zajistí správné zaokrouhlení a odstranění zbytečných nul
+            return parseFloat(Number(number).toFixed(max));
+        }
+
+        // Pokud chceme vrátit string (pro Discord výpis)
         return Number(number).toLocaleString('cs-CZ', {
             minimumFractionDigits: 0,
             maximumFractionDigits: max
-        }).replace(/\u00A0/g, ' '); // Převede nezalomitelnou mezeru na klasickou
+        }).replace(/\u00A0/g, ' '); 
     }
 
-    /** Peněžní formátování (K, M, B) */
-    money(n) {
-        if (!Number(n)) return n;
-        if (n < 1000) return n;
-        if (n < 1000000) return Math.floor(n / 100) / 10 + "K";
-        if (n < 1000000000) return Math.floor(n / 10000) / 100 + "M";
-        return Math.floor(n / 10000000) / 100 + "B";
+    /**
+     * Zkrácené formátování čísel (Compact Notation)
+     * @param {number} num - Číslo (např. 15000)
+     * @param {number} digits - Počet desetinných míst (default 1)
+     * @returns {string} Např. "15k", "1.5M"
+     */
+    money(num, digits = 1) {
+        if (num === undefined || num === null || isNaN(num)) return "0";
+        const n = Number(num);
+
+        // Definice suffixů (od největšího)
+        const lookup = [
+            { value: 1e12, symbol: "T" },
+            { value: 1e9, symbol: "B" },
+            { value: 1e6, symbol: "M" },
+            { value: 1e3, symbol: "k" }
+        ];
+
+        // Najdeme první pasující suffix
+        const item = lookup.find(item => Math.abs(n) >= item.value);
+
+        // Pokud je číslo menší než 1000, vrátíme ho formátované klasicky (např. 950)
+        if (!item) return this.f(n, 0);
+
+        // Vydělíme, zaokrouhlíme a REGEXem odstraníme zbytečné nuly (např. "10.0k" -> "10k")
+        const result = (n / item.value).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, "$1");
+
+        return result.replace('.', ",") + item.symbol;
     }
 
     /** Výpočet poměru (KDR/WLR) */
@@ -321,6 +352,40 @@ class Uhg {
         return str.split('_').map(word => 
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
+    }
+
+    /**
+     * Zjistí, zda se v argumentech nachází název SkyBlock profilu.
+     * @param {string|string[]} args - Argumenty příkazu (string nebo pole)
+     * @returns {string|null} Název profilu (např. "Mango") nebo null
+     */
+    getSbProfile(args) {
+        const validProfiles = [
+            "Apple", "Banana", "Blueberry", "Coconut", "Cucumber", 
+            "Grapes", "Kiwi", "Lemon", "Lime", "Mango", "Orange", 
+            "Papaya", "Pear", "Peach", "Pineapple", "Pomegranate", 
+            "Raspberry", "Strawberry", "Tomato", "Watermelon", "Zucchini"
+        ];
+
+        // Normalizace vstupu na pole slov
+        let words = [];
+        if (typeof args === 'string') {
+            words = args.trim().split(/\s+/);
+        } else if (Array.isArray(args)) {
+            words = args;
+        } else {
+            return null;
+        }
+
+        // Hledání shody (case-insensitive)
+        for (const word of words) {
+            const match = validProfiles.find(p => p.toLowerCase() === word.toLowerCase());
+            if (match) {
+                return match; // Vrátí "Mango" i když vstup byl "mango" nebo "MANGO"
+            }
+        }
+
+        return null;
     }
 }
 

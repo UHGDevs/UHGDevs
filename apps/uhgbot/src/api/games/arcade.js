@@ -105,8 +105,8 @@ module.exports = (hypixel) => {
         roundwins: arcade.round_wins_santa_says || 0,
         topscore: arcade.top_score_santa_says || 0,
         totalrounds: achievements.christmas2017_santa_says_rounds || 0,
-        winpercentage: func.f(100*arcade.round_wins_santa_says/achievements.christmas2017_santa_says_rounds),
-        wlr: func.f(arcade.round_wins_santa_says/achievements.christmas2017_santa_says_rounds),
+        winpercentage: func.f(100*arcade.round_wins_santa_says/achievements.christmas2017_santa_says_rounds, 2, true),
+        wlr: func.f(arcade.round_wins_santa_says/achievements.christmas2017_santa_says_rounds, 2, true),
       },
     },
     miniwalls: {
@@ -119,7 +119,7 @@ module.exports = (hypixel) => {
       witherkills: arcade.wither_kills_mini_walls || 0,
       arrowsshot: arcade.arrows_shot_mini_walls || 0,
       arrowshit: arcade.arrows_hit_mini_walls || 0,
-      arrowhitratio: func.f(arcade.arrows_hit_mini_walls/arcade.arrows_shot_mini_walls),
+      arrowhitratio: func.f(arcade.arrows_hit_mini_walls/arcade.arrows_shot_mini_walls, 2, true),
       finals: arcade.final_kills_mini_walls || 0,
     },
     pixelpainters: {
@@ -155,7 +155,7 @@ module.exports = (hypixel) => {
       revived: arcade.players_revived_zombies || 0,
       bulletsshot: arcade.bullets_shot_zombies || 0,
       bulletshit: arcade.bullets_hit_zombies || 0,
-      misshitratio: func.f(arcade.bullets_hit_zombies/arcade.bullets_shot_zombies) || 0,
+      misshitratio: func.f(arcade.bullets_hit_zombies/arcade.bullets_shot_zombies, 2, true) || 0,
       doors: arcade.doors_opened_zombies || 0,
       knocked: arcade.times_knocked_down_zombies || 0,
       windows: arcade.windows_repaired_zombies || 0,

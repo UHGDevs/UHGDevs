@@ -13,9 +13,14 @@ module.exports = async (uhg, pmsg) => {
     if (!cmd) return;
 
     pmsg.command = commandName;
-    pmsg.username = args[0] || pmsg.username; 
     pmsg.args = args.join(" ");
     pmsg.verify_data = await uhg.db.getVerify(pmsg.username);
+
+    if (cmd.sb) {
+        pmsg.profilName = uhg.getSbProfile(pmsg.args)
+        if (uhg.getSbProfile(args[0]));
+        else pmsg.username = args[0] || pmsg.username
+    } else pmsg.username = args[0] || pmsg.username; 
 
     try {
         const response = await cmd.run(uhg, pmsg);

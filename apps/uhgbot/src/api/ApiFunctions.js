@@ -8,19 +8,28 @@ const sbConstants = require('./constants/skyblock');
 class ApiFunctions {
     // --- ZÁKLADNÍ FORMÁTOVÁNÍ ---
     /**
-     * Formátování čísel podle českého standardu
+     * Formátování čísel
      * @param {number} number - Číslo k formátování
-     * @param {number} max - Maximální počet desetinných míst
-     * @returns {string} Např. "1 234 567,89"
+     * @param {number} max - Počet desetinných míst
+     * @param {boolean} asNumber - Pokud true, vrátí Number (zaokrouhlené). Pokud false, vrátí String (formátovaný).
      */
-    static f(number, max = 2) {
-        if (number === undefined || number === null) return "0";
-        if (isNaN(number)) return number;
+    static f(number, max = 2, asNumber = false) {
+        // Ošetření neplatných vstupů
+        if (number === undefined || number === null || isNaN(number)) {
+            return asNumber ? 0 : "0";
+        }
 
+        // Pokud chceme vrátit číslo (pro API/DB)
+        if (asNumber) {
+            // parseFloat(toFixed) zajistí správné zaokrouhlení a odstranění zbytečných nul
+            return parseFloat(Number(number).toFixed(max));
+        }
+
+        // Pokud chceme vrátit string (pro Discord výpis)
         return Number(number).toLocaleString('cs-CZ', {
             minimumFractionDigits: 0,
             maximumFractionDigits: max
-        }).replace(/\u00A0/g, ' '); // Převede nezalomitelnou mezeru na klasickou
+        }).replace(/\u00A0/g, ' '); 
     }
 
     static ratio(n1 = 0, n2 = 0, n3 = 2) {

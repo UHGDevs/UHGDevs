@@ -49,7 +49,8 @@ profiles: array             - []
   bank: object
     purse: int                                                     : 0
     motes: int
-    bank:  int                                                      : 0
+    bank:  int
+    personal: int                                                      : 0
     total: int
     networth: int             - currenty 0
 
@@ -111,5 +112,12 @@ profiles: array             - []
     runs: int                  - completed runs
     secretsratio: int
     mobkills: int
+    classes: object            - class level, formatted
+      healer int
+      mage: int
+      berserk: int
+      archer: int
+      tank: int
+    classavg: int
 
     `

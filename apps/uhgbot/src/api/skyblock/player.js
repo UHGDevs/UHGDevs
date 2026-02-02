@@ -75,15 +75,22 @@ module.exports = (profile, extra = {}) => {
       secrets: dungeons?.secrets || 0,
       currentClass: dungeons?.selected_dungeon_class || "",
       lastRun: func.getFloorShort(dungeons.last_dungeon_run),
-      level: func.f(func.getCataLvl(dungeons?.dungeon_types?.catacombs?.experience || 0)),
+      level: func.f(func.getCataLvl(dungeons?.dungeon_types?.catacombs?.experience || 0), 2, true),
       runs: (dungeons?.dungeon_types?.catacombs?.tier_completions?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.tier_completions?.total || 0),
       secretsratio: func.ratio(dungeons?.secrets, (dungeons?.dungeon_types?.catacombs?.tier_completions?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.tier_completions?.total || 0)),
       mobkills: (dungeons?.dungeon_types?.catacombs?.mobs_killed?.total || 0) + (dungeons?.dungeon_types?.master_catacombs?.mobs_killed?.total || 0),
+      classes: {
+        healer: func.f(func.getCataLvl(dungeons?.player_classes?.healer?.experience), 2, true),
+        mage: func.f(func.getCataLvl(dungeons?.player_classes?.mage?.experience), 2, true),
+        berserk: func.f(func.getCataLvl(dungeons?.player_classes?.berserk?.experience), 2, true),
+        archer: func.f(func.getCataLvl(dungeons?.player_classes?.archer?.experience), 2, true),
+        tank: func.f(func.getCataLvl(dungeons?.player_classes?.tank?.experience), 2, true),
+      },
+      classavg: 0,
     }
   };
 
-  
-
+  api.dungeons.classavg = func.ratio((api.dungeons.classes.healer + api.dungeons.classes.mage + api.dungeons.classes.berserk + api.dungeons.classes.archer + api.dungeons.classes.tank), 5)
 
   return (api)
 };

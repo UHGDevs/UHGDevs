@@ -1,5 +1,4 @@
 
-const { ratio } = require('../ApiFunctions');
 const func = require('../ApiFunctions');
 
 module.exports = (hypixel) => {
@@ -13,10 +12,10 @@ module.exports = (hypixel) => {
         games: smash.games || 0,
         wins: smash.wins || 0,
         losses: smash.losses || 0,
-        wlr: ratio(smash.wins || 0, smash.losses || 0),
+        wlr: func.ratio(smash.wins || 0, smash.losses || 0),
         kills: smash.kills || 0,
         deaths: smash.deaths || 0,
-        kdr: ratio(smash.kills || 0, smash.deaths || 0),
+        kdr: func.ratio(smash.kills || 0, smash.deaths || 0),
         assists: smash.assists || 0
     })
 

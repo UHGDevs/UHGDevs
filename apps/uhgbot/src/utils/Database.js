@@ -266,7 +266,6 @@ class Database {
             return {
                 _id: user.discordId,
                 uuid: user._id,
-                nickname: user.username,
                 username: user.username
             };
         }
@@ -298,7 +297,6 @@ class Database {
         return {
             _id: user.discordId,
             uuid: user._id,
-            nickname: user.username,
             username: user.username
         };
     }
