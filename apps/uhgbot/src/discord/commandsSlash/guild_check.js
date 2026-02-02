@@ -3,7 +3,7 @@
  */
 const { MessageFlags } = require('discord.js');
 
-module.exports = {
+const command = {
     name: "guild-check",
     description: "Kontrola členů guildy (Unelites / Unverified)",
     permissions: [
@@ -141,3 +141,7 @@ function generateUnverifiedEmbed(uhg, activeMembers) {
         .setColor("Yellow")
         .setDescription(description || "Všichni členové jsou verifikovaní! 🎉");
 }
+
+module.exports = command;
+module.exports.generateUnelitesEmbed = generateUnelitesEmbed;
+module.exports.generateUnverifiedEmbed = generateUnverifiedEmbed;

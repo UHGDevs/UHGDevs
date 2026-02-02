@@ -258,7 +258,8 @@ class ApiFunctions {
             }
 
             if ((currentExp - need) < 0) {
-                return Math.round((level + (currentExp / need)) * 100) / 100;
+                // Zvýšena přesnost na 6 desetinných míst (1000000)
+                return Math.round((level + (currentExp / need)) * 1000000) / 1000000;
             }
             level += 1;
             currentExp -= need;

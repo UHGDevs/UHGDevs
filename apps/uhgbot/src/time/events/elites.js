@@ -11,8 +11,7 @@ module.exports = {
   time: '0 55 4 * * 1', // Pondělí 4:55 ráno
   onstart: false,
   run: async (uhg) => {
-    const ADMIN_CHANNEL_ID = '530496801782890527';
-    const adminChannel = uhg.dc.client.channels.cache.get(ADMIN_CHANNEL_ID);
+    const adminChannel = uhg.dc.client.channels.cache.get("530496801782890527");
     const guildChannel = uhg.dc.client.channels.cache.get("715989905532256346");
 
     try {
@@ -44,7 +43,10 @@ module.exports = {
 
       // 4. ZÍSKÁNÍ JMÉN Z DATABÁZE (Hromadně - 1 dotaz místo 10 API callů)
       const dbUsers = await uhg.db.find("users", { _id: { $in: top10Uuids } }, { projection: { username: 1 } });
-      const getName = (uuid) => dbUsers.find(u => u._id === uuid)?.username || uuid;
+      const getName = (uuid) => {
+          const u = dbUsers.find(user => user._id === uuid);
+          return u ? u.username : uuid; // Fallback na UUID, kdyby náhodou nebyl v DB
+      };
 
       // 5. IDENTIFIKACE ZMĚN
       let promoteList = [];
@@ -74,6 +76,20 @@ module.exports = {
       }
 
       // 7. OZNÁMENÍ NA DISCORD
+
+      const publicEmbed = new uhg.dc.Embed()
+        .setTitle("🏆 Elite Members - Top 10 GEXP")
+        .setColor("Gold")
+        .setDescription(top10.map((m, i) => {
+            const name = getName(m.uuid);
+            const icon = i === 0 ? "🥇" : (i === 1 ? "🥈" : (i === 2 ? "🥉" : `\`#${i+1}\``));
+            return `${icon} **${uhg.dontFormat(name)}** - ${uhg.f(m.exp)}`;
+        }).join('\n'))
+        .setTimestamp();
+
+      if (guildChannel) guildChannel.send({ embeds: [publicEmbed] });
+
+
       const embed = new uhg.dc.Embed()
         .setTitle("ELITE MEMBERS - Nový týden")
         .setColor("Gold")
@@ -94,7 +110,7 @@ module.exports = {
           if (adminChannel) adminChannel.send(`⚠️ **ELITES:** Bot je offline. Proveď změny ručně:\n${promoteList.map(n => `/g promote ${n}`).join('\n')}\n${demoteList.map(n => `/g demote ${n}`).join('\n')}`);
       }
 
-      if (guildChannel) guildChannel.send({ embeds: [embed] });
+      uhg.dc.cache.channels.get('logs').send({embeds: [embed]})
 
     } catch (e) {
       console.error(" [ELITES ERROR] ".bgRed, e);

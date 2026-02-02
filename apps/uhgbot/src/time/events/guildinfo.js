@@ -24,8 +24,8 @@ module.exports = {
     };
 
     const TRACKED = [
-        { name: "UltimateHypixelGuild", uuid: "64680ee95aeb48ce80eb7aa8626016c7" },
-        { name: "TKJK", uuid: "574bfb977d4c475b8197b73b15194a2a" }
+        { name: "UltimateHypixelGuild", uuid: "64680ee95aeb48ce80eb7aa8626016c7"},
+        { name: "TKJK", uuid: "574bfb977d4c475b8197b73b15194a2a"}
     ];
 
     const statsSummary = {};
@@ -44,6 +44,7 @@ module.exports = {
         const yestStr = d.toISOString().slice(0, 10);
         const lastGS = await uhg.db.findOne("guild_stats", { _id: `${guild.name}-${yestStr}` });
         const dailyScaled = lastGS ? (guild.exp - lastGS.totalExp) : 0;
+        //console.log(`[DEBUG GEXP] ${guild.name} | Today: ${hpDate} | Yest: ${yestStr} | LastTotal: ${lastGS?.totalExp} | CurrTotal: ${guild.exp} | Diff: ${dailyScaled}`);
 
         // 2. UPDATE guild_stats
         const gStats = {
@@ -120,7 +121,7 @@ module.exports = {
 
     // B. Daily Report (05:55)
     if (now.getHours() === 5) {
-        const reportChan = uhg.dc.cache.channels.get('report') || uhg.dc.client.channels.cache.get(CHANNELS.report);
+        const reportChan = uhg.dc.cache.channels.get('logs')
         const hpDate = statsSummary["UltimateHypixelGuild"]?.date;
         if (reportChan && hpDate) {
             const reportId = `REPORT-${hpDate}`;
@@ -135,6 +136,9 @@ module.exports = {
                 const oldU = await uhg.db.findOne("guild_stats", { _id: `UltimateHypixelGuild-${yStr}` });
                 const oldT = await uhg.db.findOne("guild_stats", { _id: `TKJK-${yStr}` });
 
+                const uGain = oldU ? (u.level - oldU.level) : 0;
+                const tGain = oldT ? (t.level - oldT.level) : 0;
+
                 const gap = u.level - t.level;
                 const lastGap = (oldU && oldT) ? (oldU.level - oldT.level) : gap;
                 const delta = gap - lastGap;
@@ -143,9 +147,9 @@ module.exports = {
                     .setTitle(`UHG vs TKJK - Denní Report (${hpDate})`)
                     .setColor(delta >= 0 ? "Green" : "Orange")
                     .addFields(
-                        { name: "UHG", value: `Lvl: **${uhg.f(u.level, 3)}** (+${uhg.f(oldU ? u.level-oldU.level : 0, 5)})\nXP: +${uhg.f(u.dailyScaledExp)}`, inline: true },
-                        { name: "TKJK", value: `Lvl: **${uhg.f(t.level, 3)}** (+${uhg.f(oldT ? t.level-oldT.level : 0, 5)})\nXP: +${uhg.f(t.dailyScaledExp)}`, inline: true },
-                        { name: "Trend", value: `Rozdíl: **${uhg.f(gap, 5)}** (${delta >= 0 ? "+" : ""}${uhg.f(delta, 5)})`, inline: false }
+                        { name: "UHG", value: `Lvl: **${uhg.f(u.level, 5)}** (+${uhg.f(uGain, 5)})\nXP: +${uhg.f(u.dailyScaledExp)}`, inline: true },
+                        { name: "TKJK", value: `Lvl: **${uhg.f(t.level, 5)}** (+${uhg.f(tGain, 5)})\nXP: +${uhg.f(t.dailyScaledExp)}`, inline: true },
+                        { name: "Trend", value: `Rozdíl: **${uhg.f(gap, 6)}** (${delta >= 0 ? "+" : ""}${uhg.f(delta, 5)})`, inline: false }
                     );
                 await reportChan.send({ embeds: [embed] });
                 await uhg.db.updateOne("guild_stats", { _id: reportId }, { sent: true });
