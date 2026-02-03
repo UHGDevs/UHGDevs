@@ -61,29 +61,29 @@ module.exports = {
         // 3. BULK UPDATE ČLENŮ V USERS
         const bulkOps = [];
         for (const m of guild.members) {
+            // Sestavíme objekt pro $set tak, aby updatoval jen konkrétní dny v exp
+            const expUpdates = {};
+            for (const [date, val] of Object.entries(m.expHistory)) {
+                // Toto vytvoří klíče jako: guilds.$[elem].exp.2024-01-29
+                expUpdates[`guilds.$[elem].exp.${date}`] = val;
+            }
+
             bulkOps.push({
                 updateOne: {
-                    filter: { _id: m.uuid },
+                    filter: { _id: m.uuid, "guilds.name": guild.name },
                     update: { 
-                        $pull: { guilds: { name: guild.name } }
-                    }
-                }
-            });
-            bulkOps.push({
-                updateOne: {
-                    filter: { _id: m.uuid },
-                    update: { 
-                        $push: { guilds: {
-                            name: guild.name,
-                            active: true,
-                            joined: m.joined,
-                            rank: m.rank,
-                            exp: m.expHistory,
-                            left: null
-                        }},
-                        $set: { updated: Date.now() }
+                        $set: { 
+                            ...expUpdates,
+                            "guilds.$[elem].active": true,
+                            "guilds.$[elem].rank": m.rank,
+                            "guilds.$[elem].joined": m.joined,
+                            "guilds.$[elem].left": null,
+                            "username": m.name, // Updatuje jméno v rootu
+                            "updated": Date.now()
+                        }
                     },
-                    upsert: true
+                    arrayFilters: [{ "elem.name": guild.name }],
+                    upsert: false // DŮLEŽITÉ: Api update by neměl upsertovat bez vytvoření struktury
                 }
             });
         }
