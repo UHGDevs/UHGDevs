@@ -108,7 +108,9 @@ module.exports = (profile, extra = {}) => {
 
     garden: {
       copper: player?.garden_player_data?.copper || 0,
-    }
+    },
+
+    slayers: func.getSlayers(player.slayer?.slayer_bosses),
   };
 
   api.dungeons.classavg = func.ratio((api.dungeons.classes.healer + api.dungeons.classes.mage + api.dungeons.classes.berserk + api.dungeons.classes.archer + api.dungeons.classes.tank), 5)

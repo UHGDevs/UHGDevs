@@ -399,33 +399,95 @@ class ApiFunctions {
         };
     }
 
-    static getSlayers(slayerData) {
-        if (!slayerData) return {};
-        const slayers = {};
-        const types = ['zombie', 'spider', 'wolf', 'enderman', 'blaze', 'vampire'];
-        const totals = { 1: 5, 2: 15, 3: 200, 4: 1000, 5: 5000, 6: 20000, 7: 100000, 8: 400000, 9: 1000000 };
+    /**
+     * Zpracuje Slayer data.
+     * @param {Object} slayerBosses - Objekt 'slayer_bosses' z API
+     * @returns {Object} Naformátovaná data (total + jednotliví bossové)
+     */
+    static getSlayers(slayerBosses) {
+        if (!slayerBosses) return {};
 
-        let totalSlayerXp = 0;
+        const output = {
+            total: { level: 0, xp: 0, claimedAll: true, killsTotal: 0 }
+        };
 
-        for (const type of types) {
-            const data = slayerData[`${type}_boss`] || {};
-            const exp = data.xp || 0;
-            totalSlayerXp += exp;
+        const xpTable = [5, 15, 200, 1000, 5000, 20000, 100000, 400000, 1000000];
+        
+        const bosses = {
+            zombie:   { name: "Revenant Horror", maxTierIndex: 4 }, // T5
+            spider:   { name: "Tarantula Broodfather", maxTierIndex: 3 }, // T4
+            wolf:     { name: "Sven Packmaster", maxTierIndex: 3 }, // T4
+            enderman: { name: "Voidgloom Seraph", maxTierIndex: 3 }, // T4
+            blaze:    { name: "Inferno Demonlord", maxTierIndex: 3 }, // T4
+            vampire:  { name: "Riftstalker Bloodfiend", maxTierIndex: 4 } // T5
+        };
 
-            let level = 0;
-            for (let i = 1; i <= 9; i++) {
-                if (exp >= totals[i]) level = i;
-                else break;
+        let totalLevelSum = 0;
+        let bossCount = 0;
+
+        for (const [key, config] of Object.entries(bosses)) {
+            const data = slayerBosses[key] || {};
+            
+            // 1. XP a Level
+            const xp = data.xp || 0;
+            let level = 0; // Celé číslo (0-9)
+            let levelProgress = 0;
+
+            for (let i = 0; i < xpTable.length; i++) {
+                if (xp >= xpTable[i]) {
+                    level = i + 1;
+                } else {
+                    break;
+                }
             }
 
-            slayers[type] = {
-                xp: exp,
-                level: level,
-                kills: Object.values(data).filter(n => typeof n === 'number' && n < 100000).reduce((a,b)=>a+b, 0) // Hrubý odhad killů
+            if (level < 9) {
+                const currentReq = level === 0 ? 0 : xpTable[level - 1];
+                const nextReq = xpTable[level];
+                const needed = nextReq - currentReq;
+                const have = xp - currentReq;
+                levelProgress = have / needed;
+            }
+
+            const preciseLevel = level + levelProgress;
+            
+            // 2. Kills
+            let killsTotal = 0;
+            for (let i = 0; i <= 5; i++) {
+                killsTotal += (data[`boss_kills_tier_${i}`] || 0);
+            }
+            const killsMaxTier = data[`boss_kills_tier_${config.maxTierIndex}`] || 0;
+
+            // 3. Claimed Levels (Opravená logika)
+            // Zjistíme, kolik levelů hráč reálně vybral
+            const claimedObj = data.claimed_levels || {};
+            const claimedCount = Object.keys(claimedObj).length;
+
+            // Hráč má vše "hotové", pokud počet vyzvednutých odměn odpovídá jeho aktuálnímu levelu.
+            // Pokud je Level 5, musí mít 5 záznamů v claimed_levels.
+            const claimedAll = claimedCount >= level;
+
+            // 4. Uložení
+            output[key] = {
+                level: parseFloat(preciseLevel.toFixed(2)),
+                xp: xp,
+                claimedAll: claimedAll,
+                killsTotal: killsTotal,
+                killsMaxTier: killsMaxTier,
+                maxTier: config.maxTierIndex + 1
             };
+
+            output.total.xp += xp;
+            output.total.killsTotal += killsTotal;
+            if (!claimedAll) output.total.claimedAll = false; // Pokud chybí u jednoho bosse, chybí celkově
+            
+            totalLevelSum += preciseLevel;
+            bossCount++;
         }
-        slayers.total_xp = totalSlayerXp;
-        return slayers;
+
+        output.total.level = bossCount > 0 ? parseFloat((totalLevelSum / bossCount).toFixed(2)) : 0;
+
+        return output;
     }
 
     /**
@@ -728,6 +790,9 @@ class ApiFunctions {
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
     }
+
+
+
 
 }
 

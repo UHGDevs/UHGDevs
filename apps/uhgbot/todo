@@ -1,21 +1,18 @@
 SB API:
-    Skills ověřit, aby fungovaly
-    hotm xp nevím kde najít
-    asi developovat dělat s commandy :shrug:, základ jinak je
+    Skills ověřit, aby fungovaly s api off - achievementy - skills: základní, opravit achievementy (volat v call i hypixel) + přidat možnost vybrat konkretni skill. Přidat embed, chybí hunting
+    hotm xp není
+    asi pokračovat rozšiřování api commandy :shrug:, základ jinak je
 
 verify image is wrong
 emoji za jmenem removed
 
 COMMANDS:
-say command
-arena brawl ranking funkce
-capture the wool - v api to je asi jinde
-dropper - fails
-gamecount, gameplayers
-tourney
-wins
+    arena brawl ranking funkce
+    capture the wool - v api to je asi jinde
+    dropper - fails
+    gamecount, gameplayers
+    tourney
+    wins
 
-cakes
-skills: základní, opravit achievementy (volat v call i hypixel) + přidat možnost vybrat konkretni skill. Přidat embed, chybí hunting
-Cata, Class, Coins, Mining, Networth, Crimson, End - chybí discord podrobnější
-slayers - chybí úplně
+Sb commands: 
+    Cata, Class, Coins, Mining, Networth, Crimson, End, Slayers - chybí discord podrobnější

@@ -177,12 +177,12 @@ profiles: array             - []
     secretsratio: int
     mobkills: int
     classes: object            - class level, formatted
-      healer int
-      mage: int
-      berserk: int
-      archer: int
-      tank: int
-    classavg: int
+      healer double
+      mage: double
+      berserk: double
+      archer: double
+      tank: double
+    classavg: double
 
   crimson: object
     fraction: string
@@ -204,4 +204,19 @@ profiles: array             - []
     visitors: int
     unique: int
     composter: object
+
+  slayers: object
+    total: object
+      level: double       - average
+      xp: int             - total level
+      claimedAll: bool    - all rewards claimed
+      killsTotal: int
+    zombie: object
+      level: double
+      xp: int
+      claimedAll: bool
+      killsTotal: int
+      killsMaxTier: int
+      maxTier: int
+    ...
   `
