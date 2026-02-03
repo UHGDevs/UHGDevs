@@ -23,22 +23,23 @@ module.exports = {
 
         try {
             /**
-             * Vybíráme hráče, kteří mají stats.updated starší než staleTimestamp.
-             * Řadíme od nejstarších, aby se fronta hýbala.
+             * LOGIKA VÝBĚRU S PRIORITOU:
+             * 1. Hledáme lidi starší než staleTimestamp (např. 200h)
+             * 2. NEBO lidi, kteří mají username stejný jako _id (dočasné UUID jméno z guildinfo)
              */
             let queue = await uhg.db.db.collection("users").find({
                 $or: [
-                    { "updated": { $lt: staleTimestamp } },
-                    { "stats": { $exists: true }, "stats.updated": { $lt: staleTimestamp } }
+                    { "stats.updated": { $lt: staleTimestamp } }, // Stará data
+                    { "updated": { $lt: staleTimestamp } },       // Staré jméno
+                    { $expr: { $eq: ["$username", "$_id"] } }    // PRIORITA: Jméno je stále UUID
                 ]
             })
+            // Seřadíme tak, aby ti s UUID jménem šli co nejdříve (v sortu to obvykle vybublá)
             .sort({ "stats.updated": 1, "updated": 1 }) 
             .limit(LIMIT)
             .toArray();
 
-            // Pokud v režimu údržby nikdo takto starý v DB není, končíme bez logování
             if (!queue.length) return;
-
             console.log(` [DATABASE] Aktualizuji ${queue.length} hráčů (Mode: ${staleHours}h)...`.blue);
 
             let results = { 

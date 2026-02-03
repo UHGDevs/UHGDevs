@@ -64,16 +64,22 @@ module.exports = {
         // --- 3. BULK UPDATE ČLENŮ V USERS (Individuální historie) ---
         const bulkOps = [];
         for (const m of guild.members) {
-            // A) VŽDY: Aktualizujeme jméno v rootu. Pokud hráč v DB není, VYTVOŘÍ SE.
+            // A) Zajištění existence dokumentu a jména (bez přepisování existujících!)
             bulkOps.push({
                 updateOne: {
                     filter: { _id: m.uuid },
-                    update: { $set: { username: m.name, updated: Date.now() } },
-                    upsert: true // Tady vzniká nový dokument, pokud UUID neexistuje
+                    update: { 
+                        $set: { updated: Date.now() },
+                        $setOnInsert: { 
+                            username: m.uuid, // Dočasný nick, opraví se v database.js callu
+                            guilds: []        // Inicializace prázdného pole
+                        }
+                    },
+                    upsert: true 
                 }
             });
 
-            // B) POKUD CHYBÍ GUILDA: Pokud hráč nemá tuhle guildu v poli, přidáme ji tam (inicializace).
+            // B) Přidání guildy do pole, pokud tam tato konkrétní guilda ještě není
             bulkOps.push({
                 updateOne: {
                     filter: { _id: m.uuid, "guilds.name": { $ne: guild.name } },
@@ -83,14 +89,14 @@ module.exports = {
                             active: true,
                             joined: m.joined,
                             rank: m.rank,
-                            exp: m.expHistory // Prvotní nahrání historie (7 dní)
+                            exp: m.expHistory // Prvních 7 dní
                         }}
                     },
                     upsert: false
                 }
             });
 
-            // C) POKUD GUILDA EXISTUJE: Aktualizujeme jen konkrétní dny, abychom nesmazali historii.
+            // C) Update denní historie (pokud už guilda v poli je)
             const expUpdates = {};
             for (const [date, val] of Object.entries(m.expHistory)) {
                 expUpdates[`guilds.$[elem].exp.${date}`] = val;

@@ -161,7 +161,7 @@ class Api {
             if (!userInDb) return; // Neukládáme neznámé hráče
 
             const updatePayload = {
-                username: data.username,
+                username: data.username || userInDb.username,
                 updated: Date.now()
             };
             if (data.created_at) updatePayload.created_at = new Date(data.created_at);
