@@ -33,7 +33,6 @@ module.exports = {
     for (const gInfo of TRACKED) {
         const api = await uhg.api.call(gInfo.uuid, ["guild"]);
         if (!api.success || !api.guild.guild) continue;
-
         const guild = api.guild.all;
         const hpDate = Object.keys(guild.members[0].expHistory)[0]; 
         const apiMemberUuids = guild.members.map(m => m.uuid);
@@ -101,7 +100,6 @@ module.exports = {
     // ============================================================
     // DISCORD LOGIKA (Kanály a Reporty)
     // ============================================================
-    
     // A. Update Názvů Kanálů
     if (statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
         const u = statsSummary["UltimateHypixelGuild"];
@@ -112,7 +110,6 @@ module.exports = {
             const c = uhg.dc.client.channels.cache.get(id);
             if (c && c.name !== name) await c.setName(name).catch(()=>{});
         };
-
         await update(CHANNELS.members, `Members: ${u.membersCount}/125`);
         await update(CHANNELS.uhg_level, `UHG Level: ${uhg.f(u.level, 3)}`);
         await update(CHANNELS.tkjk_level, `TKJK Level: ${uhg.f(t.level, 3)}`);
@@ -120,13 +117,12 @@ module.exports = {
     }
 
     // B. Daily Report (05:55)
-    if (now.getHours() === 5) {
+    if (now.getUTCHours() === 4) {
         const reportChan = uhg.dc.cache.channels.get('logs')
         const hpDate = statsSummary["UltimateHypixelGuild"]?.date;
         if (reportChan && hpDate) {
             const reportId = `REPORT-${hpDate}`;
             const alreadySent = await uhg.db.findOne("guild_stats", { _id: reportId });
-
             if (!alreadySent && statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
                 const u = statsSummary["UltimateHypixelGuild"];
                 const t = statsSummary["TKJK"];
@@ -135,7 +131,7 @@ module.exports = {
                 const yStr = d.toISOString().slice(0, 10);
                 const oldU = await uhg.db.findOne("guild_stats", { _id: `UltimateHypixelGuild-${yStr}` });
                 const oldT = await uhg.db.findOne("guild_stats", { _id: `TKJK-${yStr}` });
-
+                
                 const uGain = oldU ? (u.level - oldU.level) : 0;
                 const tGain = oldT ? (t.level - oldT.level) : 0;
 
