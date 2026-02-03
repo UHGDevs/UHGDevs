@@ -140,7 +140,7 @@ module.exports = {
                     `**Statistiky:**\n` +
                     `• Scaled EXP: \`${uhg.f(totalScaled)}\`\n` +
                     `• Raw EXP: \`${uhg.f(totalRaw)}\`\n` +
-                    `• Efektivita: \`${(uhg.ratio(totalScaled, totalRaw) * 100).toFixed(1)}%\`\n\n` +
+                    `• Efektivita: \`${(uhg.func.ratio(totalScaled, totalRaw) * 100).toFixed(1)}%\`\n\n` +
                     `**Leaderboard:**\n${description || "_Žádná data pro toto období_"}`
                 )
                 .setFooter({ text: `Strana ${pages.length + 1}/${totalPages} • ${leaderboard.length} hráčů` })

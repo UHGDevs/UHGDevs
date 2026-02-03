@@ -2,9 +2,10 @@
  * src/minecraft/handler.js
  */
 const bridge = require('./bridge');
+const ApiFunctions = require('../api/ApiFunctions');
 
 module.exports = async (uhg, raw, motd) => {
-    let cleanMsg = uhg.clear(raw).trim();
+    let cleanMsg = uhg.func.clear(raw).trim();
     if (!cleanMsg) return;
 
     // 1. DEBUG LOG (Pokud je zapnuto v configu)
@@ -51,7 +52,7 @@ module.exports = async (uhg, raw, motd) => {
                 const closeB = prefixPart.lastIndexOf("]");
                 const fullRankRaw = prefixPart.substring(openB, closeB + 1);
                 
-                rank = uhg.clear(fullRankRaw); 
+                rank = uhg.func.clear(fullRankRaw); 
                 if (fullRankRaw.includes("+")) {
                     const plusPos = fullRankRaw.indexOf("+");
                     plusColor = fullRankRaw.charAt(plusPos - 1);
@@ -69,8 +70,7 @@ module.exports = async (uhg, raw, motd) => {
                     content: content.trim(), 
                     channel: handlerChannel 
                 });
-            }
-            
+            }         
             // DŮLEŽITÉ: Tady skončíme, aby se chat neposuzoval jako systémová zpráva
             return;
         }
@@ -188,6 +188,88 @@ module.exports = async (uhg, raw, motd) => {
         // Odstraníme "Guild > " pro čistší výpis na Discordu
         const finalMsg = cleanMsg.replace(/^Guild > /, "");
 
-        return bridge.sendInfoToDiscord(uhg, finalMsg, targetChannel);
+        bridge.sendInfoToDiscord(uhg, finalMsg, targetChannel);
+
+        if (cleanMsg.startsWith("Guild >") && cleanMsg.endsWith("joined.")) {
+                const parts = cleanMsg.split(" ");
+                // Guild > Username joined. -> parts[2] je jméno
+                if (parts.length === 4) {
+                    const username = parts[2];
+                    await checkCakesOnJoin(uhg, username);
+                }
+        }
     }
 };
+
+
+async function checkCakesOnJoin(uhg, username) {
+    // 1. Základní checky v DB
+    const verify = await uhg.db.getVerify(username);
+    if (!verify) return;
+
+    const user = await uhg.db.getUser(verify.uuid);
+    if (!user || !user.cakes || !user.cakes.tracking) return;
+
+    // 2. Pokud už jsme varování poslali (třeba před 5 minutami v jiném lobby), neposíláme znovu
+    // Resetuje se to jedině, když hráč sní dort (změní se čas v Api.js)
+    if (user.cakes.alert_sent) return;
+
+    const now = Date.now();
+    const WARNING_TIME = 4 * 60 * 60 * 1000; 
+
+    // 3. Rychlá kontrola časů z DB (abychom nevolali API zbytečně)
+    const dbExpiry = user.cakes.nextExpiry || 0;
+    const isUrgentDB = user.cakes.hasInactive || (dbExpiry > 0 && dbExpiry - now < WARNING_TIME);
+
+    if (!isUrgentDB) return; 
+
+    // 4. API CHECK (Ujištění)
+    const api = await uhg.api.call(user._id, ["skyblock"]);
+    if (!api.success) return;
+
+    let profile = null;
+    if (user.cakes.profile_id) profile = api.skyblock.profiles.find(p => p.id === user.cakes.profile_id);
+    
+    if (!profile) return;
+
+    const cakesData = profile.member.cakes || [];
+    const analysis = uhg.func.analyzeCakes(cakesData);
+
+    const realExpiry = analysis.nextExpiry || 0;
+    const timeToExpiry = realExpiry - now;
+    
+    const isCritical = analysis.inactiveCount > 0 || (realExpiry > 0 && timeToExpiry < WARNING_TIME);
+
+    // Aktualizace DB (časů)
+    const updateData = {
+        "cakes.nextExpiry": realExpiry,
+        "cakes.hasInactive": analysis.inactiveCount > 0
+    };
+
+    // 5. ODESLÁNÍ A ZÁPIS ALERT_SENT
+    if (isCritical) {
+        let msg = `/msg ${username} 🍰 POZOR! `;
+        
+        if (analysis.inactiveCount > 0) {
+            msg += `Máš ${analysis.inactiveCount} neaktivních dortů! `;
+        }
+        
+        if (realExpiry > 0 && timeToExpiry < 0) {
+             msg += `Dorty ti již vypršely!`;
+        } else if (realExpiry > 0 && timeToExpiry < WARNING_TIME) {
+            const timeLeft = uhg.func.toTime(timeToExpiry / 1000).formatted;
+            msg += `Dorty končí za ${timeLeft}!`;
+        }
+
+        uhg.minecraft.send(msg);
+        console.log(` [CAKES] Odeslána zpráva pro ${username}:\n${msg}`.green);
+        
+        // PŘIDÁNO: Zabráníme dalšímu spamu
+        updateData["cakes.alert_sent"] = true;
+    } else {
+        // Pokud si hráč dorty doplnil, resetujeme alert
+        updateData["cakes.alert_sent"] = false;
+    }
+
+    await uhg.db.updateOne("users", { _id: user._id }, updateData);
+}

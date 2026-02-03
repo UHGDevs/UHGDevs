@@ -24,7 +24,7 @@ module.exports = {
             try {
                 // 2. RE-VALIDACE: Zavoláme API pro čerstvá data
                 // Použijeme waitSave: true, aby se nový stav rovnou propsal do users kolekce
-                const api = await uhg.api.call(user._id, ["skyblock"], {garden: true, profileName: user.garden.profileName, cachePath: 'skyblock/profiles[0]/garden/level', all: false});
+                const api = await uhg.api.call(user._id, ["skyblock"], {garden: true, profileName: user.garden?.profileName, cachePath: `skyblock/profiles[${user.garden?.profileName ? `name=${user.garden.profileName}` : 'selected=true'}]/garden/composter`, all: false});
                 if (!api.success || !api.skyblock?.profiles[0]?.garden?.composter) continue; // Pokud API selže, zkusíme to v dalším běhu (za 10 min)
 
                 // 3. PŘEPOČET: Zjistíme skutečný aktuální stav

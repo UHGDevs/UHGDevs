@@ -70,7 +70,7 @@ class Minecraft {
         this.client.on('message', (message) => {
             const raw = message.toString();
             const motd = message.toMotd();
-            const clean = this.uhg.clear(raw);
+            const clean = this.uhg.func.clear(raw);
 
             // --- ANTISPAM RETRY LOGIKA ---
             if (clean === "You cannot say the same message twice!" && this.lastSent) {

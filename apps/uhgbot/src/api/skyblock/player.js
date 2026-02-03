@@ -94,8 +94,8 @@ module.exports = (profile, extra = {}) => {
     crimson: {
       fraction: player?.nether_island_player_data?.selected_faction || "Žádná",
       rep: player?.nether_island_player_data[`${player?.nether_island_player_data?.selected_faction || 'nic'}_reputation`] || 0,
-      dojo: Object.entries(player?.nether_island_player_data?.dojo)?.reduce((acc, [key, val]) => key.includes('points') ? acc + val : acc, 0) || 0,
-      kuudras: Object.entries(player?.nether_island_player_data?.kuudra_completed_tiers)?.reduce((acc, [key, val]) => !key.includes('highest') ? acc + val : acc, 0) || 0,
+      dojo: Object.entries(player?.nether_island_player_data?.dojo || {})?.reduce((acc, [key, val]) => key.includes('points') ? acc + val : acc, 0) || 0,
+      kuudras: Object.entries(player?.nether_island_player_data?.kuudra_completed_tiers || {})?.reduce((acc, [key, val]) => !key.includes('highest') ? acc + val : acc, 0) || 0,
       trophies: player?.trophy_fish?.total_caught || 0,
     },
 

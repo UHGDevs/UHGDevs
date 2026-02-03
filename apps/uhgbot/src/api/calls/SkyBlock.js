@@ -203,5 +203,5 @@ profiles: array             - []
     levelInfinitive: double
     visitors: int
     unique: int
-    composter: int
+    composter: object
   `

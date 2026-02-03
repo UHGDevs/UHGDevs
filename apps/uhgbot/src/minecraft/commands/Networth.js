@@ -4,7 +4,7 @@ module.exports = {
     sb: true,
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.username, ["skyblock"], {networth: true, profileName: pmsg.profilName, cachePath: 'skyblock/profiles[0]/networth/total', all:null});
+            const api = await uhg.api.call(pmsg.username, ["skyblock"], {networth: true, profileName: pmsg.profilName, cachePath: `skyblock/profiles[${pmsg.profilName ? `name=${pmsg.profilName}` : 'selected=true'}]/networth/total`, all:null});
             if (!api.success) return api.reason;
 
             let profil = pmsg.profilName ? api.skyblock.profiles.find(n => n.name == pmsg.profilName) : api.skyblock.profiles[0]

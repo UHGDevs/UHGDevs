@@ -13,6 +13,7 @@ const TimeHandler = require('../time/TimeHandler');
 const CommandHandler = require('./CommandHandler');
 const LeaderboardHelper = require('./LeaderboardHelper');
 const RoleHandler = require('./RoleHandler');
+const ApiFunctions = require('../api/ApiFunctions');
 
 class Uhg {
     constructor(discord) {
@@ -45,8 +46,6 @@ class Uhg {
         this.cmds = new CommandHandler(this);
         this.lbHelper = new LeaderboardHelper();
         this.roles = new RoleHandler(this);
-
-        this.getApi = this.api.call.bind(this.api);
 
         this.bannedWords = this.config.bannedWords || [];
     }
@@ -135,25 +134,8 @@ class Uhg {
     }
 
        /** Formátování čísel (např. 1000 -> 1 000) */
-
-    f(number, max = 2, asNumber = false) {
-        // Ošetření neplatných vstupů
-        if (number === undefined || number === null || isNaN(number)) {
-            return asNumber ? 0 : "0";
-        }
-
-        // Pokud chceme vrátit číslo (pro API/DB)
-        if (asNumber) {
-            // parseFloat(toFixed) zajistí správné zaokrouhlení a odstranění zbytečných nul
-            return parseFloat(Number(number).toFixed(max));
-        }
-
-        // Pokud chceme vrátit string (pro Discord výpis)
-        return Number(number).toLocaleString('cs-CZ', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: max
-        }).replace(/\u00A0/g, ' '); 
-    }
+    get func() { return ApiFunctions; }
+    f(n, max, asNumber) { return ApiFunctions.f(n, max, asNumber); }
 
     /**
      * Zkrácené formátování čísel (Compact Notation)
@@ -184,34 +166,8 @@ class Uhg {
 
         return result.replace('.', ",") + item.symbol;
     }
-
-    /** Výpočet poměru (KDR/WLR) */
-    ratio(n1 = 0, n2 = 0, n3 = 2) {
-        return Number(Number(isFinite(n1 / n2) ? (n1 / n2) : n1).toLocaleString('en', {maximumFractionDigits: n3}));
-    }
-
-    /** Formátování času ze sekund */
-    toTime(sec, ms = false) {
-        if (ms) sec = sec / 1000;
-        let d = Math.floor(sec / 86400);
-        let h = Math.floor((sec % 86400) / 3600);
-        let m = Math.floor((sec % 3600) / 60);
-        let s = Math.floor(sec % 60);
-        return { formatted: `${d}d ${h}h ${m}m ${s}s`, d, h, m, s };
-    }
-
-    /** Odstranění barev (§) a řídících znaků z MC zpráv */
-    clear(msg) { 
-        if (!msg) return "";
-        return msg
-            .replace(/§[0-9a-fk-or]/gi, '')
-            .replace(/✫|✪|⚝/g, '?')
-            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
-            .trim(); 
-    }
-
     /** 
-     * Ochrana proti formátování v Discordu (ZDE BYLA CHYBA)
+     * Ochrana proti formátování v Discordu
      */
     dontFormat(text) {
         if (!text) return "";
@@ -335,23 +291,6 @@ class Uhg {
         try {
             await interaction.message.edit({ components: newComponents });
         } catch (e) {}
-    }
-
-    /**
-     * Zformátuje text tak, aby první písmeno bylo velké a zbytek malý.
-     * @param {string} str - Vstupní text (např. "skyBLOCK" nebo "MASTER")
-     * @returns {string} Zformátovaný text (např. "Skyblock" nebo "Master")
-     */
-    capitalize(str) {
-        if (!str || typeof str !== 'string') return "";
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
-    /* BEDWARS_CHALLENGER -> Bedwars Challenger*/
-    capitalizeWords(str) {
-        if (!str) return "";
-        return str.split('_').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        ).join(' ');
     }
 
     /**

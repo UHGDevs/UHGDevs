@@ -2,6 +2,7 @@
  * src/minecraft/commandsHandler.js
  */
 module.exports = async (uhg, pmsg) => {
+    pmsg.by = pmsg.username
     let content = pmsg.content.trim();
     if (content.startsWith('!')) content = content.slice(1);
     else if (content.trim().startsWith(uhg.config.prefix)) content = content.slice(uhg.config.prefix.length)
@@ -14,7 +15,7 @@ module.exports = async (uhg, pmsg) => {
 
     pmsg.command = commandName;
     pmsg.args = args.join(" ");
-    pmsg.verify_data = await uhg.db.getVerify(pmsg.username);
+    pmsg.verify_data = await uhg.db.getVerify(pmsg.by);
 
     if (cmd.sb) {
         pmsg.profilName = uhg.getSbProfile(pmsg.args)

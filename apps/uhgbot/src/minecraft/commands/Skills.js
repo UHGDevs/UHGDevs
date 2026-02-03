@@ -4,7 +4,7 @@ module.exports = {
     sb: true,
     run: async (uhg, pmsg) => {
         try {
-            const api = await uhg.api.call(pmsg.username, ["skyblock"]);
+            const api = await uhg.api.call(pmsg.username, ["skyblock"],  {profileName: pmsg.profilName});
             if (!api.success) return api.reason;
 
             let profil = pmsg.profilName ? api.skyblock.profiles.find(n => n.name == pmsg.profilName) : api.skyblock.profiles[0]

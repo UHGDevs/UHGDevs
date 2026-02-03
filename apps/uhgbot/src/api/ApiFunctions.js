@@ -45,9 +45,14 @@ class ApiFunctions {
         return roman;
     }
 
-    static clear(message) {
-        if (!message) return "";
-        return message.replace(/§[0-9a-fk-or]/gi, '').replace(/✫|✪|⚝/g, '?').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "").trim();
+    /** Odstranění barev (§) a řídících znaků z MC zpráv */
+    static clear(msg) { 
+        if (!msg) return "";
+        return msg
+            .replace(/§[0-9a-fk-or]/gi, '')
+            .replace(/✫|✪|⚝/g, '?')
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+            .trim(); 
     }
 
     // --- NETWORK & RANKS ---
@@ -484,6 +489,33 @@ class ApiFunctions {
     return [...inactive, ...active];
   }
 
+    /**
+     * Analyzuje stav dortů pro rychlý přehled.
+     * @param {Array} cakes - Pole cakes z API
+     * @returns {Object} Souhrn (activeCount, inactiveCount, nextExpiry, nextExpiryFormatted)
+     */
+    static analyzeCakes(cakes) {
+        const sorted = this.getCakes(cakes); // Použije tvou existující metodu pro seřazení
+        const now = Date.now();
+
+        const active = sorted.filter(c => c.expire_at && c.expire_at > now);
+        const inactive = sorted.filter(c => !c.expire_at || c.expire_at <= now);
+        
+        // Nejbližší expirace (první v poli active, protože getCakes už řadí od nejbližšího)
+        const nextExpiry = active.length > 0 ? active[0].expire_at : null;
+
+        return {
+            total: sorted.length,
+            activeCount: active.length,
+            inactiveCount: inactive.length,
+            nextExpiry: nextExpiry,
+            // Formátovaný čas do konce (např. "3h 15m")
+            nextExpiryRelative: nextExpiry ? this.toTime((nextExpiry - now) / 1000).formatted : "N/A",
+            // Bool, zda je vše v pořádku (žádný inactive)
+            allActive: inactive.length === 0
+        };
+    }
+
     static parseEssence(essenceData) {
         // Pojistka pro případ, že data neexistují
         if (!essenceData) return {};
@@ -679,6 +711,24 @@ class ApiFunctions {
             }
         };
     }
+
+    /**
+     * Zformátuje text tak, aby první písmeno bylo velké a zbytek malý.
+     * @param {string} str - Vstupní text (např. "skyBLOCK" nebo "MASTER")
+     * @returns {string} Zformátovaný text (např. "Skyblock" nebo "Master")
+     */
+    static capitalize(str) {
+        if (!str || typeof str !== 'string') return "";
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+    /* BEDWARS_CHALLENGER -> Bedwars Challenger*/
+    static capitalizeWords(str) {
+        if (!str) return "";
+        return str.split('_').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    }
+
 }
 
 module.exports = ApiFunctions;

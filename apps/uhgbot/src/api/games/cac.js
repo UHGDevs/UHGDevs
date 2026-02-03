@@ -1,5 +1,4 @@
 
-const { ratio } = require('../ApiFunctions');
 const func = require('../ApiFunctions');
 
 module.exports = (hypixel) => {
@@ -12,7 +11,7 @@ module.exports = (hypixel) => {
         wins: (cac.game_wins_deathmatch || 0)+(cac.game_wins || 0)+(cac.game_wins_gungame || 0),
         roundwins: cac.round_wins || 0,
         kills: (cac.kills || 0)+(cac.headshot_kills || 0)+(cac.grenade_kills || 0)+(cac.kills_deathmatch || 0)+(cac.kills_gungame || 0),
-        kdr: ratio((cac.kills || 0)+(cac.headshot_kills || 0)+(cac.grenade_kills || 0)+(cac.kills_deathmatch || 0)+(cac.kills_gungame || 0), (cac.deaths || 0)+(cac.deaths_deathmatch || 0)+(cac.deaths_gungame || 0)),
+        kdr: func.ratio((cac.kills || 0)+(cac.headshot_kills || 0)+(cac.grenade_kills || 0)+(cac.kills_deathmatch || 0)+(cac.kills_gungame || 0), (cac.deaths || 0)+(cac.deaths_deathmatch || 0)+(cac.deaths_gungame || 0)),
         headshotkills: cac.headshot_kills || 0,
         grenadekills: cac.grenade_kills || 0,
         deaths: (cac.deaths || 0)+(cac.deaths_deathmatch || 0)+(cac.deaths_gungame || 0),
@@ -23,7 +22,7 @@ module.exports = (hypixel) => {
         wins: cac.game_wins || 0,
         kills: cac.kills || 0,
         deaths: cac.deaths || 0,
-        kdr: ratio(cac.kills || 0, cac.deaths || 0),
+        kdr: func.ratio(cac.kills || 0, cac.deaths || 0),
         assists: cac.assists || 0,
         bombsplanted: cac.bombs_planted || 0,
         bombsdefused: cac.bombs_defused || 0,
@@ -33,14 +32,14 @@ module.exports = (hypixel) => {
         wins: cac.game_wins_deathmatch || 0,
         kills: cac.kills_deathmatch || 0,
         deaths: cac.deaths_deathmatch || 0,
-        kdr: ratio(cac.kills_deathmatch || 0, cac.deaths_deathmatch || 0),
+        kdr: func.ratio(cac.kills_deathmatch || 0, cac.deaths_deathmatch || 0),
         assists: cac.assists_deathmatch || 0,
       },
       gungame: {
         wins: cac.game_wins_gungame || 0,
         kills: cac.kills_gungame || 0,
         deaths: cac.deaths_gungame || 0,
-        kdr: ratio(cac.kills_gungame || 0, cac.deaths_gungame || 0),
+        kdr: func.ratio(cac.kills_gungame || 0, cac.deaths_gungame || 0),
         assists: cac.assists_gungame || 0,
         besttime: cac.fastest_win_gungame || 0,
       },

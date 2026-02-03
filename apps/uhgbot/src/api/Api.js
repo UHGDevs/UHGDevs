@@ -55,7 +55,6 @@ class Api {
                     if (options.cachePath.startsWith(type)) {
                         const tempObj = { [type]: cachedData };
                         const valueToCheck = this._resolvePath(tempObj, options.cachePath);
-
                         if (valueToCheck === undefined) {
                             this.cache.del(cacheKey);
                             cachedData = null;
@@ -137,6 +136,7 @@ class Api {
 
         } catch (e) {
             console.error(` [API ERROR] call: ${e.message}`.red);
+            console.log(e)
             return { success: false, reason: e.message };
         }
     }
@@ -189,6 +189,34 @@ class Api {
                 updatePayload["garden.emptyAt"] = data.skyblock?.profiles.find(n => n.name == userInDb.garden.profileName)?.garden?.composter?.emptyAt || undefined;
             }
 
+            if (data.skyblock && data.skyblock.profiles && userInDb.cakes?.tracking) {
+                const profileName = userInDb.cakes.profile_name;
+                const profile = data.skyblock.profiles.find(p => p.name === profileName) || data.skyblock.profiles[0];
+
+                if (profile) {
+                    const cakesData = profile.cakes || [];
+                    
+                    // Použijeme tvou funkci na analýzu
+                    const analysis = this.uhg.func.analyzeCakes(cakesData);
+                    const newExpiry = analysis.nextExpiry || 0;
+
+                    // Uložíme nové hodnoty do DB
+                    updatePayload["cakes.nextExpiry"] = newExpiry;
+                    updatePayload["cakes.hasInactive"] = analysis.inactiveCount > 0;
+                    
+                    // Pro jistotu aktualizujeme i ID profilu, kdyby se změnilo jméno/profil
+                    updatePayload["cakes.profile_id"] = profile.id;
+                    updatePayload["cakes.profile_name"] = profile.name;
+
+                    // RESET ALERTU: Pokud je nová expirace v budoucnosti, resetujeme alert_sent
+                    // (Tohle se hodí, kdybychom později přidali Time Event i pro Cakes, 
+                    // nebo pro handler.js, aby věděl, že je to "fresh")
+                    if (newExpiry > Date.now()) {
+                        updatePayload["cakes.alert_sent"] = false;
+                    }
+                }
+            }
+
             await this.uhg.db.saveUser(uuid, updatePayload);
 
             const TRACKED_GUILDS = ["UltimateHypixelGuild", "TKJK"/*, "Czech Team"*/];
@@ -234,19 +262,56 @@ class Api {
     }
 
     /**
-     * Pomocná metoda pro procházení objektu stringovou cestou
-     * @param {Object} obj 
-     * @param {String} path např. "skyblock/profiles[0]/garden/level"
+     * Pokročilé procházení objektu s podporou filtrování polí.
+     * Podporuje:
+     * - "cesta/k/hodnote"
+     * - "profiles[0]" (Index)
+     * - "profiles[name=Grapes]" (Hledání podle vlastnosti - case insensitive)
+     * - "profiles[selected=true]" (Hledání podle booleanu)
      */
     _resolvePath(obj, path) {
-        // Rozdělí cestu podle / . [ ] a odstraní prázdné znaky
-        // "profiles[0]" -> ["profiles", "0"]
-        const keys = path.replace(/\[/g, '.').replace(/\]/g, '').split(/[\/\.]/).filter(k => k);
+        if (!path) return undefined;
+
+        // 1. Normalizace: nahradíme tečky lomítky a rozdělíme
+        const parts = path.replace(/\./g, '/').split('/').filter(Boolean);
         
         let current = obj;
-        for (const key of keys) {
+
+        for (const part of parts) {
             if (current === undefined || current === null) return undefined;
-            current = current[key];
+
+            // Regex pro zachycení 'klic[obsah_zavorky]'
+            // Group 1: Název pole (např. "profiles")
+            // Group 2: Obsah závorky (např. "name=Grapes" nebo "0")
+            const match = part.match(/^([^\[]+)\[(.+)\]$/);
+
+            if (match) {
+                const arrayKey = match[1];
+                const filter = match[2];
+
+                // Pokud cílová vlastnost není pole, končíme
+                if (!Array.isArray(current[arrayKey])) return undefined;
+
+                if (filter.includes('=')) {
+                    // --- LOGIKA VYHLEDÁVÁNÍ [key=value] ---
+                    const [prop, val] = filter.split('=');
+                    
+                    // Najdeme prvek v poli (převedeme na string a lowercase pro univerzálnost)
+                    current = current[arrayKey].find(item => 
+                        item[prop] !== undefined && 
+                        String(item[prop]).toLowerCase() === String(val).toLowerCase()
+                    );
+                } else if (!isNaN(filter)) {
+                    // --- LOGIKA INDEXOVÁNÍ [0] ---
+                    current = current[arrayKey][parseInt(filter)];
+                } else {
+                    // Neznámý formát filtru
+                    return undefined;
+                }
+            } else {
+                // --- KLASICKÝ PŘÍSTUP ---
+                current = current[part];
+            }
         }
         return current;
     }
