@@ -136,7 +136,7 @@ class Api {
 
         } catch (e) {
             console.error(` [API ERROR] call: ${e.message}`.red);
-            console.log(e)
+            if (this.uhg.config.dev_mode) console.log(e);
             return { success: false, reason: e.message };
         }
     }

@@ -340,15 +340,12 @@ class Database {
      */
     async updateUserGexp(uuid, guildName, date, amount, currentRank) {
         if (!this.db) return;
-
-        // 1. Nejdřív zkusíme aktualizovat existující záznam v poli
         const res = await this.db.collection("users").updateOne(
             { _id: uuid, "guilds.name": guildName },
             { 
                 $set: { 
                     "guilds.$[elem].active": true,
                     "guilds.$[elem].rank": currentRank,
-                    "guilds.$[elem].left": null,
                     [`guilds.$[elem].exp.${date}`]: amount
                 } 
             },
@@ -358,7 +355,6 @@ class Database {
             }
         );
 
-        // 2. Pokud se nic nezměnilo (res.matchedCount === 0), guilda v poli chybí -> Přidáme ji
         if (res.matchedCount === 0) {
             await this.db.collection("users").updateOne(
                 { _id: uuid },
@@ -368,7 +364,6 @@ class Database {
                             name: guildName,
                             active: true,
                             joined: Date.now(),
-                            left: null,
                             rank: currentRank,
                             exp: { [date]: amount }
                         }

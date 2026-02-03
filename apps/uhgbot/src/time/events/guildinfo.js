@@ -1,13 +1,13 @@
 /**
  * src/time/events/guildinfo.js
- * Kompletní správa guild, reportů a statistik bez snapshot kolekce.
+ * Kompletní správa guild: Update členů v users, globální statistiky, Discord reporty.
  */
 const ApiFunctions = require('../../api/ApiFunctions');
 const { generateUnelitesEmbed, generateUnverifiedEmbed } = require('../../discord/commandsSlash/guild_check');
 
 module.exports = {
   name: "guildinfo",
-  description: "Update členů v DB, statistiky a reporty",
+  description: "Update členů v DB, globální statistiky a Discord reporty",
   emoji: '📊',
   time: '0 55 * * * *', 
   onstart: true,
@@ -19,13 +19,13 @@ module.exports = {
         uhg_level: "825659339028955196",
         tkjk_level: "928569528676392980",
         diff: "928671490436648980",
-        report: "548772550386253824",
+        report: "548772550386253824", // Původní report kanál
         admin_weekly: "530496801782890527"
     };
 
     const TRACKED = [
-        { name: "UltimateHypixelGuild", uuid: "64680ee95aeb48ce80eb7aa8626016c7"},
-        { name: "TKJK", uuid: "574bfb977d4c475b8197b73b15194a2a"}
+        { name: "UltimateHypixelGuild", uuid: "64680ee95aeb48ce80eb7aa8626016c7", main: true },
+        { name: "TKJK", uuid: "574bfb977d4c475b8197b73b15194a2a", main: false }
     ];
 
     const statsSummary = {};
@@ -33,19 +33,22 @@ module.exports = {
     for (const gInfo of TRACKED) {
         const api = await uhg.api.call(gInfo.uuid, ["guild"]);
         if (!api.success || !api.guild.guild) continue;
+
         const guild = api.guild.all;
-        const hpDate = Object.keys(guild.members[0].expHistory)[0]; 
+        // Získáme nejnovější datum z historie expů (Hypixel den)
+        const hpDate = Object.keys(guild.members[0].expHistory).sort().reverse()[0]; 
         const apiMemberUuids = guild.members.map(m => m.uuid);
 
-        // 1. SCALED XP VÝPOČET (přes guild_stats)
+        // --- 1. VÝPOČET DENNÍHO SCALED GEXP (pro levely) ---
         const d = new Date(hpDate);
         d.setDate(d.getDate() - 1);
         const yestStr = d.toISOString().slice(0, 10);
+        
+        // Najdeme záznam ze včerejška v kolekci guild_stats
         const lastGS = await uhg.db.findOne("guild_stats", { _id: `${guild.name}-${yestStr}` });
         const dailyScaled = lastGS ? (guild.exp - lastGS.totalExp) : 0;
-        //console.log(`[DEBUG GEXP] ${guild.name} | Today: ${hpDate} | Yest: ${yestStr} | LastTotal: ${lastGS?.totalExp} | CurrTotal: ${guild.exp} | Diff: ${dailyScaled}`);
 
-        // 2. UPDATE guild_stats
+        // --- 2. UPDATE KOLEKCE guild_stats (Globální historie) ---
         const gStats = {
             guild: guild.name,
             date: hpDate,
@@ -58,13 +61,38 @@ module.exports = {
         await uhg.db.db.collection("guild_stats").updateOne({ _id: `${guild.name}-${hpDate}` }, { $set: gStats }, { upsert: true });
         statsSummary[guild.name] = gStats;
 
-        // 3. BULK UPDATE ČLENŮ V USERS
+        // --- 3. BULK UPDATE ČLENŮ V USERS (Individuální historie) ---
         const bulkOps = [];
         for (const m of guild.members) {
-            // Sestavíme objekt pro $set tak, aby updatoval jen konkrétní dny v exp
+            // A) VŽDY: Aktualizujeme jméno v rootu. Pokud hráč v DB není, VYTVOŘÍ SE.
+            bulkOps.push({
+                updateOne: {
+                    filter: { _id: m.uuid },
+                    update: { $set: { username: m.name, updated: Date.now() } },
+                    upsert: true // Tady vzniká nový dokument, pokud UUID neexistuje
+                }
+            });
+
+            // B) POKUD CHYBÍ GUILDA: Pokud hráč nemá tuhle guildu v poli, přidáme ji tam (inicializace).
+            bulkOps.push({
+                updateOne: {
+                    filter: { _id: m.uuid, "guilds.name": { $ne: guild.name } },
+                    update: { 
+                        $push: { guilds: {
+                            name: guild.name,
+                            active: true,
+                            joined: m.joined,
+                            rank: m.rank,
+                            exp: m.expHistory // Prvotní nahrání historie (7 dní)
+                        }}
+                    },
+                    upsert: false
+                }
+            });
+
+            // C) POKUD GUILDA EXISTUJE: Aktualizujeme jen konkrétní dny, abychom nesmazali historii.
             const expUpdates = {};
             for (const [date, val] of Object.entries(m.expHistory)) {
-                // Toto vytvoří klíče jako: guilds.$[elem].exp.2024-01-29
                 expUpdates[`guilds.$[elem].exp.${date}`] = val;
             }
 
@@ -76,62 +104,67 @@ module.exports = {
                             ...expUpdates,
                             "guilds.$[elem].active": true,
                             "guilds.$[elem].rank": m.rank,
-                            "guilds.$[elem].joined": m.joined,
-                            "guilds.$[elem].left": null,
-                            "username": m.name, // Updatuje jméno v rootu
-                            "updated": Date.now()
+                            "guilds.$[elem].joined": m.joined
                         }
                     },
                     arrayFilters: [{ "elem.name": guild.name }],
-                    upsert: false // DŮLEŽITÉ: Api update by neměl upsertovat bez vytvoření struktury
+                    upsert: false
                 }
             });
         }
         if (bulkOps.length) await uhg.db.bulkUpdateUsers(bulkOps);
 
-        // 4. DETEKCE ODCHODŮ
+        // --- 4. DETEKCE ODCHODŮ ---
         await uhg.db.db.collection("users").updateMany(
-            { "guilds": { $elemMatch: { name: guild.name, active: true } }, "_id": { $nin: apiMemberUuids } },
-            { $set: { "guilds.$[elem].active": false, "guilds.$[elem].left": Date.now() } },
+            { 
+                "guilds": { $elemMatch: { name: guild.name, active: true } }, 
+                "_id": { $nin: apiMemberUuids } 
+            },
+            { $set: { "guilds.$[elem].active": false } },
             { arrayFilters: [{ "elem.name": guild.name, "elem.active": true }] }
         );
     }
 
     // ============================================================
-    // DISCORD LOGIKA (Kanály a Reporty)
+    // DISCORD LOGIKA
     // ============================================================
-    // A. Update Názvů Kanálů
+    
+    // A. AKTUALIZACE KANÁLŮ (Názvy kanálů se statistikami)
     if (statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
         const u = statsSummary["UltimateHypixelGuild"];
         const t = statsSummary["TKJK"];
         const diff = Math.abs(u.level - t.level);
 
-        const update = async (id, name) => {
+        const updateName = async (id, name) => {
             const c = uhg.dc.client.channels.cache.get(id);
             if (c && c.name !== name) await c.setName(name).catch(()=>{});
         };
-        await update(CHANNELS.members, `Members: ${u.membersCount}/125`);
-        await update(CHANNELS.uhg_level, `UHG Level: ${uhg.f(u.level, 3)}`);
-        await update(CHANNELS.tkjk_level, `TKJK Level: ${uhg.f(t.level, 3)}`);
-        await update(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 4)}`);
+
+        await updateName(CHANNELS.members, `Members: ${u.membersCount}/125`);
+        await updateName(CHANNELS.uhg_level, `UHG Level: ${uhg.f(u.level, 3)}`);
+        await updateName(CHANNELS.tkjk_level, `TKJK Level: ${uhg.f(t.level, 3)}`);
+        await updateName(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 4)}`);
     }
 
-    // B. Daily Report (05:55)
+    // B. DAILY REPORT (04:55 UTC = 05:55/06:55 v ČR)
     if (now.getUTCHours() === 4) {
-        const reportChan = uhg.dc.cache.channels.get('logs')
+        const reportChan = uhg.dc.cache.channels.get('logs'); // Nebo CHANNELS.report
         const hpDate = statsSummary["UltimateHypixelGuild"]?.date;
+
         if (reportChan && hpDate) {
             const reportId = `REPORT-${hpDate}`;
             const alreadySent = await uhg.db.findOne("guild_stats", { _id: reportId });
+
             if (!alreadySent && statsSummary["UltimateHypixelGuild"] && statsSummary["TKJK"]) {
                 const u = statsSummary["UltimateHypixelGuild"];
                 const t = statsSummary["TKJK"];
                 
                 const d = new Date(hpDate); d.setDate(d.getDate() - 1);
                 const yStr = d.toISOString().slice(0, 10);
+                
                 const oldU = await uhg.db.findOne("guild_stats", { _id: `UltimateHypixelGuild-${yStr}` });
                 const oldT = await uhg.db.findOne("guild_stats", { _id: `TKJK-${yStr}` });
-                
+
                 const uGain = oldU ? (u.level - oldU.level) : 0;
                 const tGain = oldT ? (t.level - oldT.level) : 0;
 
@@ -143,46 +176,55 @@ module.exports = {
                     .setTitle(`UHG vs TKJK - Denní Report (${hpDate})`)
                     .setColor(delta >= 0 ? "Green" : "Orange")
                     .addFields(
-                        { name: "UHG", value: `Lvl: **${uhg.f(u.level, 5)}** (+${uhg.f(uGain, 5)})\nXP: +${uhg.f(u.dailyScaledExp)}`, inline: true },
-                        { name: "TKJK", value: `Lvl: **${uhg.f(t.level, 5)}** (+${uhg.f(tGain, 5)})\nXP: +${uhg.f(t.dailyScaledExp)}`, inline: true },
-                        { name: "Trend", value: `Rozdíl: **${uhg.f(gap, 6)}** (${delta >= 0 ? "+" : ""}${uhg.f(delta, 5)})`, inline: false }
-                    );
+                        { 
+                            name: "UltimateHypixelGuild", 
+                            value: `Lvl: **${uhg.f(u.level, 5)}** (+${uhg.f(uGain, 6)})\nXP: +${uhg.f(u.dailyScaledExp, 0)}`, 
+                            inline: true 
+                        },
+                        { 
+                            name: "TKJK", 
+                            value: `Lvl: **${uhg.f(t.level, 5)}** (+${uhg.f(tGain, 6)})\nXP: +${uhg.f(t.dailyScaledExp, 0)}`, 
+                            inline: true 
+                        },
+                        { 
+                            name: "Souboj o levely", 
+                            value: `Rozdíl: **${uhg.f(gap, 6)}** (${delta >= 0 ? "+" : ""}${uhg.f(delta, 6)})`, 
+                            inline: false 
+                        }
+                    )
+                    .setFooter({ text: "Statistiky vygenerovány před denním resetem Hypixelu" })
+                    .setTimestamp();
+
                 await reportChan.send({ embeds: [embed] });
                 await uhg.db.updateOne("guild_stats", { _id: reportId }, { sent: true });
             }
         }
     }
 
-    // C. Weekly Report (Neděle 19:55)
+    // C. WEEKLY REPORT (Neděle 19:55)
     if (now.getDay() === 0 && now.getHours() === 19) {
         const adminChan = uhg.dc.client.channels.cache.get(CHANNELS.admin_weekly);
         if (adminChan) {
-            // 1. Načteme členy (projekcí vytáhneme jen jméno, guildu a potřebný lastLogin ze stats)
+            // Sestavení virtuálního objektu pro kompatibilitu se starými funkcemi
             const membersFromDb = await uhg.db.db.collection("users").find(
                 { "guilds": { $elemMatch: { name: "UltimateHypixelGuild", active: true } } },
-                { projection: { username: 1, guilds: 1, "stats.general.lastLogin": 1 } }
+                { projection: { username: 1, guilds: 1, "stats.general.lastLogin": 1, lastLogin: 1 } }
             ).toArray();
 
-            // 2. Sestavení virtuálního objektu pro generateUnelitesEmbed
-            const virtualGuild = {
-                name: "UltimateHypixelGuild",
-                members: membersFromDb.map(m => {
-                    const g = m.guilds.find(x => x.name === "UltimateHypixelGuild");
-                    return { 
-                        uuid: m._id, 
-                        name: m.username, 
-                        exp: { daily: g.exp }, 
-                        rank: g.rank, 
-                        joined: g.joined,
-                        // DŮLEŽITÉ: Přidáme stats objekt, aby v něm funkce v guild_check.js našla lastLogin
-                        stats: m.stats 
-                    };
-                })
-            };
+            const virtualMembers = membersFromDb.map(m => {
+                const g = m.guilds.find(x => x.name === "UltimateHypixelGuild");
+                return { 
+                    uuid: m._id, 
+                    name: m.username, 
+                    exp: { daily: g.exp }, 
+                    rank: g.rank, 
+                    joined: g.joined,
+                    stats: m.stats || { general: { lastLogin: m.lastLogin || 0 } } 
+                };
+            });
 
-            // 3. Spuštění funkcí z guild_check.js
-            const unelites = await generateUnelitesEmbed(uhg, virtualGuild.members, 30);
-            const unverified = await generateUnverifiedEmbed(uhg, virtualGuild.members);
+            const unelites = await generateUnelitesEmbed(uhg, virtualMembers, 30);
+            const unverified = await generateUnverifiedEmbed(uhg, virtualMembers);
 
             await adminChan.send({ 
                 content: "📅 **Týdenní automatická kontrola UHG**", 
