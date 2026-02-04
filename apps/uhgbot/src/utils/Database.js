@@ -184,50 +184,6 @@ class Database {
     }
 
     /**
-     * Získá statistiky hráče (bez SkyBlock data a dalších zbytečností).
-     * Optimalizováno pomocí Mongo Projection.
-     * * @param {string} id - UUID, Discord ID nebo Username
-     */
-    async getStats(id) {
-        if (!id) return null;
-        const key = String(id).toLowerCase();
-
-        // 1. Kontrola Cache (Pokud máme kompletní data, použijeme je)
-        if (this.cache.users.has(key)) {
-            return this.cache.users.get(key);
-        }
-
-        // 2. Sestavení dotazu (stejné jako u getUser)
-        const query = {
-            $or: [
-                { _id: id },
-                { discordId: id },
-                { username: { $regex: new RegExp(`^${id}$`, 'i') } }
-            ]
-        };
-
-        // 3. Projection: Vybereme jen to, co potřebujeme
-        const projection = {
-            _id: 1,      // UUID (primární klíč)
-            uuid: 1,     // Explicitní UUID pole (pokud existuje)
-            username: 1, // Jméno
-            stats: 1,    // Statistiky z Hypixelu
-        };
-
-        const data = await this.findOne("users", query, projection);
-
-        if (!data) return null;
-
-        // Pokud v DB chybí pole 'uuid' (protože je v _id), doplníme ho pro kompatibilitu
-        if (!data.uuid) data.uuid = data._id;
-
-        // 4. NEUKLÁDÁME do this.cache.users!
-        // Uložení částečných dat by rozbilo logiku metody getUser (která spoléhá na to, že v cache je vše).
-        
-        return data;
-    }
-
-    /**
      * VERIFIKACE: Propojí Discord ID s Minecraft účtem v kolekci 'users'.
      */
     async updateVerify(discordId, data) {
