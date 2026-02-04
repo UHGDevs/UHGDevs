@@ -64,6 +64,7 @@ module.exports = {
                     }
                 } else {
                     results.error++;
+                    results.errorList.push(player.username || player._id);
                     // PROTI ZACYKLENÍ: I u chyby updatneme timestamp, aby hráč neblokoval začátek fronty
                     const errUpdate = { updated: now };
                     if (player.stats) errUpdate["stats.updated"] = now;
@@ -96,6 +97,12 @@ module.exports = {
                     embed.addFields({ name: "Zpracovaní hráči", value: `\`\`\`${listStr}\`\`\`` });
                 }
 
+                if (results.errorList.length > 0) {
+                    let listStr = results.errorList.join(", ");
+                    if (listStr.length > 1000) listStr = listStr.slice(0, 1000) + "...";
+                    embed.addFields({ name: "Error hráči", value: `\`\`\`${listStr}\`\`\`` });
+                }
+
                 // Výpis detekovaných změn jmen
                 if (results.names.length > 0) {
                     embed.addFields({ 
@@ -104,11 +111,8 @@ module.exports = {
                     });
                 }
 
-                // Pokud jsme v catch-up módu (stale=0), přidáme info, kolik jich zbývá
-                if (staleHours === 0) {
-                    const remaining = await uhg.db.db.collection("users").countDocuments({ "stats.updated": { $lt: now - 3600000 } }); // starší než 1h
-                    embed.setFooter({ text: `Zbývá cca ${remaining} hráčů k první aktualizaci.` });
-                }
+                const remaining = await uhg.db.db.collection("users").countDocuments({ "stats.updated": { $lt: staleTimestamp } });
+                embed.setFooter({ text: `Zbývá cca ${remaining} hráčů k aktualizaci.` });
 
                 await logsChannel.send({ embeds: [embed] });
             }

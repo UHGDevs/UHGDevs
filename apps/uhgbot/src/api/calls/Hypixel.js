@@ -12,7 +12,7 @@ module.exports = {
         if (!res.data.success) {
             throw new Error(res.data.cause || "Neznámá chyba Hypixel API");
         }
-        if (res.data.player) {
+        if (!res.data.player) {
             throw new Error("Hráč nebyl nalezen v Hypixel DB");
         }
         const p = res.data.player;
