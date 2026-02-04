@@ -4,7 +4,7 @@
  */
 
 const Parser = require('rss-parser');
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
     name: "forums",
@@ -30,19 +30,37 @@ module.exports = {
             try {
                 const feed = await parser.parseURL(feedInfo.url);
                 
+                // Získání nejvyššího GUID v aktuálním feedu pro detekci bumped starých příspěvků
+                const allGuids = feed.items.map(item => {
+                    const id = item.link.split('.').pop().replace('/', '') || item.guid;
+                    return parseInt(id);
+                }).filter(id => !isNaN(id));
+                const maxGuid = allGuids.length > 0 ? Math.max(...allGuids) : 0;
+
                 for (const item of feed.items) {
                     const pubDate = new Date(item.pubDate || item.isoDate);
                     
                     // 1. OCHRANA PROTI STARÝM PŘÍSPĚVKŮM
                     if (isNaN(pubDate.getTime()) || (Date.now() - pubDate.getTime()) > MAX_AGE) {
+                        // console.log(` [FORUMS] Přeskočeno (příliš staré): ${item.title} (${item.pubDate || item.isoDate})`);
                         continue; 
                     }
 
                     // Získání ID vlákna z linku
-                    const guid = item.link.split('.').pop().replace('/', '') || item.guid;
+                    const guidFromLink = item.link.split('.').pop().replace('/', '');
+                    const guid = isNaN(parseInt(guidFromLink)) ? (item.guid || guidFromLink) : guidFromLink;
+                    const numericGuid = parseInt(guid);
+
+                    // 1.5 OCHRANA PROTI BUMPED STARÝM PŘÍSPĚVKŮM (pokud je ID o víc než 10 000 nižší než nejnovější v RSS)
+                    // Hypixel někdy aktualizuje pubDate u starých článků, ale ID vlákna (GUID) zůstává staré.
+                    if (!isNaN(numericGuid) && maxGuid > 0 && (maxGuid - numericGuid) > 10000) {
+                        // console.log(` [FORUMS] Přeskočen starý bumped příspěvek: ${item.title} (ID: ${guid})`);
+                        continue;
+                    }
 
                     // 2. KONTROLA V DB (používáme novou kolekci v DB 'data')
-                    const exists = await uhg.db.findOne("forums", { _id: guid });
+                    // Hledáme podle stringu guid i podle číselného ID (pro kompatibilitu se starou DB)
+                    const exists = await uhg.db.findOne("forums", { $or: [{ _id: guid }, { _id: numericGuid }] });
                     if (exists) continue;
 
                     // 3. ULOŽENÍ NOVÉHO ČLÁNKU
@@ -148,37 +166,47 @@ module.exports = {
         const guid = interaction.customId.split('_')[2];
         const data = await uhg.db.findOne("forums", { _id: guid });
 
-        if (!data || data.announced) return interaction.reply({ content: "Příspěvek neexistuje nebo již byl publikován.", ephemeral: true });
+        if (!data || data.announced) return interaction.reply({ content: "Příspěvek neexistuje nebo již byl publikován.", flags: [MessageFlags.Ephemeral] });
 
-        // Kanál pro novinky (#news / #oznameni)
-        const channel = uhg.dc.client.channels.cache.get('468084524023021568');
-        if (!channel) return interaction.reply({ content: "Cílový kanál nebyl nalezen.", ephemeral: true });
+        // Deferujeme hned, abychom předešli timeoutu (3s)
+        await interaction.deferUpdate();
 
-        // Vytáhneme pings z dříve připraveného embedu
-        const pings = interaction.message.embeds[0].fields[0].value;
-        const cleanPings = pings === '*Žádné (pouze odkaz)*' ? '' : pings;
+        try {
+            // Kanál pro novinky (#news / #oznameni)
+            const channel = uhg.dc.client.channels.cache.get('468084524023021568');
+            if (!channel) return interaction.followUp({ content: "Cílový kanál nebyl nalezen.", flags: [MessageFlags.Ephemeral] });
 
-        const newsEmbed = new uhg.dc.Embed()
-            .setTitle(data.title)
-            .setURL(data.link)
-            .setColor(data.type === 'SkyBlock' ? 0x00AA00 : 0xFFAA00)
-            .setDescription(`Na Hypixelu vyšel nový článek v kategorii **${data.type}**!\n\n🔗 **[Zobrazit příspěvek na fóru](${data.link})**`)
-            .setFooter({ text: `Autor: ${data.author}` })
-            .setTimestamp(data.timestamp);
+            // Vytáhneme pings z dříve připraveného embedu
+            const oldEmbed = interaction.message.embeds[0];
+            const pings = (oldEmbed && oldEmbed.fields && oldEmbed.fields[0]) ? oldEmbed.fields[0].value : '';
+            const cleanPings = pings === '*Žádné (pouze odkaz)*' ? '' : pings;
 
-        await channel.send({ 
-            content: cleanPings, 
-            embeds: [newsEmbed],
-            allowedMentions: { parse: ['roles'] }
-        });
+            const newsEmbed = new uhg.dc.Embed()
+                .setTitle(data.title)
+                .setURL(data.link)
+                .setColor(data.type === 'SkyBlock' ? 0x00AA00 : 0xFFAA00)
+                .setDescription(`Na Hypixelu vyšel nový článek v kategorii **${data.type}**!\n\n🔗 **[Zobrazit příspěvek na fóru](${data.link})**`)
+                .setFooter({ text: `Autor: ${data.author}` })
+                .setTimestamp(data.timestamp);
 
-        // Označíme v DB jako vyřízené
-        await uhg.db.updateOne("forums", { _id: guid }, { announced: true });
+            await channel.send({ 
+                content: cleanPings, 
+                embeds: [newsEmbed],
+                allowedMentions: { parse: ['roles'] }
+            });
 
-        await interaction.update({ 
-            content: `✅ Publikováno v <#${channel.id}> uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
-            components: [] 
-        });
+            // Označíme v DB jako vyřízené
+            await uhg.db.updateOne("forums", { _id: guid }, { announced: true });
+
+            await interaction.editReply({ 
+                content: `✅ Publikováno v <#${channel.id}> uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
+                embeds: interaction.message.embeds, 
+                components: [] 
+            });
+        } catch (err) {
+            console.error(" [FORUMS] Chyba při publikování:", err);
+            await interaction.followUp({ content: `Došlo k chybě při publikování: ${err.message}`, flags: [MessageFlags.Ephemeral] });
+        }
     },
 
     /**
@@ -187,12 +215,20 @@ module.exports = {
     ignoruj: async (uhg, interaction) => {
         const guid = interaction.customId.split('_')[2];
         
-        // DŮLEŽITÉ: I ignorovaný musíme označit jako announced: true, aby se nevracel v dalším cyklu!
-        await uhg.db.updateOne("forums", { _id: guid }, { announced: true });
+        await interaction.deferUpdate();
 
-        await interaction.update({ 
-            content: `❌ Ignorováno uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
-            components: [] 
-        });
+        try {
+            // DŮLEŽITÉ: I ignorovaný musíme označit jako announced: true, aby se nevracel v dalším cyklu!
+            await uhg.db.updateOne("forums", { _id: guid }, { announced: true });
+
+            await interaction.editReply({ 
+                content: `❌ Ignorováno uživatelem **${uhg.dontFormat(interaction.user.username)}**`, 
+                embeds: interaction.message.embeds,
+                components: [] 
+            });
+        } catch (err) {
+            console.error(" [FORUMS] Chyba při ignorování:", err);
+            await interaction.followUp({ content: `Došlo k chybě: ${err.message}`, flags: [MessageFlags.Ephemeral] });
+        }
     }
 };
