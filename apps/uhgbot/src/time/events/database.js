@@ -46,7 +46,8 @@ module.exports = {
                 success: 0, 
                 error: 0, 
                 names: [], // Pro změny jmen
-                updatedList: [] // Pro seznam zpracovaných
+                updatedList: [], // Pro seznam zpracovaných
+                errorList: []
             };
 
             for (let player of queue) {
