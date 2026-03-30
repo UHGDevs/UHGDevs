@@ -232,7 +232,7 @@ async function checkCakesOnJoin(uhg, username) {
     
     if (!profile) return;
 
-    const cakesData = profile.member.cakes || [];
+    const cakesData = profile.member?.cakes || [];
     const analysis = uhg.func.analyzeCakes(cakesData);
 
     const realExpiry = analysis.nextExpiry || 0;
