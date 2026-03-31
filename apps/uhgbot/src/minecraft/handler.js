@@ -147,7 +147,7 @@ module.exports = async (uhg, raw, motd) => {
                 
                 // Zpracování dat (pokud API selže, dáme defaulty)
                 const level = api.success && api.hypixel ? Math.floor(api.hypixel.level) : 0;
-                const discordTag = api.success && api.hypixel ? api.hypixel.links.DISCORD : "Nenačteno";
+                const discordTag = api.success && api.hypixel ? api.hypixel?.links?.DISCORD : "Nenačteno";
                 const prefix = api.success && api.hypixel ? api.hypixel.prefix : null;
 
                 // Pošleme i rank jako argument
