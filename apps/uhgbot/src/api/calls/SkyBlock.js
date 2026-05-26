@@ -31,7 +31,6 @@ module.exports = {
                     museumData = museumRes.data.members[uuid];
                 }
               } catch (e) {}
-
             const calculator = new ProfileNetworthCalculator(
               p.members[uuid],          // 1. Raw data hráče
               museumData,               // 2. Museum data
@@ -42,7 +41,6 @@ module.exports = {
               onlyNetworth: false,
               returnItemData: false 
             });
-
             profile.bank.networth = nwData.networth;
             profile.networth = nwData;
             
@@ -84,7 +82,6 @@ module.exports = {
             // 3. Priorita: Datum připojení (First Join) - od nejnovějšího
             return b.first_join - a.first_join;
         });
-
         return { profiles };
     }
 };

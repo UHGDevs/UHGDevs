@@ -146,7 +146,7 @@ module.exports = async (uhg, raw, motd) => {
                 const api = await uhg.api.call(user, ["hypixel"]);
                 
                 // Zpracování dat (pokud API selže, dáme defaulty)
-                const level = api.success && api.hypixel ? Math.floor(api.hypixel.level) : 0;
+                const level = api.success ? Math.floor(api?.hypixel?.stats?.general?.level || 0) : 0;
                 const discordTag = api.success && api.hypixel ? api.hypixel?.links?.DISCORD : "Nenačteno";
                 const prefix = api.success && api.hypixel ? api.hypixel.prefix : null;
 
@@ -232,7 +232,8 @@ async function checkCakesOnJoin(uhg, username) {
     
     if (!profile) return;
 
-    const cakesData = profile.member?.cakes || [];
+    const cakesData = profile.cakes || [];
+    // console.log(`[CAKES DEBUG] Počet cakes pro ${username}: ${cakesData.length}`);
     const analysis = uhg.func.analyzeCakes(cakesData);
 
     const realExpiry = analysis.nextExpiry || 0;
