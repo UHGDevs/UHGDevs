@@ -79,6 +79,7 @@ module.exports = {
                 "garden.composter_alert": true,
                 "garden.emptyAt": calc.emptyAt,
                 "garden.alert_sent": false,
+                "garden.last_refresh": Date.now(),
                 "garden.profile_id": profile.id,
                 "garden.profileName": profile.name
             });

@@ -11,11 +11,13 @@ module.exports = {
     run: async (uhg) => {
         const now = Date.now();
 
-        // 1. Najdeme v DB kandidáty, kterým už MĚL čas vypršet
+        // 1. Najdeme v DB kandidáty, kterým už MĚL čas vypršet NEBO potřebují refresh dat (každé 2h)
         const candidates = await uhg.db.find("users", {
             "garden.composter_alert": true,
-            "garden.alert_sent": false,
-            "garden.emptyAt": { $lt: now }
+            $or: [
+                { "garden.alert_sent": false, "garden.emptyAt": { $lt: now } },
+                { "garden.alert_sent": true, $or: [ { "garden.last_refresh": { $lt: now - 7200000 } }, { "garden.last_refresh": { $exists: false } } ] }
+            ]
         });
         if (!candidates.length) return;
         
@@ -23,15 +25,28 @@ module.exports = {
         for (const user of candidates) {
             try {
                 // 2. RE-VALIDACE: Zavoláme API pro čerstvá data
-                // Použijeme waitSave: true, aby se nový stav rovnou propsal do users kolekce
                 const api = await uhg.api.call(user._id, ["skyblock"], {garden: true, profileName: user.garden?.profileName, cachePath: `skyblock/profiles[${user.garden?.profileName ? `name=${user.garden.profileName}` : 'selected=true'}]/garden/composter`, all: false});
-                if (!api.success || !api.skyblock?.profiles[0]?.garden?.composter) continue; // Pokud API selže, zkusíme to v dalším běhu (za 10 min)
+                if (!api.success || !api.skyblock?.profiles[0]?.garden?.composter) continue;
 
                 // 3. PŘEPOČET: Zjistíme skutečný aktuální stav
                 const freshCalc = api.skyblock?.profiles[0]?.garden.composter
 
                 // 4. ROZHODNUTÍ
-                if (freshCalc.active && freshCalc.emptyAt > now + 60000) continue;
+                // Pokud je kompostér aktivní a má čas (došlo k refresh), resetujeme alert
+                if (freshCalc.active && freshCalc.emptyAt > now + 60000) {
+                    await uhg.db.updateOne("users", { _id: user._id }, { 
+                        "garden.alert_sent": false, 
+                        "garden.emptyAt": freshCalc.emptyAt,
+                        "garden.last_refresh": now
+                    });
+                    continue;
+                }
+
+                // Pokud už byl alert poslán, jen aktualizujeme čas refreshu a končíme
+                if (user.garden?.alert_sent) {
+                    await uhg.db.updateOne("users", { _id: user._id }, { "garden.last_refresh": now });
+                    continue;
+                }
 
                 // Pokud je stále prázdný (nebo dojde do 1 minuty), pošleme DM
                 const dcUser = await uhg.dc.client.users.fetch(user.discordId).catch(() => null);
@@ -51,8 +66,8 @@ module.exports = {
                     });
                 }
 
-                // Označíme jako odeslané (případně se resetuje při dalším /composter notify:true)
-                await uhg.db.updateOne("users", { _id: user._id }, { "garden.alert_sent": true });
+                // Označíme jako odeslané a uložíme čas refreshu
+                await uhg.db.updateOne("users", { _id: user._id }, { "garden.alert_sent": true, "garden.last_refresh": now });
                 
             } catch (e) {
                 console.error(` [COMPOSTER ERROR] ${user.username}: ${e.message}`);

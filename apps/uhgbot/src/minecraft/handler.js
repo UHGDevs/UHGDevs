@@ -208,6 +208,7 @@ async function checkCakesOnJoin(uhg, username) {
     if (!verify) return;
 
     const user = await uhg.db.getUser(verify.uuid);
+
     if (!user || !user.cakes || !user.cakes.tracking) return;
 
     // 2. Pokud už jsme varování poslali (třeba před 5 minutami v jiném lobby), neposíláme znovu
@@ -266,7 +267,7 @@ async function checkCakesOnJoin(uhg, username) {
         console.log(` [CAKES] Odeslána zpráva pro ${username}:\n${msg}`.green);
         
         // PŘIDÁNO: Zabráníme dalšímu spamu
-        updateData["cakes.alert_sent"] = true;
+        //updateData["cakes.alert_sent"] = true;
     } else {
         // Pokud si hráč dorty doplnil, resetujeme alert
         updateData["cakes.alert_sent"] = false;

@@ -19,15 +19,13 @@ module.exports = async (uhg, pmsg) => {
 
     if (cmd.sb) {
         pmsg.profilName = uhg.getSbProfile(pmsg.args)
-        if (uhg.getSbProfile(args[0]));
-        else pmsg.username = args[0] || pmsg.username
-    } else pmsg.username = args[0] || pmsg.username; 
-
+        if (uhg.getSbProfile(args[1]) || args[1]?.length < 4);
+        else pmsg.username = args[1] || pmsg.username
+    } else pmsg.username = args[1] || pmsg.username;
     try {
         const response = await cmd.run(uhg, pmsg);
         if (!response) return;
         const dcRes = response.dc || response.mc || (typeof response === 'string' ? response : null);
-        
         if (dcRes) {
             // A) Pokud příkaz přišel přímo z Discordu -> Reply
             if (pmsg.channel === 'Discord') {
@@ -58,7 +56,6 @@ module.exports = async (uhg, pmsg) => {
         // --- 2. MINECRAFT ODPOVĚĎ (Text) ---
         // Vybereme textovou verzi: mc > string
         const mcRes = response.mc || (typeof response === 'string' ? response : null);
-        
         if (mcRes) {
 
             if (!uhg.mc.ready) {
@@ -83,7 +80,6 @@ module.exports = async (uhg, pmsg) => {
                 if (pmsg.message.channel.id === uhg.config.channels.officer) target = '/go ';
                 else if (pmsg.message.channel.id === uhg.config.channels.guild) target = '/gc ';
             }
-
             if (target) uhg.minecraft.send(target + mcRes);
         }
 
