@@ -18,10 +18,30 @@ module.exports = async (uhg, pmsg) => {
     pmsg.verify_data = await uhg.db.getVerify(pmsg.by);
 
     if (cmd.sb) {
-        pmsg.profilName = uhg.getSbProfile(pmsg.args)
-        if (uhg.getSbProfile(args[1]) || args[1]?.length < 4);
-        else pmsg.username = args[1] || pmsg.username
-    } else pmsg.username = args[1] || pmsg.username;
+        pmsg.profilName = uhg.getSbProfile(args);
+        let profileInArgs = !!pmsg.profilName;
+
+        // Pokud první argument není profil a existuje, bereme ho jako jméno hráče
+        if (args[0] && args[0].toLowerCase() !== pmsg.profilName?.toLowerCase()) {
+            pmsg.username = args[0];
+        } 
+        // Pokud je v args[0] profil, ale existuje i args[1], bereme args[1] jako jméno
+        else if (profileInArgs && args[1]) {
+            pmsg.username = args[1];
+        }
+    } else {
+        // U ne-SkyBlock příkazů (jako !cakes)
+        const subCommands = ["on", "off"];
+        
+        // Zkusíme najít jméno v prvních dvou argumentech
+        // Příklad: !cakes DavidCzPdy on -> args[0] je jméno
+        // Příklad: !cakes on DavidCzPdy -> args[1] je jméno
+        if (args[0] && !subCommands.includes(args[0].toLowerCase())) {
+            pmsg.username = args[0];
+        } else if (args[0] && subCommands.includes(args[0].toLowerCase()) && args[1]) {
+            pmsg.username = args[1];
+        }
+    }
     try {
         const response = await cmd.run(uhg, pmsg);
         if (!response) return;
@@ -74,7 +94,7 @@ module.exports = async (uhg, pmsg) => {
             } else if (pmsg.channel?.toLowerCase() === 'guild') {
                 target = '/gc '
             } else if (pmsg.channel === 'DM') {
-                target = `/msg ${pmsg.username} `;
+                target = `/msg ${pmsg.by} `;
             } else if (pmsg.channel === 'Discord' && pmsg.message) {
                 // Pokud píšeme z Discordu, určíme chat podle ID kanálu
                 if (pmsg.message.channel.id === uhg.config.channels.officer) target = '/go ';

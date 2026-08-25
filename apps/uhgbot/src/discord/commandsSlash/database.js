@@ -11,8 +11,10 @@ module.exports = {
     name: "database",
     description: "Správa hráče v databázi (Stats, Verifikace, Role)",
     permissions: [
-        { type: 'USER', id: '378928808989949964' }, // Ty (David)
-        { type: 'USER', id: '312861502073995265' }  // Farmans
+        { type: 'USER', id: '378928808989949964' }, // David
+        { type: 'ROLE', id: '475585340762226698' },  // GENERAL
+        { type: 'ROLE', id: '537252847025127424' }, // MANAGER
+        { type: 'ROLE', id: '530504567528620063' } // uni
     ],
     options: [
         {
@@ -24,7 +26,9 @@ module.exports = {
     ],
 
     run: async (uhg, interaction) => {
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        if (interaction.user.id === "378928808989949964") await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        else await interaction.deferReply({ flags: [] });
+
         const playerArg = interaction.options.getString('player');
         await module.exports.render(uhg, interaction, playerArg);
     },
@@ -179,12 +183,15 @@ module.exports = {
 
         const mojang = await uhg.api.getMojang(uuid);
         if (mojang.success) {
-            // Zde byla chyba - voláme uhg.db.updateVerify
             await uhg.db.updateVerify(discordId, { uuid: mojang.uuid, username: mojang.username });
             
             // Refresh rolí
-            const newUser = await uhg.db.getUser(mojang.uuid);
-            await uhg.roles.updateMember(interaction.guild.members.cache.get(discordId), newUser);
+            const member = interaction.guild.members.cache.get(discordId);
+            if (member) {
+                const userData = await uhg.db.getUser(mojang.uuid);
+                const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
+                await uhg.roles.updateMember(member, userData, activeMembers);
+            }
         }
 
         return module.exports.render(uhg, interaction, uuid);

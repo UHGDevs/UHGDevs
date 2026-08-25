@@ -38,7 +38,7 @@ module.exports = {
 
         // 2. CUSTOM VERIFY (Admin force)
         if (targetUser && nickname) {
-             if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }], interaction)) {
+             if (!uhg.handlePerms([{ type: 'USER', id: '378928808989949964' }, { type: 'USER', id: '427198829935460353' }], interaction)) {
                 return interaction.reply({ content: 'Nemáš práva na custom verify.', flags: [MessageFlags.Ephemeral] });
             }
             await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
@@ -62,25 +62,9 @@ module.exports = {
     },
 
     modalSubmit: async (uhg, interaction) => {
-        await interaction.deferUpdate();
-        const uuid = interaction.customId.split('_')[2];
-        const discordId = interaction.fields.getTextInputValue('discordId');
-
-        const mojang = await uhg.api.getMojang(uuid);
-        if (mojang.success) {
-            // Update verify v DB
-            await uhg.db.updateVerify(discordId, { uuid: mojang.uuid, username: mojang.username });
-            
-            // OKAMŽITÝ UPDATE ROLÍ
-            const member = interaction.guild.members.cache.get(discordId);
-            if (member) {
-                const userData = await uhg.db.getUser(mojang.uuid);
-                const activeMembers = await uhg.db.getOnlineMembers("UltimateHypixelGuild");
-                await uhg.roles.updateMember(member, userData, activeMembers);
-            }
-        }
-
-        return module.exports.render(uhg, interaction, uuid);
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        const nickname = interaction.fields.getTextInputValue('nickname');
+        return await verifyProcess(uhg, interaction, nickname, interaction.user, false);
     }
 };
 

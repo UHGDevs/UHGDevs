@@ -152,8 +152,8 @@ module.exports = {
         await updateName(CHANNELS.diff, `Rozdíl: ${uhg.f(diff, 4)}`);
     }
 
-    // B. DAILY REPORT (04:55 UTC = 05:55/06:55 v ČR)
-    if (now.getUTCHours() === 4) {
+    // B. DAILY REPORT (03:55 UTC = 04:55/05:55 v ČR)
+    if (now.getUTCHours() === 3) {
         const reportChan = uhg.dc.cache.channels.get('logs'); // Nebo CHANNELS.report
         const hpDate = statsSummary["UltimateHypixelGuild"]?.date;
 

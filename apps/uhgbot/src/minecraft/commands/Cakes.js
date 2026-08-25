@@ -6,19 +6,25 @@ module.exports = {
     run: async (uhg, pmsg) => {
         try {
             const args = pmsg.args.split(" ");
-            const subCommand = args[0] ? args[0].toLowerCase() : "";
+            const subCommands = ["on", "off"];
+            let subCommand = "";
+            if (subCommands.includes(args[0]?.toLowerCase())) subCommand = args[0].toLowerCase();
+            else if (subCommands.includes(args[1]?.toLowerCase())) subCommand = args[1].toLowerCase();
             
-            const verify = await uhg.db.getVerify(pmsg?.verify_data?._id);
-            if (!verify) return "Nejsi verifikovaný.";
+            const verify = await uhg.db.getVerify(pmsg.username);
+            if (!verify) return `Hráč **${pmsg.username}** není verifikovaný.`;
             
+            const isAdmin = pmsg.by.toLowerCase() === "davidczpdy";
+
             // --- VYPNUTÍ ---
             if (subCommand === "off") {
+                if (pmsg.username !== pmsg.by && !isAdmin) return "Sledování můžeš vypnout jen sám sobě.";
                 await uhg.db.db.collection("users").updateOne(
                     { _id: verify.uuid },
                     { $unset: { cakes: "" } }
                 );
                 uhg.db.cache.users.del(verify.uuid);
-                return "Sledování New Year Cakes bylo vypnuto.";
+                return `Sledování New Year Cakes pro **${pmsg.username}** bylo vypnuto.`;
             }
 
             // --- ZÍSKÁNÍ DAT ---
@@ -44,21 +50,27 @@ module.exports = {
             const analysis = ApiFunctions.analyzeCakes(cakesData);
 
             // --- ULOŽENÍ DO DB (Update expirace) ---
-            // Ukládáme to vždy při zavolání příkazu, aby byla DB aktuální
-            const updateData = {
-                "cakes.tracking": true,
-                "cakes.profile_id": profile.id,
-                "cakes.profile_name": profile.name,
-                "cakes.nextExpiry": analysis.nextExpiry || 0, // Čas expirace nebo 0
-                "cakes.hasInactive": analysis.inactiveCount > 0,
-                "cakes.alert_sent": false
-            };
+            // Ukládáme to vždy při zavolání příkazu, pokud uživatel už má tracking zapnutý, 
+            // nebo pokud ho právě zapíná pomocí "on"
+            const userInDb = await uhg.db.getUser(verify.uuid);
+            const isTracking = userInDb?.cakes?.tracking || subCommand === "on";
 
-            await uhg.db.updateOne("users", { _id: verify.uuid }, updateData);
+            if (isTracking) {
+                const updateData = {
+                    "cakes.tracking": true,
+                    "cakes.profile_id": profile.id,
+                    "cakes.profile_name": profile.name,
+                    "cakes.nextExpiry": analysis.nextExpiry || 0,
+                    "cakes.hasInactive": analysis.inactiveCount > 0,
+                    "cakes.alert_sent": false
+                };
+                await uhg.db.updateOne("users", { _id: verify.uuid }, updateData);
+            }
             
             // --- VÝPIS ---
             if (subCommand === "on") {
-                return `Sledování zapnuto (Profil: ${profile.name}). Upozorním tě po připojení, pokud budou docházet.`;
+                if (pmsg.username !== pmsg.by && !isAdmin) return "Sledování můžeš zapnout jen sám sobě.";
+                return `Sledování pro **${pmsg.username}** zapnuto (Profil: ${profile.name}). Upozorním ho po připojení, pokud budou docházet.`;
             }
 
             let msg = `Cakes (${profile.name}): ${analysis.activeCount}/${analysis.total} Aktivní. `;

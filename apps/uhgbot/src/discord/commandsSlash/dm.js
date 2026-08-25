@@ -9,7 +9,10 @@ module.exports = {
     description: 'Pošle hromadnou DM zprávu všem členům s určitou rolí',
     permissions: [
         { type: 'USER', id: '378928808989949964' }, // DavidCzPdy
-        { type: 'USER', id: '312861502073995265' }  // Farmans
+        { type: 'USER', id: '312861502073995265' },  // Farmans
+        { type: 'ROLE', id: '530504567528620063' }, // GMASTER
+        { type: 'ROLE', id: '475585340762226698' }, // GGENERAL
+        { type: 'ROLE', id: '537252847025127424' } // GMANAGER
     ],
     options: [
         {
